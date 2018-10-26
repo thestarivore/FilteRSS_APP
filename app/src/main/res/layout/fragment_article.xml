@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    android:orientation="horizontal">
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="5dp"
+        android:layout_height="match_parent"
+        android:background="@color/colorAccent" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/textViewTitle"
+                style="@style/material_type_scale_h6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:singleLine="false"
+                android:text="Article Title Article Title Article Title Article Title" />
+
+            <TextView
+                android:id="@+id/textViewExcerpt"
+                style="@style/material_type_scale_body2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:singleLine="false"
+                android:text="Article Excerpt Article Excerpt Article Excerpt Article Excerpt Article Excerpt Article Excerpt Article Excerpt Article Excerpt" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textViewSub"
+            style="@style/material_type_scale_overline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="bottom|left"
+            android:text="Sub"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:singleLine="true"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageViewImage"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="end"
+        android:background="@drawable/mockimg"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/mockimg" />
+        <!--android:src="@drawable/gradient"-->
+
+</LinearLayout>

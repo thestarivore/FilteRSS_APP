@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ArticleActivity">
+
+    <item
+        android:id="@+id/save"
+        android:icon="@drawable/ic_local_offer_24dp"
+        android:title="Save"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/share"
+        android:icon="@drawable/ic_share_24dp"
+        android:title="Share"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/about"
+        android:icon="@android:drawable/ic_dialog_info"
+        android:title="Other"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/exit"
+        android:title="Other"
+        app:showAsAction="never"/>
+</menu>
