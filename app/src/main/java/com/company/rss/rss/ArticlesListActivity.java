@@ -42,7 +42,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticleFr
         mPager = (ViewPager) findViewById(R.id.pagerArticles);
         mPagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
         mPager.setAdapter(mPagerAdapter);
-        mPager.setCurrentItem(mPagerAdapter.getCount() / 2, false); // set current item in the adapter to middle
+        // Set current item to middle
+        mPager.setCurrentItem(mPagerAdapter.getCount() / 2, false);
         mPager.setClipToPadding(false);
         mPager.setPadding(60,0,60,0);
         mPager.setPageMargin(0);
@@ -64,7 +65,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticleFr
                     collapsingToolbarLayout.setTitle("Title");
                     isShow = true;
                 } else if(isShow) {
-                    collapsingToolbarLayout.setTitle(" ");//carefull there should a space between double quote otherwise it wont work
+                    collapsingToolbarLayout.setTitle(" ");
                     isShow = false;
                 }
             }
