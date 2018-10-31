@@ -2,10 +2,13 @@ package com.company.rss.rss;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 
@@ -25,7 +28,10 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticleFr
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_articles_list);
-        setTitle("All news");
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarArtlclesList);
+        setSupportActionBar(toolbar);
+
 
         // Create mock articles for top articles
         ArrayList<ArticleContent.Article> topArticles = new ArrayList<ArticleContent.Article>();
@@ -40,6 +46,29 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticleFr
         mPager.setClipToPadding(false);
         mPager.setPadding(60,0,60,0);
         mPager.setPageMargin(0);
+
+
+        // Show CollapsingToolbarLayout Title only when collapsed
+        final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayoutArticlesList);
+        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.AppBarLayoutArticlesList);
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            boolean isShow = true;
+            int scrollRange = -1;
+
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange();
+                }
+                if (scrollRange + verticalOffset == 0) {
+                    collapsingToolbarLayout.setTitle("Title");
+                    isShow = true;
+                } else if(isShow) {
+                    collapsingToolbarLayout.setTitle(" ");//carefull there should a space between double quote otherwise it wont work
+                    isShow = false;
+                }
+            }
+        });
     }
 
     @Override
