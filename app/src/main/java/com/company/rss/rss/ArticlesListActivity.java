@@ -1,6 +1,9 @@
 package com.company.rss.rss;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,17 +11,35 @@ import android.view.Menu;
 
 import com.company.rss.rss.models.ArticleContent;
 
-public class ArticlesListActivity extends AppCompatActivity implements ArticleFragment.OnListFragmentInteractionListener{
+import java.util.ArrayList;
+
+public class ArticlesListActivity extends AppCompatActivity implements ArticleFragment.OnListFragmentInteractionListener, ArticleSlideFragment.OnFragmentInteractionListener{
 
     // TODO: refactor this
     public static final String EXTRA_ARTICLE = "com.rss.rss.ARTICLE";
+
+    private ViewPager mPager;
+    private PagerAdapter mPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_articles_list);
-
         setTitle("All news");
+
+        // Create mock articles for top articles
+        ArrayList<ArticleContent.Article> topArticles = new ArrayList<ArticleContent.Article>();
+        for(int i=0; i<6; i++){
+            topArticles.add(ArticleContent.createMockArticle(i));
+        }
+
+        mPager = (ViewPager) findViewById(R.id.pagerArticles);
+        mPagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
+        mPager.setAdapter(mPagerAdapter);
+        mPager.setCurrentItem(mPagerAdapter.getCount() / 2, false); // set current item in the adapter to middle
+        mPager.setClipToPadding(false);
+        mPager.setPadding(60,0,60,0);
+        mPager.setPageMargin(0);
     }
 
     @Override
@@ -40,4 +61,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticleFr
     }
 
 
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
+    }
 }

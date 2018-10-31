@@ -10,21 +10,16 @@ import android.widget.TextView;
 
 import com.company.rss.rss.ArticleFragment.OnListFragmentInteractionListener;
 import com.company.rss.rss.models.ArticleContent;
-import com.company.rss.rss.models.ArticleContent.DummyItem;
 
 import java.util.List;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
-public class MyArticleRecyclerViewAdapter extends RecyclerView.Adapter<MyArticleRecyclerViewAdapter.ViewHolder> {
+
+public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecyclerViewAdapter.ViewHolder> {
 
     private final List<ArticleContent.Article> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyArticleRecyclerViewAdapter(List<ArticleContent.Article> articles, OnListFragmentInteractionListener listener) {
+    public ArticleRecyclerViewAdapter(List<ArticleContent.Article> articles, OnListFragmentInteractionListener listener) {
         mValues = articles;
         mListener = listener;
     }
@@ -42,7 +37,7 @@ public class MyArticleRecyclerViewAdapter extends RecyclerView.Adapter<MyArticle
         holder.mTitleView.setText(mValues.get(position).title);
 
         holder.mExcerptView.setText(mValues.get(position).excerpt);
-        holder.mSubView.setText(mValues.get(position).sub);
+        holder.mSubView.setText(mValues.get(position).source);
         holder.mImageView.setClipToOutline(true);
 
         holder.mTitleView.post(new Runnable() {

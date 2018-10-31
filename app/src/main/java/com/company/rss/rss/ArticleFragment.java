@@ -64,7 +64,7 @@ public class ArticleFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyArticleRecyclerViewAdapter(ArticleContent.ARTICLES, mListener));
+            recyclerView.setAdapter(new ArticleRecyclerViewAdapter(ArticleContent.ARTICLES, mListener));
         }
         return view;
     }

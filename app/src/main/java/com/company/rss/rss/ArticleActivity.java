@@ -35,7 +35,7 @@ public class ArticleActivity extends AppCompatActivity {
         ArticleContent.Article article = (ArticleContent.Article) intent.getSerializableExtra(ArticlesListActivity.EXTRA_ARTICLE);
 
         int articleImage = R.drawable.mockimg;
-        String articleSubtitle = article.getSub();
+        String articleSubtitle = article.getSource();
         String articleTitle = article.getTitle();
         String articleBody = article.getBody();
         int readingTime = article.getReadingTime();

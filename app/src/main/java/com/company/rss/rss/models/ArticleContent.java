@@ -5,6 +5,7 @@ import com.thedeanda.lorem.LoremIpsum;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,20 +19,8 @@ import java.util.StringTokenizer;
  */
 public class ArticleContent {
 
-
-    /**
-     * An array of sample (dummy) items.
-     */
-    public static final List<DummyItem> ITEMS = new ArrayList<DummyItem>();
     public static final List<Article> ARTICLES = new ArrayList<Article>();
-
-
-    /**
-     * A map of sample (dummy) items, by ID.
-     */
-    public static final Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
     public static final Map<String, Article> ARTICLES_MAP = new HashMap<String, Article>();
-
 
     private static final int COUNT = 25;
 
@@ -47,18 +36,13 @@ public class ArticleContent {
         ARTICLES_MAP.put(article.id, article);
     }
 
-    private static void addItem(DummyItem item) {
-        ITEMS.add(item);
-        ITEM_MAP.put(item.id, item);
+    public static Article createMockArticle(int i) {
+        return new Article(String.valueOf(i), makeTitle(), makeBody(), makeSource(), new Date());
     }
 
-    private static Article createMockArticle(int i) {
-        return new Article(String.valueOf(i), makeTitle(), makeBody(), makeSub());
-    }
-
-    private static String makeSub() {
+    private static String makeSource() {
         Lorem lorem = LoremIpsum.getInstance();
-        return lorem.getCountry() + " / " + lorem.getCity() + " / " + lorem.getName();
+        return lorem.getName();
     }
 
     private static String makeBody() {
@@ -71,56 +55,21 @@ public class ArticleContent {
         return lorem.getTitle(1, 18);
     }
 
-
-    private static DummyItem createDummyItem(int position) {
-        return new DummyItem(String.valueOf(position), "Item " + position, makeDetails(position));
-    }
-
-    private static String makeDetails(int position) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Details about Item: ").append(position);
-        for (int i = 0; i < position; i++) {
-            builder.append("\nMore details information here.");
-        }
-        return builder.toString();
-    }
-
-    /**
-     * A dummy item representing a piece of content.
-     */
-    public static class DummyItem {
-        public final String id;
-        public final String content;
-        public final String details;
-
-        public DummyItem(String id, String content, String details) {
-            this.id = id;
-            this.content = content;
-            this.details = details;
-        }
-
-        @Override
-        public String toString() {
-            return content;
-        }
-    }
-
-    /**
-     * The article model
-     */
     public static class Article implements Serializable {
         public final String id;
         public final String title;
         public final String excerpt;
         public final String body;
-        public final String sub;
+        public final String source;
+        public final Date pubblishTime;
 
-        public Article(String id, String title, String body, String sub) {
+        public Article(String id, String title, String body, String source, Date pubblishTime) {
             this.id = id;
             this.title = title;
             this.excerpt = body; // TODO: extract excerpt
             this.body = body;
-            this.sub = sub;
+            this.source = source;
+            this.pubblishTime = pubblishTime;
         }
 
         public String getId() {
@@ -135,8 +84,8 @@ public class ArticleContent {
             return body;
         }
 
-        public String getSub() {
-            return sub;
+        public String getSource() {
+            return source;
         }
 
         public int getReadingTime() {

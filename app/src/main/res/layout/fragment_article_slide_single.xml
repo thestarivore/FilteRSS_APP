@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/costraintLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imageViewArticleSlider"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/mockimg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:tint="#80000000"/>
+
+    <TextView
+        android:id="@+id/textViewSliderArticleTitle"
+        style="@style/material_type_scale_h5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Article title Article title Article title Article title Article title Article title"
+        android:textColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="@+id/imageViewArticleSlider"
+        app:layout_constraintStart_toStartOf="@+id/imageViewArticleSlider"
+        app:layout_constraintTop_toBottomOf="@+id/textViewSliderArticleSource"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/textViewSliderArticleSource"
+        style="@style/material_type_scale_overline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Article source"
+        android:textColor="@android:color/white"
+        app:layout_constraintStart_toStartOf="@+id/imageViewArticleSlider"
+        app:layout_constraintTop_toTopOf="@+id/imageViewArticleSlider" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="@+id/imageViewArticleSlider"
+        app:layout_constraintTop_toTopOf="@+id/imageViewArticleSlider"
+        app:srcCompat="@drawable/ic_share_24dp" />
+
+</android.support.constraint.ConstraintLayout>
