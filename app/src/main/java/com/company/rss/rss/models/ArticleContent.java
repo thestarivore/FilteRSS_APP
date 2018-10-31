@@ -11,12 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-/**
- * Helper class for providing sample content for user interfaces created by
- * Android template wizards.
- * <p>
- * TODO: Replace all uses of this class before publishing your app.
- */
 public class ArticleContent {
 
     public static final List<Article> ARTICLES = new ArrayList<Article>();
@@ -94,7 +88,7 @@ public class ArticleContent {
             }
 
             StringTokenizer tokens = new StringTokenizer(this.body);
-            return tokens.countTokens() / 130; // 130 is the avg words per minute
+            return tokens.countTokens() / 130; // 130 is the avg words read per minute
         }
     }
 }

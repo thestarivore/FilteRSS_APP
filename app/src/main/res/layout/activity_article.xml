@@ -74,7 +74,7 @@
                             android:id="@+id/textViewReadTime"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="4dp"
+                            android:layout_marginStart="4dp"
                             android:gravity="center"
                             android:text="Read Time"
                             android:textColor="#FFFFFF"
@@ -110,7 +110,7 @@
                     android:layout_marginLeft="32dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginRight="32dp"
-                    android:layout_marginBottom="0dp"
+                    android:layout_marginBottom="32dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -140,7 +140,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_margin="16dp"
         app:backgroundTint="@color/colorAccent"
         app:srcCompat="@drawable/ic_plus_one_24dp" />
 
