@@ -10,7 +10,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/AppBarLayoutArticlesList"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="400dp"
         android:fitsSystemWindows="true"
         android:theme="@style/AppTheme.AppBarOverlay">
 
@@ -55,7 +55,7 @@
 
             <fragment
                 android:id="@+id/headlines_fragment"
-                android:name="com.company.rss.rss.ArticleFragment"
+                android:name="com.company.rss.rss.fragments.ArticlesListFragment"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginLeft="16dp"

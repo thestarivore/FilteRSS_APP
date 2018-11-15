@@ -1,88 +1,154 @@
 package com.company.rss.rss;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.company.rss.rss.models.Feed;
+import com.company.rss.rss.models.Multifeed;
+
+import java.util.Map;
 
 public class FeedsSearchActivity extends AppCompatActivity {
+    // TODO: view https://developer.android.com/training/improving-layouts/smooth-scrolling#java
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_feeds_search);
-    }
-}
+        setContentView(R.layout.feeds_search_activity);
 
-public class ListViewLoader extends ListActivity
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+        // TODO: get feeds and multifeeds from the API
+        final Feed[] feeds = Feed.generateMockupFeeds(10);
+        final Multifeed[] multifeeds = Multifeed.generateMockupMultifeeds(4);
 
-    // This is the Adapter being used to display the list's data
-    SimpleCursorAdapter mAdapter;
+        final ListView listview = (ListView) findViewById(R.id.listViewFeedsList);
+        final FeedsListAdapter adapter = new FeedsListAdapter(this, feeds);
+        listview.setAdapter(adapter);
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+                Log.v(ArticleActivity.logTag, "Feed " + id + " clicked");
+                final Feed feed = (Feed) parent.getItemAtPosition(position);
 
-    // These are the Contacts rows that we will retrieve
-    static final String[] PROJECTION = new String[] {ContactsContract.Data._ID,
-            ContactsContract.Data.DISPLAY_NAME};
+                Log.v(ArticleActivity.logTag, "Feed information: " + feed.toString());
 
-    // This is the select criteria
-    static final String SELECTION = "((" +
-            ContactsContract.Data.DISPLAY_NAME + " NOTNULL) AND (" +
-            ContactsContract.Data.DISPLAY_NAME + " != '' ))";
+                // if feed not in any feed list
+                new AlertDialog.Builder(FeedsSearchActivity.this)
+                        .setTitle(R.string.dialog_add_feed_title)
+                        .setSingleChoiceItems(Multifeed.toStrings(multifeeds), -1,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int selectedIndex) {
+                                        Log.d(ArticleActivity.logTag, "Multifeed " + selectedIndex + " clicked");
+                                        Log.d(ArticleActivity.logTag, "Multifeed information: " + multifeeds[selectedIndex].toString());
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+                                        boolean added = addFeedToMultifeed(feed, multifeeds[selectedIndex]);
 
-        // Create a progress bar to display while the list loads
-        ProgressBar progressBar = new ProgressBar(this);
-        progressBar.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-        progressBar.setIndeterminate(true);
-        getListView().setEmptyView(progressBar);
+                                        if (added) {
+                                            // Animate add button
+                                            ImageView imageViewAdd = (ImageView) view.findViewById(R.id.imageViewFeedsSearchAdd);
+                                            imageViewAdd.animate().setDuration(500).rotation(45);
+                                            dialog.dismiss();
+                                        } else {
+                                            // TODO: show error
+                                            Toast.makeText(getApplicationContext(), R.string.feed_add_error , Toast.LENGTH_SHORT).show();
+                                        }
 
-        // Must add the progress bar to the root of the layout
-        ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
-        root.addView(progressBar);
+                                    }
+                                })
+                        .setPositiveButton(R.string.dialog_add_feed_positive_button, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.d(ArticleActivity.logTag, "Creating new multifeed");
+                            }
+                        })
+                        .setNegativeButton(R.string.dialog_add_feed_negative_button, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.d(ArticleActivity.logTag, "Dialog closed");
+                            }
+                        })
+                        .show();
 
-        // For the cursor adapter, specify which columns go into which views
-        String[] fromColumns = {ContactsContract.Data.DISPLAY_NAME};
-        int[] toViews = {android.R.id.text1}; // The TextView in simple_list_item_1
+                /*view.animate().setDuration(2000).alpha(0)
+                        .withEndAction(new Runnable() {
+                            @Override
+                            public void run() {
+                                *//*listview.remove(item);
+                                adapter.notifyDataSetChanged();
+                                view.setAlpha(1);*//*
+                            }
+                        });*/
+            }
 
-        // Create an empty adapter we will use to display the loaded data.
-        // We pass null for the cursor, then update it in onLoadFinished()
-        mAdapter = new SimpleCursorAdapter(this,
-                android.R.layout.simple_list_item_1, null,
-                fromColumns, toViews, 0);
-        setListAdapter(mAdapter);
-
-        // Prepare the loader. Either re-connect with an existing one,
-        // or start a new one.
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    // Called when a new Loader needs to be created
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        // Now create and return a CursorLoader that will take care of
-        // creating a Cursor for the data being displayed.
-        return new CursorLoader(this, ContactsContract.Data.CONTENT_URI,
-                PROJECTION, SELECTION, null, null);
-    }
-
-    // Called when a previously created loader has finished loading
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        // Swap the new cursor in. (The framework will take care of closing the
-        // old cursor once we return.)
-        mAdapter.swapCursor(data);
-    }
-
-    // Called when a previously created loader is reset, making the data unavailable
-    public void onLoaderReset(Loader<Cursor> loader) {
-        // This is called when the last Cursor provided to onLoadFinished()
-        // above is about to be closed. We need to make sure we are no
-        // longer using it.
-        mAdapter.swapCursor(null);
+        });
     }
 
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        // Do something when a list item is clicked
+    private boolean addFeedToMultifeed(Feed feed, Multifeed multifeed) {
+        // TODO: call the API and add the feed to the multifeed
+
+        // Feed added
+        Boolean feedAdded = true;
+        if(feedAdded)
+            return true;
+        else
+            return false;
+    }
+
+    private class ViewHolderFeed {
+        TextView feedName;
+        TextView feedCategory;
+        ImageView feedIcon;
+    }
+
+    private class FeedsListAdapter extends ArrayAdapter<Feed> {
+        private final Context context;
+        private final Feed[] feeds;
+
+        public FeedsListAdapter(Context context, Feed[] feeds) {
+            super(context, -1, feeds);
+            this.context = context;
+            this.feeds = feeds;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolderFeed viewHolder;
+
+            if (convertView == null) {
+                LayoutInflater inflater = (LayoutInflater) context
+                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                convertView = inflater.inflate(R.layout.feeds_search_item, parent, false);
+
+                viewHolder = new ViewHolderFeed();
+                viewHolder.feedName = (TextView) convertView.findViewById(R.id.textViewFeedsSearchName);
+                viewHolder.feedCategory = (TextView) convertView.findViewById(R.id.textViewFeedsSearchCategory);
+                viewHolder.feedIcon = (ImageView) convertView.findViewById(R.id.imageViewFeedsSearchIcon);
+
+                convertView.setTag(viewHolder);
+            } else {
+                viewHolder = (ViewHolderFeed) convertView.getTag();
+            }
+
+            Feed feed = feeds[position];
+            if (feed != null) {
+                viewHolder.feedName.setText(feed.getName());
+                viewHolder.feedCategory.setText(feed.getCategory());
+            }
+            return convertView;
+
+        }
     }
 }

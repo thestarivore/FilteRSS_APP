@@ -1,4 +1,4 @@
-package com.company.rss.rss;
+package com.company.rss.rss.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.company.rss.rss.ArticleFragment.OnListFragmentInteractionListener;
+import com.company.rss.rss.ArticleActivity;
+import com.company.rss.rss.fragments.ArticlesListFragment.OnListFragmentInteractionListener;
+import com.company.rss.rss.R;
 import com.company.rss.rss.models.ArticleContent;
 
 import java.util.List;

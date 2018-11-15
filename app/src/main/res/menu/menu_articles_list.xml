@@ -4,7 +4,7 @@
     tools:context=".ArticleActivity">
 
     <item
-        android:id="@+id/save"
+        android:id="@+id/itemSearchArticleList"
         android:icon="@drawable/ic_search_24dp"
         android:title="Search"
         app:showAsAction="always" />

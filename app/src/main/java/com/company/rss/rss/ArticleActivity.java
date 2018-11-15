@@ -96,10 +96,10 @@ public class ArticleActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()) {
-            case R.id.save:
+            case R.id.itemSaveArticle:
                 //add the function to perform here
                 return (true);
-            case R.id.share:
+            case R.id.itemShareArticle:
                 //add the function to perform here
                 return (true);
             case R.id.about:

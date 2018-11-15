@@ -11,12 +11,16 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 
+import com.company.rss.rss.adapters.ArticleSlidePagerAdapter;
+import com.company.rss.rss.fragments.ArticlesListFragment;
+import com.company.rss.rss.fragments.ArticlesSlideFragment;
 import com.company.rss.rss.models.ArticleContent;
 
 import java.util.ArrayList;
 
-public class ArticlesListActivity extends AppCompatActivity implements ArticleFragment.OnListFragmentInteractionListener, ArticleSlideFragment.OnFragmentInteractionListener{
+public class ArticlesListActivity extends AppCompatActivity implements ArticlesListFragment.OnListFragmentInteractionListener, ArticlesSlideFragment.OnFragmentInteractionListener {
 
     // TODO: refactor this
     public static final String EXTRA_ARTICLE = "com.rss.rss.ARTICLE";
@@ -32,7 +36,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticleFr
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarArtlclesList);
         setSupportActionBar(toolbar);
 
-
         // Create mock articles for top articles
         ArrayList<ArticleContent.Article> topArticles = new ArrayList<ArticleContent.Article>();
         for(int i=0; i<6; i++){
@@ -47,7 +50,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticleFr
         mPager.setClipToPadding(false);
         mPager.setPadding(60,0,60,0);
         mPager.setPageMargin(0);
-
 
         // Show CollapsingToolbarLayout Title only when collapsed
         final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayoutArticlesList);
@@ -90,6 +92,16 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticleFr
         startActivity(intent);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()) {
+            case R.id.itemSearchArticleList:
+                Intent intent = new Intent(this, FeedsSearchActivity.class);
+                startActivity(intent);
+                return (true);
+        }
+        return (super.onOptionsItemSelected(item));
+    }
 
     @Override
     public void onFragmentInteraction(Uri uri) {

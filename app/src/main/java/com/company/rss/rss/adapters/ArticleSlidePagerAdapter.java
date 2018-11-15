@@ -1,12 +1,10 @@
-package com.company.rss.rss;
+package com.company.rss.rss.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
+import com.company.rss.rss.fragments.ArticlesSlideFragment;
 import com.company.rss.rss.models.ArticleContent;
 
 import java.util.ArrayList;
@@ -26,11 +24,11 @@ public class ArticleSlidePagerAdapter extends FragmentStatePagerAdapter {
         if (mArticles != null && mArticles.size() > 0)
         {
             position = position % mArticles.size();
-            return ArticleSlideFragment.newInstance(mArticles.get(position));
+            return ArticlesSlideFragment.newInstance(mArticles.get(position));
         }
         else
         {
-            return ArticleSlideFragment.newInstance(null);
+            return ArticlesSlideFragment.newInstance(null);
         }
     }
 

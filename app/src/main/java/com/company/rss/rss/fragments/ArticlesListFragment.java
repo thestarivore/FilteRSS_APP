@@ -1,4 +1,4 @@
-package com.company.rss.rss;
+package com.company.rss.rss.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -6,10 +6,14 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.company.rss.rss.ArticleListSwipeController;
+import com.company.rss.rss.R;
+import com.company.rss.rss.adapters.ArticleRecyclerViewAdapter;
 import com.company.rss.rss.models.ArticleContent;
 
 /**
@@ -18,7 +22,7 @@ import com.company.rss.rss.models.ArticleContent;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class ArticleFragment extends Fragment {
+public class ArticlesListFragment extends Fragment {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
@@ -28,13 +32,13 @@ public class ArticleFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ArticleFragment() {
+    public ArticlesListFragment() {
     }
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static ArticleFragment newInstance(int columnCount) {
-        ArticleFragment fragment = new ArticleFragment();
+    public static ArticlesListFragment newInstance(int columnCount) {
+        ArticlesListFragment fragment = new ArticlesListFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
@@ -59,6 +63,12 @@ public class ArticleFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
+
+            // Set the swipe controller
+            ArticleListSwipeController articleListSwipeController = new ArticleListSwipeController();
+            ItemTouchHelper itemTouchhelper = new ItemTouchHelper(articleListSwipeController);
+            itemTouchhelper.attachToRecyclerView(recyclerView);
+
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
