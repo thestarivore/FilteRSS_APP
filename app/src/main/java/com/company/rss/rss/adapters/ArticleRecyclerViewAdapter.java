@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.company.rss.rss.ArticleActivity;
@@ -77,6 +79,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         public final TextView mExcerptView;
         public final TextView mSubView;
         public final ImageView mImageView;
+        public LinearLayout viewBackground, viewForeground;
 
         public ArticleContent.Article mItem;
 
@@ -87,6 +90,9 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             mExcerptView = (TextView) view.findViewById(R.id.textViewExcerpt);
             mSubView = (TextView) view.findViewById(R.id.textViewSub);
             mImageView = (ImageView) view.findViewById(R.id.imageViewImage);
+
+            viewBackground = view.findViewById(R.id.articleListSingleBackground);
+            viewForeground = view.findViewById(R.id.articleListSingleForeground);
         }
 
         @Override

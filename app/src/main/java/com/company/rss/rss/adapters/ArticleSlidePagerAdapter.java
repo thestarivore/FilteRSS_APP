@@ -21,13 +21,10 @@ public class ArticleSlidePagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        if (mArticles != null && mArticles.size() > 0)
-        {
+        if (mArticles != null && mArticles.size() > 0) {
             position = position % mArticles.size();
             return ArticlesSlideFragment.newInstance(mArticles.get(position));
-        }
-        else
-        {
+        } else {
             return ArticlesSlideFragment.newInstance(null);
         }
     }

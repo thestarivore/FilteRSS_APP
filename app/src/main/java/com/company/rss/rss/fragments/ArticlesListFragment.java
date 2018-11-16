@@ -10,6 +10,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.company.rss.rss.ArticleListSwipeController;
 import com.company.rss.rss.R;
@@ -22,7 +23,7 @@ import com.company.rss.rss.models.ArticleContent;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class ArticlesListFragment extends Fragment {
+public class ArticlesListFragment extends Fragment implements ArticleListSwipeController.RecyclerItemTouchHelperListener {
 
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
@@ -48,7 +49,6 @@ public class ArticlesListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
@@ -65,9 +65,8 @@ public class ArticlesListFragment extends Fragment {
             RecyclerView recyclerView = (RecyclerView) view;
 
             // Set the swipe controller
-            ArticleListSwipeController articleListSwipeController = new ArticleListSwipeController();
-            ItemTouchHelper itemTouchhelper = new ItemTouchHelper(articleListSwipeController);
-            itemTouchhelper.attachToRecyclerView(recyclerView);
+            ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ArticleListSwipeController(0, ItemTouchHelper.LEFT, this);
+            new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -97,6 +96,13 @@ public class ArticlesListFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        Toast.makeText(getActivity(), "Swiped",
+                Toast.LENGTH_LONG).show();
+
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -109,7 +115,7 @@ public class ArticlesListFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(ArticleContent.Article item);
+        void onListFragmentInteraction(ArticleContent.Article article);
     }
 
     

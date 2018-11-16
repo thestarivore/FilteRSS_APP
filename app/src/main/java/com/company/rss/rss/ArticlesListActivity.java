@@ -36,12 +36,12 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarArtlclesList);
         setSupportActionBar(toolbar);
 
+        // TOP ARTICLES
         // Create mock articles for top articles
         ArrayList<ArticleContent.Article> topArticles = new ArrayList<ArticleContent.Article>();
         for(int i=0; i<6; i++){
             topArticles.add(ArticleContent.createMockArticle(i));
         }
-
         mPager = (ViewPager) findViewById(R.id.pagerArticles);
         mPagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
         mPager.setAdapter(mPagerAdapter);
@@ -80,11 +80,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         return true;
     }
 
-    @Override
-    public void onListFragmentInteraction(ArticleContent.Article article) {
-        Log.v(ArticleActivity.logTag, article.toString());
-        startArticleActivity(article);
-    }
+
 
     private void startArticleActivity(ArticleContent.Article article) {
         Intent intent = new Intent(this, ArticleActivity.class);
@@ -103,8 +99,22 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         return (super.onOptionsItemSelected(item));
     }
 
+    /*
+    Handles the interactions with the list
+     */
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
+    public void onListFragmentInteraction(ArticleContent.Article article) {
+        Log.v(ArticleActivity.logTag, article.toString());
+        startArticleActivity(article);
     }
+
+    /*
+    Handles the interactions with the top slider
+     */
+    @Override
+    public void onFragmentInteraction(ArticleContent.Article article) {
+        Log.v(ArticleActivity.logTag, article.toString());
+        startArticleActivity(article);
+    }
+
 }

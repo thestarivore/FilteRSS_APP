@@ -1,7 +1,6 @@
 package com.company.rss.rss.fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,24 +15,13 @@ import com.company.rss.rss.models.ArticleContent;
 
 public class ArticlesSlideFragment extends Fragment {
     private static final String ARTICLE = "article";
-
     private ArticleContent.Article mArticle;
-
     private OnFragmentInteractionListener mListener;
 
     public ArticlesSlideFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ArticlesSlideFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ArticlesSlideFragment newInstance(ArticleContent.Article article) {
         ArticlesSlideFragment fragment = new ArticlesSlideFragment();
         Bundle args = new Bundle();
@@ -59,19 +47,23 @@ public class ArticlesSlideFragment extends Fragment {
 
         articleTitle.setText(mArticle.getTitle());
         articleSource.setText(mArticle.getSource());
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (null != mListener) {
+                    // Notify the active callbacks interface (the activity, if the
+                    // fragment is attached to one) that an item has been selected.
+                    mListener.onFragmentInteraction(mArticle);
+                }
+            }
+        });
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
@@ -103,6 +95,6 @@ public class ArticlesSlideFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onFragmentInteraction(ArticleContent.Article article);
     }
 }
