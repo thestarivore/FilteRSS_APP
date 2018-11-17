@@ -9,28 +9,17 @@
         android:id="@+id/articleListSingleBackground"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:background="@android:color/holo_red_dark"
-        android:orientation="horizontal"
-        android:layout_gravity="center">
-
-        <ImageView
-            android:id="@+id/delete_icon"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="30dp"
-            android:src="@drawable/ic_access_time_black_24dp" />
+        android:layout_gravity="center"
+        android:background="@android:color/black"
+        android:gravity="center"
+        android:orientation="horizontal">
 
         <TextView
+            style="@style/material_type_scale_h6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="30dp"
-            android:layout_toLeftOf="@id/delete_icon"
-            android:text="Delete"
-            android:textColor="#fff"
-            android:textSize="13dp" />
+            android:text="@string/swipe_to_save"
+            android:textColor="#fff" />
 
     </LinearLayout>
 
@@ -38,11 +27,11 @@
         android:id="@+id/articleListSingleForeground"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:layout_gravity="center"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:background="@android:color/white"
-        android:orientation="horizontal"
-        android:layout_gravity="center">
+        android:orientation="horizontal">
 
         <View
             android:id="@+id/view"

@@ -10,12 +10,13 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.company.rss.rss.ArticleListSwipeController;
 import com.company.rss.rss.R;
 import com.company.rss.rss.adapters.ArticleRecyclerViewAdapter;
-import com.company.rss.rss.models.ArticleContent;
+import com.company.rss.rss.models.Article;
+
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -28,6 +29,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+    List<Article> articles =  Article.generateMockupArticle(25);
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -65,7 +67,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             RecyclerView recyclerView = (RecyclerView) view;
 
             // Set the swipe controller
-            ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ArticleListSwipeController(0, ItemTouchHelper.LEFT, this);
+            ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ArticleListSwipeController(0, ItemTouchHelper.RIGHT, this);
             new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
             if (mColumnCount <= 1) {
@@ -73,7 +75,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new ArticleRecyclerViewAdapter(ArticleContent.ARTICLES, mListener));
+            recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener));
         }
         return view;
     }
@@ -98,9 +100,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-        Toast.makeText(getActivity(), "Swiped",
-                Toast.LENGTH_LONG).show();
-
+        mListener.onListFragmentInteractionSwipe(articles.get(position));
     }
 
     /**
@@ -115,7 +115,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(ArticleContent.Article article);
+        void onListFragmentInteractionClick(Article article);
+        void onListFragmentInteractionSwipe(Article article);
     }
 
     

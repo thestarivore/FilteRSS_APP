@@ -11,18 +11,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.company.rss.rss.R;
-import com.company.rss.rss.models.ArticleContent;
+import com.company.rss.rss.models.Article;
 
 public class ArticlesSlideFragment extends Fragment {
     private static final String ARTICLE = "article";
-    private ArticleContent.Article mArticle;
+    private Article mArticle;
     private OnFragmentInteractionListener mListener;
 
     public ArticlesSlideFragment() {
         // Required empty public constructor
     }
 
-    public static ArticlesSlideFragment newInstance(ArticleContent.Article article) {
+    public static ArticlesSlideFragment newInstance(Article article) {
         ArticlesSlideFragment fragment = new ArticlesSlideFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARTICLE, article);
@@ -34,7 +34,7 @@ public class ArticlesSlideFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mArticle = (ArticleContent.Article) getArguments().getSerializable(ARTICLE);
+            mArticle = (Article) getArguments().getSerializable(ARTICLE);
         }
     }
 
@@ -95,6 +95,6 @@ public class ArticlesSlideFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onFragmentInteraction(ArticleContent.Article article);
+        void onFragmentInteraction(Article article);
     }
 }

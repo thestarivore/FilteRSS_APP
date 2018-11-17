@@ -29,7 +29,6 @@ public class ArticleListSwipeController extends ItemTouchHelper.SimpleCallback {
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
         if (viewHolder != null) {
             final View foregroundView = ((ArticleRecyclerViewAdapter.ViewHolder) viewHolder).viewForeground;
-
             getDefaultUIUtil().onSelected(foregroundView);
         }
     }
@@ -58,7 +57,6 @@ public class ArticleListSwipeController extends ItemTouchHelper.SimpleCallback {
         getDefaultUIUtil().onDraw(c, recyclerView, foregroundView, dX, dY,
                 actionState, isCurrentlyActive);
     }
-
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {

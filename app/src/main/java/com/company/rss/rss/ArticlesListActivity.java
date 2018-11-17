@@ -1,7 +1,6 @@
 package com.company.rss.rss;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.view.PagerAdapter;
@@ -12,19 +11,20 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.company.rss.rss.adapters.ArticleSlidePagerAdapter;
 import com.company.rss.rss.fragments.ArticlesListFragment;
 import com.company.rss.rss.fragments.ArticlesSlideFragment;
-import com.company.rss.rss.models.ArticleContent;
+import com.company.rss.rss.models.Article;
 
-import java.util.ArrayList;
+import java.util.List;
+
 
 public class ArticlesListActivity extends AppCompatActivity implements ArticlesListFragment.OnListFragmentInteractionListener, ArticlesSlideFragment.OnFragmentInteractionListener {
 
     // TODO: refactor this
     public static final String EXTRA_ARTICLE = "com.rss.rss.ARTICLE";
-
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
 
@@ -38,17 +38,15 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
         // TOP ARTICLES
         // Create mock articles for top articles
-        ArrayList<ArticleContent.Article> topArticles = new ArrayList<ArticleContent.Article>();
-        for(int i=0; i<6; i++){
-            topArticles.add(ArticleContent.createMockArticle(i));
-        }
+        List<Article> topArticles = Article.generateMockupArticle(6);
+
         mPager = (ViewPager) findViewById(R.id.pagerArticles);
         mPagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
         mPager.setAdapter(mPagerAdapter);
         // Set current item to middle
         mPager.setCurrentItem(mPagerAdapter.getCount() / 2, false);
         mPager.setClipToPadding(false);
-        mPager.setPadding(60,0,60,0);
+        mPager.setPadding(60, 0, 60, 0);
         mPager.setPageMargin(0);
 
         // Show CollapsingToolbarLayout Title only when collapsed
@@ -66,12 +64,13 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 if (scrollRange + verticalOffset == 0) {
                     collapsingToolbarLayout.setTitle("Title");
                     isShow = true;
-                } else if(isShow) {
+                } else if (isShow) {
                     collapsingToolbarLayout.setTitle(" ");
                     isShow = false;
                 }
             }
         });
+
     }
 
     @Override
@@ -80,16 +79,14 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         return true;
     }
 
-
-
-    private void startArticleActivity(ArticleContent.Article article) {
+    private void startArticleActivity(Article article) {
         Intent intent = new Intent(this, ArticleActivity.class);
         intent.putExtra(EXTRA_ARTICLE, article);
         startActivity(intent);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.itemSearchArticleList:
                 Intent intent = new Intent(this, FeedsSearchActivity.class);
@@ -100,19 +97,33 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     }
 
     /*
-    Handles the interactions with the list
+    Handles the interactions with the list, click
      */
     @Override
-    public void onListFragmentInteraction(ArticleContent.Article article) {
+    public void onListFragmentInteractionClick(Article article) {
         Log.v(ArticleActivity.logTag, article.toString());
         startArticleActivity(article);
+    }
+
+    /*
+    Handles the interactions with the list, swipe
+     */
+    @Override
+    public void onListFragmentInteractionSwipe(Article article) {
+        Log.v(ArticleActivity.logTag, article.toString());
+        /* TODO: save article in the read it later collection if not already present
+        otherwise remove it from read it later */
+        boolean alreadyPresent = false;
+        if (alreadyPresent) {
+            Toast.makeText(this, R.string.unswipe_to_remove, Toast.LENGTH_LONG).show();
+        }
     }
 
     /*
     Handles the interactions with the top slider
      */
     @Override
-    public void onFragmentInteraction(ArticleContent.Article article) {
+    public void onFragmentInteraction(Article article) {
         Log.v(ArticleActivity.logTag, article.toString());
         startArticleActivity(article);
     }

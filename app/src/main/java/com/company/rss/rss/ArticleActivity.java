@@ -15,7 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.company.rss.rss.models.ArticleContent;
+import com.company.rss.rss.models.Article;
 
 import static android.text.Layout.JUSTIFICATION_MODE_INTER_WORD;
 
@@ -32,7 +32,7 @@ public class ArticleActivity extends AppCompatActivity {
 
         // INPUT DATA
         Intent intent = getIntent();
-        ArticleContent.Article article = (ArticleContent.Article) intent.getSerializableExtra(ArticlesListActivity.EXTRA_ARTICLE);
+        Article article = (Article) intent.getSerializableExtra(ArticlesListActivity.EXTRA_ARTICLE);
 
         int articleImage = R.drawable.mockimg;
         String articleSubtitle = article.getSource();

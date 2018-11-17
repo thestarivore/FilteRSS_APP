@@ -7,23 +7,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.fragments.ArticlesListFragment.OnListFragmentInteractionListener;
 import com.company.rss.rss.R;
-import com.company.rss.rss.models.ArticleContent;
+import com.company.rss.rss.models.Article;
 
 import java.util.List;
 
 
 public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecyclerViewAdapter.ViewHolder> {
 
-    private final List<ArticleContent.Article> mValues;
+    private final List<Article> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public ArticleRecyclerViewAdapter(List<ArticleContent.Article> articles, OnListFragmentInteractionListener listener) {
+    public ArticleRecyclerViewAdapter(List<Article> articles, OnListFragmentInteractionListener listener) {
         mValues = articles;
         mListener = listener;
     }
@@ -62,7 +61,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onListFragmentInteractionClick(holder.mItem);
                 }
             }
         });
@@ -81,7 +80,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         public final ImageView mImageView;
         public LinearLayout viewBackground, viewForeground;
 
-        public ArticleContent.Article mItem;
+        public Article mItem;
 
         public ViewHolder(View view) {
             super(view);
