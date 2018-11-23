@@ -1,5 +1,6 @@
 package com.company.rss.rss.adapters;
 
+
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.fragments.ArticlesListFragment.OnListFragmentInteractionListener;
 import com.company.rss.rss.R;
+import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
 
 import java.util.List;
@@ -19,11 +21,11 @@ import java.util.List;
 
 public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Article> mValues;
+    private final List<Article> mArticles;
     private final OnListFragmentInteractionListener mListener;
 
     public ArticleRecyclerViewAdapter(List<Article> articles, OnListFragmentInteractionListener listener) {
-        mValues = articles;
+        mArticles = articles;
         mListener = listener;
     }
 
@@ -36,11 +38,16 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-        holder.mTitleView.setText(mValues.get(position).title);
+        holder.mItem = mArticles.get(position);
+        holder.mTitleView.setText(mArticles.get(position).getTitle());
 
-        holder.mExcerptView.setText(mValues.get(position).excerpt);
-        holder.mSubView.setText(mValues.get(position).source);
+        holder.mExcerptView.setText(mArticles.get(position).getExcerpt());
+        holder.mSubView.setText(mArticles.get(position).getSource());
+
+        // show The Image in a ImageView
+        new DownloadImageTask(holder.mImageView)
+                .execute(mArticles.get(position).getThumbnail());
+
         holder.mImageView.setClipToOutline(true);
 
         holder.mTitleView.post(new Runnable() {
@@ -69,7 +76,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mArticles.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -106,4 +113,6 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
                     '}';
         }
     }
+
+
 }

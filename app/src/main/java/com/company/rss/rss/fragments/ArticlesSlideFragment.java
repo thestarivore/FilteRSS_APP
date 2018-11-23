@@ -8,9 +8,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.company.rss.rss.R;
+import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
 
 public class ArticlesSlideFragment extends Fragment {
@@ -44,9 +46,12 @@ public class ArticlesSlideFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_article_slide_single, container, false);
         TextView articleTitle = (TextView) view.findViewById(R.id.textViewSliderArticleTitle);
         TextView articleSource = (TextView) view.findViewById(R.id.textViewSliderArticleSource);
+        ImageView articleImage = (ImageView) view.findViewById(R.id.imageViewArticleSlider);
 
         articleTitle.setText(mArticle.getTitle());
         articleSource.setText(mArticle.getSource());
+        new DownloadImageTask(articleImage)
+                .execute(mArticle.getThumbnail());
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override

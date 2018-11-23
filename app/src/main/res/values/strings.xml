@@ -99,6 +99,14 @@
     <string name="dialog_add_feed_positive_button">Create New</string>
     <string name="dialog_add_feed_negative_button">Cancel</string>
     <string name="feed_add_error">An error occurred while adding the feed</string>
-    <string name="swipe_to_save">Save to read it later</string>
-    <string name="unswipe_to_remove">Removed from read it later</string>
+    <string name="swipe_to_save">Saved to Read it Later</string>
+    <string name="unswipe_to_remove">Removed from Read it Later</string>
+    <string name="categories">Categories</string>
+    <string name="search_feed">Search feed</string>
+    <string name="multifeed">Multifeed</string>
+    <string name="multifeeds">Multifeeds</string>
+    <string name="collection">Collection</string>
+    <string name="collections">Collections</string>
+    <string name="language_en">English</string>
+    <string name="language_it">Italian</string>
 </resources>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ArticleActivity">
+
+    <item
+        android:id="@+id/itemSearchFeeds"
+        android:icon="@drawable/ic_search_24dp"
+        android:title="Search"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/itemLanguageSelectorEN"
+        android:checkable="true"
+        android:title="@string/language_en"
+        app:showAsAction="never"
+        app:actionViewClass="android.widget.CheckBox"/>
+    <item
+        android:id="@+id/itemLanguageSelectorIT"
+        android:checkable="true"
+        android:title="@string/language_it"
+        app:showAsAction="never"
+        app:actionViewClass="android.widget.CheckBox" />
+</menu>

@@ -3,14 +3,22 @@ package com.company.rss.rss;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -19,19 +27,67 @@ import android.widget.Toast;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.Multifeed;
 
-import java.util.Map;
-
 public class FeedsSearchActivity extends AppCompatActivity {
+    private DrawerLayout drawerLayout;
+
     // TODO: view https://developer.android.com/training/improving-layouts/smooth-scrolling#java
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.feeds_search_activity);
+        setContentView(R.layout.activity_feeds_search);
+
+        Toolbar toolbar = findViewById(R.id.feeds_search_toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white);
 
         // TODO: get feeds and multifeeds from the API
         final Feed[] feeds = Feed.generateMockupFeeds(10);
         final Multifeed[] multifeeds = Multifeed.generateMockupMultifeeds(4);
+
+        drawerLayout = findViewById(R.id.drawer_layout_feeds_search);
+        drawerLayout.addDrawerListener(
+                new DrawerLayout.DrawerListener() {
+                    @Override
+                    public void onDrawerSlide(View drawerView, float slideOffset) {
+                        // Respond when the drawer's position changes
+                    }
+
+                    @Override
+                    public void onDrawerOpened(View drawerView) {
+                        // Respond when the drawer is opened
+                    }
+
+                    @Override
+                    public void onDrawerClosed(View drawerView) {
+                        // Respond when the drawer is closed
+                    }
+
+                    @Override
+                    public void onDrawerStateChanged(int newState) {
+                        // Respond when the drawer motion state changes
+                    }
+                }
+        );
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        drawerLayout.closeDrawers();
+
+                        // Add code here to update the UI based on the item selected
+                        // For example, swap UI fragments here
+
+                        return true;
+                    }
+                });
 
         final ListView listview = (ListView) findViewById(R.id.listViewFeedsList);
         final FeedsListAdapter adapter = new FeedsListAdapter(this, feeds);
@@ -150,5 +206,40 @@ public class FeedsSearchActivity extends AppCompatActivity {
             return convertView;
 
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            case R.id.itemLanguageSelectorEN:
+                // TODO: retrieve EN language feed from API and save to preferences
+
+                item.setChecked(!item.isChecked());
+                Toast.makeText(getBaseContext(), "English lang selected", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.itemLanguageSelectorIT:
+                // TODO: retrieve IT language feed from API and save to preferences
+
+                item.setChecked(!item.isChecked());
+                Toast.makeText(getBaseContext(), "Italian lang selected", Toast.LENGTH_SHORT).show();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_feeds_search, menu);
+
+
+        // TODO: retrieve values for feeds language from preferences
+        CheckBox checkBox = (CheckBox) menu.findItem(R.id.itemLanguageSelectorEN).getActionView();
+        checkBox.setChecked(true);
+
+        return true;
     }
 }

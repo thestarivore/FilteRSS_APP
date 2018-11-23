@@ -2,12 +2,11 @@
 <!-- Use DrawerLayout as root container for activity -->
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/drawer_layout_feeds_search"
+    android:id="@+id/drawer_layout_multifeed"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <!-- Layout to contain contents of main body of screen (drawer will slide over this) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,12 +17,12 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            app:title="@string/search_feed"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:title="@string/multifeed"
             app:titleTextColor="@android:color/white"/>
 
         <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/listViewFeedsList"
+            android:id="@+id/listViewMultifeedList"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 

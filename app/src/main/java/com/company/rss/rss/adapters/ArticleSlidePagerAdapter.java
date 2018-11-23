@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import com.company.rss.rss.fragments.ArticlesSlideFragment;
 import com.company.rss.rss.models.Article;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ArticleSlidePagerAdapter extends FragmentStatePagerAdapter {

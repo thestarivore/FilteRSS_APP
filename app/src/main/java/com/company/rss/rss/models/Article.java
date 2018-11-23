@@ -1,34 +1,38 @@
 package com.company.rss.rss.models;
 
+import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.StringTokenizer;
 
 public class Article implements Serializable {
-    public final int id;
-    public final String title;
-    public final String excerpt;
-    public final String body;
-    public final String source;
-    public final Date pubblishTime;
+    private final int id;
+    private final String title;
+    private final String excerpt;
+    private final String body;
+    private final String source;
+    private final Date pubblishTime;
+    private final String image;
+    private final String thumbnail;
 
-    public Article(int id, String title, String body, String source, Date pubblishTime) {
+    public Article(int id, String title, String body, String source, Date pubblishTime, String image, String thumbnail) {
         this.id = id;
         this.title = title;
         this.excerpt = body; // TODO: extract excerpt
         this.body = body;
         this.source = source;
         this.pubblishTime = pubblishTime;
+        this.image = image;
+        this.thumbnail = thumbnail;
     }
 
     public int getId() {
@@ -67,7 +71,8 @@ public class Article implements Serializable {
 
     private static Article createMockArticle() {
         Random random = new Random();
-        return new Article(random.nextInt(), makeTitle(), makeBody(), makeSource(), new Date());
+        int imageId = random.nextInt(1085);
+        return new Article(random.nextInt(), makeTitle(), makeBody(), makeSource(), new Date(), makeImage(imageId), makeThumbnail(imageId));
     }
 
     private static String makeSource() {
@@ -83,6 +88,30 @@ public class Article implements Serializable {
     private static String makeTitle() {
         Lorem lorem = LoremIpsum.getInstance();
         return lorem.getTitle(1, 18);
+    }
+
+    private static String makeThumbnail(int imageId){
+        Random random = new Random();
+        return "https://picsum.photos/200/300?image=" + imageId;
+    }
+
+    private static String makeImage(int imageId){
+        Random random = new Random();
+        return "https://picsum.photos/2000/3000?image=" + imageId;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public String getThumbnail() { return thumbnail; }
+
+    public String getExcerpt() {
+        return excerpt;
+    }
+
+    public Date getPubblishTime() {
+        return pubblishTime;
     }
 
     public static List<Article> generateMockupArticle(int length) {
