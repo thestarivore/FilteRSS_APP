@@ -3,12 +3,9 @@ package com.company.rss.rss;
 import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.view.MotionEvent;
 import android.view.View;
 
 import com.company.rss.rss.adapters.ArticleRecyclerViewAdapter;
-
-import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_SWIPE;
 
 
 public class ArticleListSwipeController extends ItemTouchHelper.SimpleCallback {

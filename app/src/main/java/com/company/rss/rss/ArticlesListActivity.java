@@ -24,7 +24,6 @@ import com.company.rss.rss.adapters.ExpandableListAdapter;
 import com.company.rss.rss.fragments.ArticlesListFragment;
 import com.company.rss.rss.fragments.ArticlesSlideFragment;
 import com.company.rss.rss.models.Article;
-import com.company.rss.rss.models.Multifeed;
 
 import java.util.ArrayList;
 import java.util.HashMap;

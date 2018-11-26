@@ -97,7 +97,7 @@
     <string name="action_settings">Settings</string>
     <string name="dialog_add_feed_title">Choose a multifeed</string>
     <string name="dialog_add_feed_positive_button">Create New</string>
-    <string name="dialog_add_feed_negative_button">Cancel</string>
+    <string name="cancel">Cancel</string>
     <string name="feed_add_error">An error occurred while adding the feed</string>
     <string name="swipe_to_save">Saved to Read it Later</string>
     <string name="unswipe_to_remove">Removed from Read it Later</string>
@@ -109,4 +109,10 @@
     <string name="collections">Collections</string>
     <string name="language_en">English</string>
     <string name="language_it">Italian</string>
+    <string name="name">Name</string>
+    <string name="importance">Importance</string>
+    <string name="color">Color</string>
+    <string name="choose">Choose</string>
+    <string name="dialog_remove_feed_title">Remove this feed?</string>
+    <string name="remove">Remove</string>
 </resources>

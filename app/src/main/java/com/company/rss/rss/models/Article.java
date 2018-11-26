@@ -1,13 +1,11 @@
 package com.company.rss.rss.models;
 
-import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
 
 import java.io.Serializable;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

@@ -4,6 +4,7 @@ import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Feed {
@@ -17,12 +18,12 @@ public class Feed {
         this.category = category;
     }
 
-    public static Feed[] generateMockupFeeds(int length) {
+    public static List<Feed> generateMockupFeeds(int length) {
         Random random = new Random();
         Lorem lorem = LoremIpsum.getInstance();
-        Feed[] feeds = new Feed[length];
+        List<Feed> feeds = new ArrayList<Feed>();
         for (int i = 0; i < length; i++) {
-            feeds[i] = new Feed(random.nextInt(), lorem.getName(), lorem.getCity());
+            feeds.add(new Feed(random.nextInt(), lorem.getName(), lorem.getCity()));
         }
         return feeds;
     }

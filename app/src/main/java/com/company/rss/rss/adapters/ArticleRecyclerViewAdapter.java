@@ -11,8 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.company.rss.rss.ArticleActivity;
-import com.company.rss.rss.fragments.ArticlesListFragment.OnListFragmentInteractionListener;
 import com.company.rss.rss.R;
+import com.company.rss.rss.fragments.ArticlesListFragment.OnListFragmentInteractionListener;
 import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
 

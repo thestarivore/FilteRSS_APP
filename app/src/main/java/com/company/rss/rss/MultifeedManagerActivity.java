@@ -1,40 +1,33 @@
 package com.company.rss.rss;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.company.rss.rss.models.Feed;
+import com.company.rss.rss.fragments.MultifeedEditFragment;
 import com.company.rss.rss.models.Multifeed;
 
-import java.util.ArrayList;
-import java.util.Random;
-
-public class MultifeedManagerActivity extends AppCompatActivity {
-    private DrawerLayout drawerLayout;
+public class MultifeedManagerActivity extends AppCompatActivity implements MultifeedEditFragment.SaveMultifeedInterface {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_multifeed);
+        setContentView(R.layout.activity_multifeed_manager);
+
+        Toolbar toolbar = findViewById(R.id.feeds_search_toolbar);
+        setSupportActionBar(toolbar);
 
         final Multifeed[] multifeeds = Multifeed.generateMockupMultifeeds(4);
-
 
         final ListView listview = (ListView) findViewById(R.id.listViewMultifeedList);
         final MultifeedManagerActivity.MultifeedListAdapter adapter = new MultifeedManagerActivity.MultifeedListAdapter(this, multifeeds);
@@ -44,12 +37,19 @@ public class MultifeedManagerActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
                 Log.v(ArticleActivity.logTag, "Multifeed " + id + " clicked");
                 final Multifeed multifeed = (Multifeed) parent.getItemAtPosition(position);
-
                 Log.v(ArticleActivity.logTag, "Multifeed information: " + multifeed.toString());
+
+                // Show multifeed edit fragment
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                MultifeedEditFragment multifeedEditFragment = MultifeedEditFragment.newInstance(multifeed);
+                ft.replace(R.id.multifeedEditFrameLayout, multifeedEditFragment);
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                ft.commit();
             }
 
         });
     }
+
 
     private class ViewHolderMultifeed {
         View multifeedViewColor;
@@ -96,10 +96,17 @@ public class MultifeedManagerActivity extends AppCompatActivity {
                 Log.v(ArticleActivity.logTag, "Multifeed color: " + multifeed.getColor());
 
                 viewHolder.multifeedViewColor.setBackgroundColor(multifeed.getColor());
+
             }
             return convertView;
 
         }
+    }
+
+    @Override
+    public void onSaveMultifeed(Multifeed multifeed) {
+        // TODO: call the API and update the multifeed
+        Log.v(ArticleActivity.logTag, "Saving multifeed: " + multifeed.toString());
     }
 
 }

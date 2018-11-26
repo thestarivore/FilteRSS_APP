@@ -30,7 +30,9 @@
             android:name=".FeedsSearchActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <activity android:name=".MultifeedManagerActivity"></activity>
+        <activity
+            android:name=".MultifeedManagerActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
