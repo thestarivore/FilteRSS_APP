@@ -39,11 +39,11 @@ public class FeedsSearchActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
 
         // TODO: get feeds and multifeeds from the API
         final List<Feed> feeds = Feed.generateMockupFeeds(10);
-        final Multifeed[] multifeeds = Multifeed.generateMockupMultifeeds(4);
+        final List<Multifeed> multifeeds = Multifeed.generateMockupMultifeeds(4);
 
         drawerLayout = findViewById(R.id.drawer_layout_feeds_search);
         drawerLayout.addDrawerListener(
@@ -106,9 +106,9 @@ public class FeedsSearchActivity extends AppCompatActivity {
                                     @Override
                                     public void onClick(DialogInterface dialog, int selectedIndex) {
                                         Log.d(ArticleActivity.logTag, "Multifeed " + selectedIndex + " clicked");
-                                        Log.d(ArticleActivity.logTag, "Multifeed information: " + multifeeds[selectedIndex].toString());
+                                        Log.d(ArticleActivity.logTag, "Multifeed information: " + multifeeds.get(selectedIndex).toString());
 
-                                        boolean added = addFeedToMultifeed(feed, multifeeds[selectedIndex]);
+                                        boolean added = addFeedToMultifeed(feed, multifeeds.get(selectedIndex));
 
                                         if (added) {
                                             // Animate add (+) button that becomes remove (x) button

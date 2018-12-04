@@ -3,11 +3,12 @@ package com.company.rss.rss.models;
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Feed {
+public class Feed implements Serializable {
     private final int id;
     private final String category;
     private final String name;

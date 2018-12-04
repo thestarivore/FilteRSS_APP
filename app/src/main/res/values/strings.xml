@@ -114,5 +114,7 @@
     <string name="color">Color</string>
     <string name="choose">Choose</string>
     <string name="dialog_remove_feed_title">Remove this feed?</string>
+    <string name="dialog_remove_multifeed_title">Remove this multifeed?</string>
     <string name="remove">Remove</string>
+    <string name="feeds">Feeds</string>
 </resources>

@@ -28,6 +28,7 @@ import static android.text.Layout.JUSTIFICATION_MODE_INTER_WORD;
 public class ArticleActivity extends AppCompatActivity {
 
     public final static String logTag = "RSSLOG";
+    private boolean fabVisible;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,7 @@ public class ArticleActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
 
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
 
@@ -101,10 +102,11 @@ public class ArticleActivity extends AppCompatActivity {
                 //Log.v(logTag, Float.toString(percentageScrolled));
                 positionProgressBar.setProgress((int) percentageScrolled);
 
-                if (percentageScrolled >= 70) {
+                if (!fabVisible && percentageScrolled >= 70) {
                     Toast.makeText(getBaseContext(), "Asking for feedback",
                             Toast.LENGTH_SHORT).show();
                     fab.setVisibility(View.VISIBLE);
+                    fabVisible = true;
                 }
             }
         });

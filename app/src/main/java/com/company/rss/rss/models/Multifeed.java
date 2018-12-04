@@ -6,6 +6,7 @@ import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -13,7 +14,6 @@ public class Multifeed implements Serializable {
     private int id;
     private String name;
     private int color;
-    private int feedCount;
     private int importance;
     private List<Feed> feeds;
 
@@ -22,7 +22,6 @@ public class Multifeed implements Serializable {
         this.id = id;
         this.name = name;
         this.color = color;
-        this.feedCount = 0;
         this.importance = importance;
         this.feeds = feeds;
     }
@@ -32,11 +31,7 @@ public class Multifeed implements Serializable {
     }
 
     public int getFeedCount() {
-        return feedCount;
-    }
-
-    public void setFeedCount(int feedCount) {
-        this.feedCount = feedCount;
+        return feeds.size();
     }
 
     public int getId() {
@@ -63,27 +58,26 @@ public class Multifeed implements Serializable {
         this.importance = importance;
     }
 
-    public static Multifeed[] generateMockupMultifeeds(int length) {
+    public static List<Multifeed> generateMockupMultifeeds(int length) {
         Random random = new Random();
         Lorem lorem = LoremIpsum.getInstance();
-        Multifeed[] multifeeds = new Multifeed[length];
+        List<Multifeed> multifeeds = new ArrayList<Multifeed>(length);
         for (int i = 0; i < length; i++) {
-            multifeeds[i] = new Multifeed(
+            multifeeds.add(new Multifeed(
                     random.nextInt(),
                     lorem.getName(),
                     Color.argb(255, random.nextInt(256), random.nextInt(256), random.nextInt(256)),
                     random.nextInt(5),
-                    Feed.generateMockupFeeds(random.nextInt(10))
+                    Feed.generateMockupFeeds(random.nextInt(10)))
             );
-            multifeeds[i].setFeedCount(random.nextInt(10));
         }
         return multifeeds;
     }
 
-    public static String[] toStrings(Multifeed[] multifeeds) {
-        String[] multifeedsStrings = new String[multifeeds.length];
-        for (int i = 0; i < multifeeds.length; i++) {
-            multifeedsStrings[i] = multifeeds[i].getName();
+    public static String[] toStrings(List<Multifeed> multifeeds) {
+        String[] multifeedsStrings = new String[multifeeds.size()];
+        for (int i = 0; i < multifeeds.size(); i++) {
+            multifeedsStrings[i] = multifeeds.get(i).getName();
         }
         return multifeedsStrings;
     }

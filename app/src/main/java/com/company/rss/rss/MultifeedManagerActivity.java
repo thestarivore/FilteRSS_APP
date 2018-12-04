@@ -1,23 +1,31 @@
 package com.company.rss.rss;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.FrameLayout;
 
 import com.company.rss.rss.fragments.MultifeedEditFragment;
+import com.company.rss.rss.fragments.MultifeedListFragment;
 import com.company.rss.rss.models.Multifeed;
 
-public class MultifeedManagerActivity extends AppCompatActivity implements MultifeedEditFragment.SaveMultifeedInterface {
+import java.util.ArrayList;
+
+public class MultifeedManagerActivity extends AppCompatActivity implements MultifeedEditFragment.MultifeedEditInterface, MultifeedListFragment.OnMultifeedListListener {
+    private boolean isTwoPane = false;
+    private boolean editView = false;
+    private ArrayList<Multifeed> multifeeds;
+    private ActionBar actionbar;
+    private DrawerLayout drawerLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,88 +34,104 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
 
         Toolbar toolbar = findViewById(R.id.feeds_search_toolbar);
         setSupportActionBar(toolbar);
+        actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
 
-        final Multifeed[] multifeeds = Multifeed.generateMockupMultifeeds(4);
+        // drawerLayout = findViewById(R.id.drawer_layout_multifeed_manager);
 
-        final ListView listview = (ListView) findViewById(R.id.listViewMultifeedList);
-        final MultifeedManagerActivity.MultifeedListAdapter adapter = new MultifeedManagerActivity.MultifeedListAdapter(this, multifeeds);
-        listview.setAdapter(adapter);
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-                Log.v(ArticleActivity.logTag, "Multifeed " + id + " clicked");
-                final Multifeed multifeed = (Multifeed) parent.getItemAtPosition(position);
-                Log.v(ArticleActivity.logTag, "Multifeed information: " + multifeed.toString());
+        determinePaneLayout();
 
-                // Show multifeed edit fragment
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                MultifeedEditFragment multifeedEditFragment = MultifeedEditFragment.newInstance(multifeed);
-                ft.replace(R.id.multifeedEditFrameLayout, multifeedEditFragment);
-                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                ft.commit();
-            }
+        // TODO: get user's multifeeds
+        multifeeds = (ArrayList<Multifeed>) Multifeed.generateMockupMultifeeds(4);
 
-        });
+        showListFragment();
     }
 
-
-    private class ViewHolderMultifeed {
-        View multifeedViewColor;
-        TextView multifeedName;
-        TextView multifeedCount;
+    private void showListFragment() {
+        MultifeedListFragment multifeedListFragment = MultifeedListFragment.newInstance(multifeeds);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.multifeedListFrameLayout, multifeedListFragment);
+        ft.commit();
     }
 
-
-    private class MultifeedListAdapter extends ArrayAdapter<Multifeed> {
-        private final Context context;
-        private final Multifeed[] multifeeds;
-
-        public MultifeedListAdapter(Context context, Multifeed[] multifeeds) {
-            super(context, -1, multifeeds);
-            this.context = context;
-            this.multifeeds = multifeeds;
+    private void determinePaneLayout() {
+        FrameLayout fragmentItemDetail = (FrameLayout) findViewById(R.id.multifeedEditFrameLayout);
+        if (fragmentItemDetail != null) {
+            // large layout is used
+            isTwoPane = true;
         }
+    }
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            MultifeedManagerActivity.ViewHolderMultifeed viewHolder;
+    private void showMultifeedEditFragment(Multifeed multifeed) {
+        Fragment multifeedEditFragment;
+        if (multifeed == null) {
+            multifeedEditFragment = new Fragment();
+        } else {
+            multifeedEditFragment = MultifeedEditFragment.newInstance(multifeed);
+        }
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.multifeedEditFrameLayout, multifeedEditFragment);
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        ft.commit();
 
-            if (convertView == null) {
-                LayoutInflater inflater = (LayoutInflater) context
-                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                convertView = inflater.inflate(R.layout.multifeed_item, parent, false);
+    }
 
-                viewHolder = new MultifeedManagerActivity.ViewHolderMultifeed();
-                viewHolder.multifeedViewColor = (View) convertView.findViewById(R.id.viewMultifeedColor);
-                viewHolder.multifeedName = (TextView) convertView.findViewById(R.id.textViewMultifeedName);
-                viewHolder.multifeedCount= (TextView) convertView.findViewById(R.id.textViewMultifeedCount);
+    @Override
+    public void onMultifeedSelected(int position) {
+        if (isTwoPane) { // single activity with multifeed and detail
+            // Replace frame layout with correct edit fragment
+            MultifeedEditFragment multifeedEditFragment = MultifeedEditFragment.newInstance(multifeeds.get(position));
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.multifeedEditFrameLayout, multifeedEditFragment);
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            ft.commit();
+        } else { // separate activities
+            editView = true;
+            actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+            MultifeedEditFragment multifeedEditFragment = MultifeedEditFragment.newInstance(multifeeds.get(position));
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.multifeedListFrameLayout, multifeedEditFragment);
+            ft.commit();
+        }
+    }
 
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (MultifeedManagerActivity.ViewHolderMultifeed) convertView.getTag();
-            }
-
-            Multifeed multifeed = multifeeds[position];
-            if (multifeed != null) {
-                viewHolder.multifeedName.setText(multifeed.getName());
-
-                viewHolder.multifeedCount.setText(String.valueOf(multifeed.getFeedCount()));
-
-                Log.v(ArticleActivity.logTag, "Multifeed color: " + multifeed.getColor());
-
-                viewHolder.multifeedViewColor.setBackgroundColor(multifeed.getColor());
-
-            }
-            return convertView;
-
+    @Override
+    public void onBackPressed() {
+        Log.d(ArticleActivity.logTag, "onBackPressed Called");
+        if(editView){
+            showListFragment();
+            editView = false;
+            actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+        } else {
+            super.onBackPressed();
         }
     }
 
     @Override
     public void onSaveMultifeed(Multifeed multifeed) {
         // TODO: call the API and update the multifeed
-        Log.v(ArticleActivity.logTag, "Saving multifeed: " + multifeed.toString());
+        Log.v(ArticleActivity.logTag, "Saving multifeed to API: " + multifeed.toString());
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_multifeed_manager, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.onBackPressed();
+                return true;
+            /*if(editView){
+                } else {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }*/
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
 

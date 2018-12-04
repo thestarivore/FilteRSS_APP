@@ -28,7 +28,18 @@ import top.defaults.colorpicker.ColorPickerPopup;
 
 public class MultifeedEditFragment extends Fragment {
     private View view;
-    private SaveMultifeedInterface saveMultifeedInterface;
+    private MultifeedEditInterface saveMultifeedInterface;
+    private Multifeed multifeed;
+
+    public static MultifeedEditFragment newInstance(Multifeed multifeed) {
+        MultifeedEditFragment multifeedEditFragment = new MultifeedEditFragment();
+
+        Bundle args = new Bundle();
+        args.putSerializable("multifeed", multifeed);
+        multifeedEditFragment.setArguments(args);
+
+        return multifeedEditFragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
@@ -86,16 +97,6 @@ public class MultifeedEditFragment extends Fragment {
         return view;
     }
 
-    public static MultifeedEditFragment newInstance(Multifeed multifeed) {
-        MultifeedEditFragment multifeedEditFragment = new MultifeedEditFragment();
-
-        Bundle args = new Bundle();
-        args.putSerializable("multifeed", multifeed);
-        multifeedEditFragment.setArguments(args);
-
-        return multifeedEditFragment;
-    }
-
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         final View viewMultifeedEditColor = (View) view.findViewById(R.id.viewMultifeedEditColor);
@@ -132,12 +133,18 @@ public class MultifeedEditFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        saveMultifeedInterface = (SaveMultifeedInterface) context;
+        if (context instanceof MultifeedEditInterface) {
+            saveMultifeedInterface = (MultifeedEditInterface) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement MultifeedEditInterface");
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        Log.v(ArticleActivity.logTag, "Multifeed Edit Fragment paused");
 
         // save data and pass updated multifeed to parent activity
         Multifeed multifeed = (Multifeed) getArguments().getSerializable("multifeed");
@@ -150,6 +157,7 @@ public class MultifeedEditFragment extends Fragment {
         multifeed.setColor(getBackgroundColor(colorView));
         multifeed.setImportance(seekBar.getProgress());
 
+        Log.v(ArticleActivity.logTag, "Multifeed set " + multifeed.toString());
 
         // TODO: invoke onSaveMultifeed only if the multifeed has been updated
         saveMultifeedInterface.onSaveMultifeed(multifeed);
@@ -163,7 +171,7 @@ public class MultifeedEditFragment extends Fragment {
         return 0;
     }
 
-    public interface SaveMultifeedInterface {
+    public interface MultifeedEditInterface {
         public void onSaveMultifeed(Multifeed multifeed);
     }
 

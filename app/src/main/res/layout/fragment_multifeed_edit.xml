@@ -96,10 +96,22 @@
         </LinearLayout>
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/listViewEditMultifeed"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="16dp"
-        android:layout_weight="1" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="16dp">
+        <TextView
+            android:id="@+id/textViewLabelFeedsList"
+            style="@style/material_type_scale_overline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/feeds" />
+
+        <ListView
+            android:id="@+id/listViewEditMultifeed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+    </LinearLayout>
 </LinearLayout>

@@ -107,7 +107,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
 
 
         // TOP ARTICLES - SLIDER
@@ -226,8 +226,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         Log.v(ArticleActivity.logTag, article.toString());
         startArticleActivity(article);
     }
-
-
 
 
     private void startArticleActivity(Article article) {
