@@ -7,9 +7,12 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,7 +48,7 @@ public class ArticleActivity extends AppCompatActivity {
 
         // INPUT DATA
         Intent intent = getIntent();
-        Article article = (Article) intent.getSerializableExtra(ArticlesListActivity.EXTRA_ARTICLE);
+        final Article article = (Article) intent.getSerializableExtra(ArticlesListActivity.EXTRA_ARTICLE);
 
         String articleImage = article.getImage();
         String articleSubtitle = article.getSource();
@@ -83,9 +86,37 @@ public class ArticleActivity extends AppCompatActivity {
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabFeedbackButtonArticle);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(final View view) {
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(ArticleActivity.this);
+                final View dialogView = LayoutInflater.from(ArticleActivity.this).inflate(R.layout.dialog_feedback_layout, null);
+                builder.setView(dialogView);
+                final AlertDialog feedbackDialog = builder.create();
+                dialogView.findViewById(R.id.linearLayoutFeedbackGood).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        sendArticlesFeedback(article, 1);
+                        Snackbar.make(view, R.string.thank_you_feedback_submit, Snackbar.LENGTH_LONG).show();
+                        feedbackDialog.dismiss();
+                    }
+                });
+                dialogView.findViewById(R.id.linearLayoutFeedbackAverage).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        sendArticlesFeedback(article, 0);
+                        Snackbar.make(view, R.string.thank_you_feedback_submit, Snackbar.LENGTH_LONG).show();
+                        feedbackDialog.dismiss();
+                    }
+                });
+                dialogView.findViewById(R.id.linearLayoutFeedbackBad).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        sendArticlesFeedback(article, -1);
+                        Snackbar.make(view, R.string.thank_you_feedback_submit, Snackbar.LENGTH_LONG).show();
+                        feedbackDialog.dismiss();
+                    }
+                });
+                feedbackDialog.show();
             }
         });
 
@@ -103,14 +134,25 @@ public class ArticleActivity extends AppCompatActivity {
                 positionProgressBar.setProgress((int) percentageScrolled);
 
                 if (!fabVisible && percentageScrolled >= 70) {
-                    Toast.makeText(getBaseContext(), "Asking for feedback",
-                            Toast.LENGTH_SHORT).show();
                     fab.setVisibility(View.VISIBLE);
                     fabVisible = true;
+
+                    sendArticlesRead(article);
                 }
             }
         });
 
+    }
+
+    private void sendArticlesRead(Article article) {
+        // TODO: call the API and increment the article reads counter
+        Log.v(ArticleActivity.logTag, "Sending article count increment for " + article.toString());
+
+    }
+
+    private void sendArticlesFeedback(Article article, int i) {
+        // TODO: call the API and send the feedback
+        Log.v(ArticleActivity.logTag, "Sending feedback " + i +  " for " + article.toString());
     }
 
     @Override

@@ -117,4 +117,9 @@
     <string name="dialog_remove_multifeed_title">Remove this multifeed?</string>
     <string name="remove">Remove</string>
     <string name="feeds">Feeds</string>
+    <string name="feedback_question">How do you rate this content?</string>
+    <string name="feedback_good">Good</string>
+    <string name="feedback_average">Average</string>
+    <string name="feedback_bad">Bad</string>
+    <string name="thank_you_feedback_submit">Thank you for the feedback</string>
 </resources>
