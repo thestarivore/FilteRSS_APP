@@ -7,7 +7,7 @@
     android:padding="16dp">
 
     <View
-        android:id="@+id/viewMultifeedColor"
+        android:id="@+id/viewCollectionColor"
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@drawable/rounded_button" />
@@ -21,19 +21,13 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/textViewMultifeedName"
+            android:id="@+id/textViewCollectionName"
             style="@style/material_type_scale_h6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="16dp"
-            android:text="Feed Name" />
+            android:text="Collection Name" />
 
-        <TextView
-            android:id="@+id/textViewMultifeedCount"
-            style="@style/material_type_scale_caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Feed Count" />
     </LinearLayout>
 
 </LinearLayout>

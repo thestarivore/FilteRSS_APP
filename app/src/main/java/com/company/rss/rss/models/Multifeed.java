@@ -18,12 +18,11 @@ public class Multifeed implements Serializable {
     private List<Feed> feeds;
 
 
-    public Multifeed(int id, String name, int color, int importance, List<Feed> feeds) {
+    public Multifeed(int id, String name, int color, int importance) {
         this.id = id;
         this.name = name;
         this.color = color;
         this.importance = importance;
-        this.feeds = feeds;
     }
 
     public int getColor() {
@@ -67,9 +66,8 @@ public class Multifeed implements Serializable {
                     random.nextInt(),
                     lorem.getName(),
                     Color.argb(255, random.nextInt(256), random.nextInt(256), random.nextInt(256)),
-                    random.nextInt(5),
-                    Feed.generateMockupFeeds(random.nextInt(10)))
-            );
+                    random.nextInt(5)));
+            multifeeds.get(i).setFeeds(Feed.generateMockupFeeds(random.nextInt(10)));
         }
         return multifeeds;
     }
@@ -86,12 +84,15 @@ public class Multifeed implements Serializable {
         return feeds;
     }
 
+    public void setFeeds(List<Feed> feeds) { this.feeds = feeds; }
+
     @Override
     public String toString() {
         return "Multifeed{" +
                 "id=" + id +
-                ", title='" + name + '\'' +
+                ", name='" + name + '\'' +
+                ", color=" + color +
+                ", importance=" + importance +
                 '}';
     }
-
 }

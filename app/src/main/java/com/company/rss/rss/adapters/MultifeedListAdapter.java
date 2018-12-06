@@ -1,6 +1,7 @@
 package com.company.rss.rss.adapters;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,20 +17,16 @@ import java.util.List;
 
 
 public class MultifeedListAdapter extends ArrayAdapter<Multifeed> {
-    public List<Multifeed> getItems() {
-        return multifeeds;
-    }
-
     private class ViewHolderMultifeed {
+
         View multifeedViewColor;
         TextView multifeedName;
         TextView multifeedCount;
     }
 
-
     private final Context context;
-    private final List<Multifeed> multifeeds;
 
+    private final List<Multifeed> multifeeds;
     public MultifeedListAdapter(Context context, List<Multifeed> multifeeds) {
         super(context, -1, multifeeds);
         this.context = context;
@@ -59,9 +56,15 @@ public class MultifeedListAdapter extends ArrayAdapter<Multifeed> {
         if (multifeed != null) {
             viewHolder.multifeedName.setText(multifeed.getName());
             viewHolder.multifeedCount.setText(String.valueOf(multifeed.getFeedCount()));
-            viewHolder.multifeedViewColor.setBackgroundColor(multifeed.getColor());
+            // set the multifeed's color
+            GradientDrawable background = (GradientDrawable) viewHolder.multifeedViewColor.getBackground();
+            background.setColor(multifeed.getColor());
         }
         return convertView;
 
+    }
+
+    public List<Multifeed> getItems() {
+        return multifeeds;
     }
 }

@@ -122,4 +122,7 @@
     <string name="feedback_average">Average</string>
     <string name="feedback_bad">Bad</string>
     <string name="thank_you_feedback_submit">Thank you for the feedback</string>
+    <string name="title_activity_collection_manager">CollectionManagerActivity</string>
+    <string name="dialog_remove_collection_title">Remove this collection?</string>
+    <string name="save">Save</string>
 </resources>

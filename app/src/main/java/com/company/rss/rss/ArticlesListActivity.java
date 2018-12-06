@@ -68,6 +68,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                     // multifeeds title long clicked
                     if(listDataHeader.get(groupPosition).equals(getString(R.string.multifeeds))){
                         startMultifeedManagerActivity();
+                    } else if(listDataHeader.get(groupPosition).equals(getString(R.string.collections))){
+                        startCollectionManagerActivity();
                     }
                 }
                 /*else if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
@@ -119,7 +121,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         viewPager.getLayoutParams().height = size.y / 3;
 
         // Create mock articles for top articles
-        List<Article> topArticles = Article.generateMockupArticle(6);
+        List<Article> topArticles = Article.generateMockupArticles(6);
 
         pager = (ViewPager) findViewById(R.id.pagerArticles);
         pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
@@ -236,6 +238,11 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
     private void startMultifeedManagerActivity() {
         Intent intent = new Intent(this, MultifeedManagerActivity.class);
+        startActivity(intent);
+    }
+
+    private void startCollectionManagerActivity() {
+        Intent intent = new Intent(this, CollectionManagerActivity.class);
         startActivity(intent);
     }
 }

@@ -29,7 +29,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
-    List<Article> articles =  Article.generateMockupArticle(25);
+    List<Article> articles =  Article.generateMockupArticles(25);
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the

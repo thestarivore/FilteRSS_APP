@@ -85,6 +85,7 @@ public class MultifeedListFragment extends Fragment {
                                 Log.d(ArticleActivity.logTag, "Removing multifeed " + position + " multifeed: " + parent.getItemAtPosition(position));
                                 adapter.notifyDataSetChanged();
                                 multifeeds.remove(position);
+                                // TODO: call the API and remove the multifeed
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

@@ -32,7 +32,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multifeed_manager);
 
-        Toolbar toolbar = findViewById(R.id.feeds_search_toolbar);
+        Toolbar toolbar = findViewById(R.id.multifeed_manager_toolbar);
         setSupportActionBar(toolbar);
         actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);

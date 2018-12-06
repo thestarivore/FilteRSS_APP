@@ -15,24 +15,26 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".ArticleActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ArticlesListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".FeedsSearchActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".MultifeedManagerActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".CollectionManagerActivity"
+            android:label="@string/title_activity_collection_manager"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

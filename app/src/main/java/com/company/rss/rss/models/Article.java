@@ -112,7 +112,7 @@ public class Article implements Serializable {
         return pubblishTime;
     }
 
-    public static List<Article> generateMockupArticle(int length) {
+    public static List<Article> generateMockupArticles(int length) {
         List<Article> articles = new ArrayList<Article>(length);
         for (int i = 0; i < length; i++) {
             articles.add(createMockArticle());

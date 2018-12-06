@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -53,7 +54,9 @@ public class MultifeedEditFragment extends Fragment {
 
         multifeed = (Multifeed) getArguments().getSerializable("multifeed");
         name.setText(multifeed.getName());
-        color.setBackgroundColor(multifeed.getColor());
+        // set the button's color
+        GradientDrawable background = (GradientDrawable) color.getBackground();
+        background.setColor(multifeed.getColor());
         seekBar.setProgress(multifeed.getImportance());
 
 
@@ -106,7 +109,7 @@ public class MultifeedEditFragment extends Fragment {
             @Override
             public void onClick(final View v) {
                 new ColorPickerPopup.Builder(getContext())
-                        .initialColor(getBackgroundColor(viewMultifeedEditColor))
+                        .initialColor(multifeed.getColor())
                         .enableBrightness(false)
                         .enableAlpha(false)
                         .okTitle(getString(R.string.choose))
@@ -117,7 +120,9 @@ public class MultifeedEditFragment extends Fragment {
                         .show(new ColorPickerPopup.ColorPickerObserver() {
                             @Override
                             public void onColorPicked(int color) {
-                                v.setBackgroundColor(color);
+                                GradientDrawable background = (GradientDrawable) v.getBackground();
+                                background.setColor(color);
+                                multifeed.setColor(color);
                             }
 
                             @Override
@@ -155,21 +160,12 @@ public class MultifeedEditFragment extends Fragment {
         SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekBarMultifeedEdit);
 
         multifeed.setName(String.valueOf(name.getText()));
-        multifeed.setColor(getBackgroundColor(colorView));
         multifeed.setImportance(seekBar.getProgress());
 
         Log.v(ArticleActivity.logTag, "Multifeed set " + multifeed.toString());
 
         // TODO: invoke onSaveMultifeed only if the multifeed has been updated
         saveMultifeedInterface.onSaveMultifeed(multifeed);
-    }
-
-    private int getBackgroundColor(View view) {
-        Drawable background = view.getBackground();
-        if (background instanceof ColorDrawable){
-            return ((ColorDrawable) background).getColor();
-        }
-        return 0;
     }
 
     public interface MultifeedEditInterface {
