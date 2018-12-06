@@ -63,20 +63,6 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         }
     }
 
-    private void showMultifeedEditFragment(Multifeed multifeed) {
-        Fragment multifeedEditFragment;
-        if (multifeed == null) {
-            multifeedEditFragment = new Fragment();
-        } else {
-            multifeedEditFragment = MultifeedEditFragment.newInstance(multifeed);
-        }
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.multifeedEditFrameLayout, multifeedEditFragment);
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        ft.commit();
-
-    }
-
     @Override
     public void onMultifeedSelected(int position) {
         if (isTwoPane) { // single activity with multifeed and detail
@@ -86,6 +72,9 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
             ft.replace(R.id.multifeedEditFrameLayout, multifeedEditFragment);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             ft.commit();
+
+            // Update the list
+            showListFragment();
         } else { // separate activities
             editView = true;
             actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);

@@ -95,9 +95,7 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_gravity="end"
-            android:background="@drawable/mockimg"
-            android:scaleType="centerCrop"
-            app:srcCompat="@drawable/mockimg" />
+            android:scaleType="centerCrop" />
         <!--android:src="@drawable/gradient"-->
 
     </LinearLayout>

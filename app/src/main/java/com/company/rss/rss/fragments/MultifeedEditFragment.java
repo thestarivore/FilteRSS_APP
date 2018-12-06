@@ -51,7 +51,7 @@ public class MultifeedEditFragment extends Fragment {
         View color = (View) view.findViewById(R.id.viewMultifeedEditColor);
         SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekBarMultifeedEdit);
 
-        Multifeed multifeed = (Multifeed) getArguments().getSerializable("multifeed");
+        multifeed = (Multifeed) getArguments().getSerializable("multifeed");
         name.setText(multifeed.getName());
         color.setBackgroundColor(multifeed.getColor());
         seekBar.setProgress(multifeed.getImportance());
@@ -81,6 +81,7 @@ public class MultifeedEditFragment extends Fragment {
                                 Log.d(ArticleActivity.logTag, "Removing feed " + position + " feed: " + feeds.get(position));
                                 feeds.remove(position);
                                 adapter.notifyDataSetChanged();
+                                saveMultifeedInterface.onSaveMultifeed(multifeed);
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -142,8 +143,8 @@ public class MultifeedEditFragment extends Fragment {
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onStop() {
+        super.onStop();
         Log.v(ArticleActivity.logTag, "Multifeed Edit Fragment paused");
 
         // save data and pass updated multifeed to parent activity

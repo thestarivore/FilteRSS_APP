@@ -58,13 +58,8 @@ public class MultifeedListAdapter extends ArrayAdapter<Multifeed> {
         Multifeed multifeed = multifeeds.get(position);
         if (multifeed != null) {
             viewHolder.multifeedName.setText(multifeed.getName());
-
             viewHolder.multifeedCount.setText(String.valueOf(multifeed.getFeedCount()));
-
-            Log.v(ArticleActivity.logTag, "Multifeed color: " + multifeed.getColor());
-
             viewHolder.multifeedViewColor.setBackgroundColor(multifeed.getColor());
-
         }
         return convertView;
 
