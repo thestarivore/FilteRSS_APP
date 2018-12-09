@@ -1,5 +1,7 @@
 package com.company.rss.rss;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -24,6 +26,23 @@ import com.company.rss.rss.adapters.ExpandableListAdapter;
 import com.company.rss.rss.fragments.ArticlesListFragment;
 import com.company.rss.rss.fragments.ArticlesSlideFragment;
 import com.company.rss.rss.models.Article;
+import com.company.rss.rss.models.Category;
+import com.company.rss.rss.models.Collection;
+import com.company.rss.rss.models.Feed;
+import com.company.rss.rss.models.Multifeed;
+import com.company.rss.rss.models.ReadArticle;
+import com.company.rss.rss.models.SQLOperation;
+import com.company.rss.rss.models.User;
+import com.company.rss.rss.restful_api.RESTMiddleware;
+import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
+import com.company.rss.rss.restful_api.callbacks.CategoryCallback;
+import com.company.rss.rss.restful_api.callbacks.CollectionCallback;
+import com.company.rss.rss.restful_api.callbacks.FeedCallback;
+import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
+import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
+import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
+import com.company.rss.rss.restful_api.callbacks.UserCallback;
+import com.company.rss.rss.rss_parser.LoadRSSFeed;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +50,7 @@ import java.util.List;
 
 
 public class ArticlesListActivity extends AppCompatActivity implements ArticlesListFragment.OnListFragmentInteractionListener, ArticlesSlideFragment.OnFragmentInteractionListener {
+    private static final String TAG = "MainActivity";
 
     // TODO: refactor this
     private DrawerLayout drawerLayout;
@@ -41,17 +61,29 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private ExpandableListView expListView;
     private List<String> listDataHeader;
     private HashMap<String, List<String>> listDataChild;
+    private RESTMiddleware api;
+    private List<Feed> feedList = new ArrayList<Feed>();
+    private Context context;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_articles_list);
+        context = this;
 
         // DRAWER AND TOOLBAR
         // Left Menu
         expListView = (ExpandableListView) findViewById(R.id.exp_list_view_article);
         prepareListData();
+
+
+        //Instantiate the Middleware for the RESTful API's
+        api = new RESTMiddleware(this);
+
+        //Calls all the RESTful APIs to test them
+        restApiTestCalls();
+
         listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
         expListView.setAdapter(listAdapter);
         expListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -245,4 +277,561 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         Intent intent = new Intent(this, CollectionManagerActivity.class);
         startActivity(intent);
     }
+
+    /**
+     * Calls all the RESTful APIs to test them
+     */
+    private void restApiTestCalls(){
+        final ProgressDialog progressDialog =
+                ProgressDialog.show(this, "Wait", "Executing RESTful APIs...", true, false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                /*********************** Categories *********************************/
+                api.getAllCategories(new CategoryCallback() {
+                    @Override
+                    public void onLoad(List<Category> categories) {
+                        for(Category category: categories){
+                            Log.d(TAG, "\nCategory: " + category.getName() + ", " + category.getLang());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getAllCategories");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                /*********************** Auth *********************************/
+                //Registration
+                api.registerNewUser("pino", "dino","pinodino", "qwerty", new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nRegistered User with id: " + sqlOperation.getInsertId());
+                        }
+                        else{
+                            Log.d(TAG, "\nNO User Registered");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: registerNewUser");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Authentication
+                api.getUserAuthentication("pinodino", "qwerty", new UserCallback() {
+                    @Override
+                    public void onLoad(List<User> users) {
+                        for(User user: users){
+                            Log.d(TAG, "\nUser authentication");
+                            Log.d(TAG, "\nUser: " + user.getId() +  ", " + user.getName() + ", " + user.getSurname() + ", " + user.getEmail() + ", " + user.getPassword());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getUserAuthentication");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Change password
+                api.changeUsersPassword("pinodino", "qwerty12345", new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nChanged the password of the User");
+                        }
+                        else{
+                            Log.d(TAG, "\nNO change!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: changeUsersPassword");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Authentication
+                api.getUserAuthentication("pinodino", "qwerty12345", new UserCallback() {
+                    @Override
+                    public void onLoad(List<User> users) {
+                        for(User user: users){
+                            Log.d(TAG, "\nUser authentication");
+                            Log.d(TAG, "\nUser: " + user.getId() +  ", " + user.getName() + ", " + user.getSurname() + ", " + user.getEmail() + ", " + user.getPassword());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getUserAuthentication");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                /*********************** Feeds *********************************/
+                //Get all the Feeds
+                api.getAllFeeds(new FeedCallback() {
+                    @Override
+                    public void onLoad(List<Feed> feeds) {
+                        Log.d(TAG, "\nNumber of Feeds: " + feeds.size());
+
+                        //Get a copy of the feeds
+                        feedList.addAll(feeds);
+
+                        // Start parsing the first 20 feeds
+                        for(int i = 0 ; i<20 ; i++) {
+                            String feedURL = feeds.get(i).getLink();
+                            new LoadRSSFeed(context, feedURL).execute();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getAllFeeds");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Add a new Feed
+                api.addFeed("UniqueTitle", "www.anything.rss.net", "Tech","EN",new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nAdded a new feed!");
+                        }
+                        else{
+                            Log.d(TAG, "\nFeed NOT added!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: addFeed");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Get all the Feeds Filtered by a string
+                api.getFilteredFeeds("UniqueTitle", new FeedCallback() {
+                    @Override
+                    public void onLoad(List<Feed> feeds) {
+                        for(Feed feed:feeds) {
+                            Log.d(TAG, "\nFeed: " + feed.getTitle() + "," + feed.getLink()+ "," + feed.getCategory()+ "," + feed.getLang());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getFilteredFeeds");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                /*********************** User - Feeds *********************************/
+                //Add a Feed to the User's Multifeed
+                Log.d(TAG, "\naddUserFeed:");
+                api.addUserFeed(1032,7, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nAssociated feed to user's multifeed");
+                        }
+                        else{
+                            Log.d(TAG, "\nFeed NOT associated!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: addUserFeed");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Get all the User's Feeds
+                Log.d(TAG, "\ngetUserFeeds:");
+                api.getUserFeeds("test", new FeedCallback() {
+                    @Override
+                    public void onLoad(List<Feed> feeds) {
+                        for(Feed feed:feeds) {
+                            Log.d(TAG, "\nFeed: " + feed.getTitle() + "," + feed.getLink()+ "," + feed.getCategory()+ "," + feed.getLang());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getUserFeeds");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Add an article checkpoint to the Feed associated with the User's Multifeed
+                Log.d(TAG, "\naddUserFeedCheckpoint:");
+                api.addUserFeedCheckpoint(1032,7, 7266917625629689308L, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nAdded a checpoint article to the feed related to a user!");
+                        }
+                        else{
+                            Log.d(TAG, "\nChecpoint NOT associated!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: addUserFeedCheckpoint");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Get the checkpoint of the User's Feed-Multifeed Group
+                Log.d(TAG, "\ngetUserFeedCheckpoint:");
+                api.getUserFeedCheckpoint(1032, 7, new ArticleCallback() {
+                    @Override
+                    public void onLoad(List<Article> articles) {
+                        for(Article article:articles) {
+                            Log.d(TAG, "\nArticle: " + article.getHashId() + "," + article.getTitle()+ "," + article.getLink()+ "," + article.getImgLink());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getUserFeedCheckpoint");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Delete a Feed related to a User's Multifeed
+                Log.d(TAG, "\ndeleteUserFeed:");
+                api.deleteUserFeed(1032,7, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nDeleted a feed-multifeed-user association!");
+                        }
+                        else{
+                            Log.d(TAG, "\nDelete NOT done!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: deleteUserFeed");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                /*********************** User - Multifeed *********************************/
+                //Add a Multifeed to a User
+                Log.d(TAG, "\naddUserMultifeed:");
+                api.addUserMultifeed("TestMultifeed",1,7, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nAdded a Multifeed!");
+                        }
+                        else{
+                            Log.d(TAG, "\nMultifeed NOT added!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: addUserMultifeed");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Gets the list of all the User's Multifeeds
+                Log.d(TAG, "\ngetUserMultifeeds:");
+                api.getUserMultifeeds("pino", new MultifeedCallback() {
+                    @Override
+                    public void onLoad(List<Multifeed> multifeeds) {
+                        for(Multifeed multifeed:multifeeds) {
+                            Log.d(TAG, "\nrMultifeed: " + multifeed.getTitle() + "," + multifeed.getUser()+ "," + multifeed.getColor());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getUserMultifeeds");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Delete a Multifeed related to a User (manually select one)
+                Log.d(TAG, "\ndeleteUserMultifeed:");
+                api.deleteUserMultifeed(16, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nDeleted a multifeed!");
+                        }
+                        else{
+                            Log.d(TAG, "\nDelete NOT done!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: deleteUserMultifeed");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+
+                /*********************** User - Collection *********************************/
+                //Add a Collection to a User
+                Log.d(TAG, "\naddUserCollection:");
+                api.addUserCollection("TestCollection",1,7, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nAdded a Collection!");
+                        }
+                        else{
+                            Log.d(TAG, "\nCollection NOT added!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: addUserCollection");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Gets the list of all the User's Collections
+                Log.d(TAG, "\ngetUserCollections:");
+                api.getUserCollections("pino", new CollectionCallback() {
+                    @Override
+                    public void onLoad(List<Collection> collections) {
+                        for(Collection collection:collections) {
+                            Log.d(TAG, "\nCollection: " + collection.getTitle() + "," + collection.getUser()+ "," + collection.getColor());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getUserCollections");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Delete a Collection related to a User (manually select one)
+                Log.d(TAG, "\ndeleteUserCollection:");
+                api.deleteUserCollection(4, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nDeleted a Collection!");
+                        }
+                        else{
+                            Log.d(TAG, "\nDelete NOT done!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: deleteUserCollection");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+
+                /*********************** User - Articles *********************************/
+                //Add a Article to a User
+                Log.d(TAG, "\naddUserArticle:");
+                api.addUserArticle("TestArticle", "-", "-", "www.test.com", "www.img.com",
+                        "2018-10-21 00:00:00", 8,1032, new SQLOperationCallback() {
+                            @Override
+                            public void onLoad(SQLOperation sqlOperation) {
+                                if(sqlOperation.getAffectedRows() == 1){
+                                    Log.d(TAG, "\nAdded an Article!");
+                                }
+                                else{
+                                    Log.d(TAG, "\nArticle NOT added!");
+                                }
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                Log.d(TAG, "\nFailure on: addUserArticle");
+                            }
+                        });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Gets the list of all the User's Articles
+                Log.d(TAG, "\ngetUserArticles:");
+                api.getUserArticles(1032, new ArticleCallback() {
+                    @Override
+                    public void onLoad(List<Article> articles) {
+                        for(Article article:articles) {
+                            Log.d(TAG, "\nArticle: " + article.getHashId() + "," + article.getTitle()+ "," + article.getLink());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getUserArticles");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Delete a Article related to a User (manually select one)
+                Log.d(TAG, "\ndeleteUserArticle:");
+                api.deleteUserArticle(-4948164086017713000L, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nDeleted a Article!");
+                        }
+                        else{
+                            Log.d(TAG, "\nDelete NOT done!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: deleteUserArticle");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+
+                /*********************** User - SavedArticles *********************************/
+                //Add a SavedArticle to a User
+                Log.d(TAG, "\naddUserSavedArticle:");
+                api.addUserSavedArticle(7266917625629689308L,3, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nAdded an SavedArticle!");
+                        }
+                        else{
+                            Log.d(TAG, "\nSavedArticle NOT added!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: addUserSavedArticle");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Gets the list of all the User's SavedArticle
+                Log.d(TAG, "\ngetUserSavedArticles:");
+                api.getUserSavedArticles(3, new ArticleCallback() {
+                    @Override
+                    public void onLoad(List<Article> articles) {
+                        for(Article article:articles) {
+                            Log.d(TAG, "\nSavedArticle: " + article.getHashId() + "," + article.getTitle()+ "," + article.getLink());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getUserSavedArticles");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Delete a SavedArticle related to a User (manually select one)
+                Log.d(TAG, "\ndeleteUserSavedArticle:");
+                api.deleteUserSavedArticle(7266917625629689308L, 3, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nDeleted a SavedArticle!");
+                        }
+                        else{
+                            Log.d(TAG, "\nDelete NOT done!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: deleteUserSavedArticle");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+
+                /*********************** User - ReadArticles *********************************/
+                //Add a ReadArticle to a User
+                Log.d(TAG, "\naddUserReadArticle:");
+                api.addUserReadArticle(2,8375590935598658000L,2, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nAdded an ReadArticle!");
+                        }
+                        else{
+                            Log.d(TAG, "\nReadArticle NOT added!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: addUserReadArticle");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Gets the list of all the User's ReadArticle
+                Log.d(TAG, "\ngetUserReadArticles:");
+                api.getUserReadArticles(3, new ReadArticleCallback() {
+                    @Override
+                    public void onLoad(List<ReadArticle> readArticles) {
+                        for(ReadArticle readArticle : readArticles) {
+                            Log.d(TAG, "\nReadArticle: " + readArticle.getArticle() + "," + readArticle.getUser()+ "," + readArticle.getVote());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getUserReadArticles");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Delete a ReadArticle related to a User (manually select one)
+                Log.d(TAG, "\ndeleteUserReadArticle:");
+                api.deleteUserReadArticle(2, 8375590935598658000L, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        if(sqlOperation.getAffectedRows() == 1){
+                            Log.d(TAG, "\nDeleted a ReadArticle!");
+                        }
+                        else{
+                            Log.d(TAG, "\nDelete NOT done!");
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: deleteUserReadArticle");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Dismiss dialog
+                progressDialog.dismiss();
+            }
+        };
+        thread.start();
+    }
+
 }

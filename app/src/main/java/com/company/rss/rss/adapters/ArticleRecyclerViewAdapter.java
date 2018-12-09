@@ -42,7 +42,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         holder.mTitleView.setText(mArticles.get(position).getTitle());
 
         holder.mExcerptView.setText(mArticles.get(position).getExcerpt());
-        holder.mSubView.setText(mArticles.get(position).getSource());
+        holder.mSubView.setText(mArticles.get(position).getLink());
 
         // show The Image in a ImageView
         new DownloadImageTask(holder.mImageView)

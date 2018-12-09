@@ -21,7 +21,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
@@ -50,16 +49,16 @@ public class ArticleActivity extends AppCompatActivity {
         Intent intent = getIntent();
         final Article article = (Article) intent.getSerializableExtra(ArticlesListActivity.EXTRA_ARTICLE);
 
-        String articleImage = article.getImage();
-        String articleSubtitle = article.getSource();
+        String articleImage = article.getImgLink();
+        String articleSubtitle = article.getLink();
         String articleTitle = article.getTitle();
-        String articleBody = article.getBody();
+        String articleBody = article.getDescription();
         int readingTime = article.getReadingTime();
 
         // SETTERS
         ImageView articleImageView = (ImageView) findViewById(R.id.imageViewArticleImage);
         new DownloadImageTask(articleImageView)
-                .execute(article.getImage());
+                .execute(article.getImgLink());
         // Set the image to full size of the viewport
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();

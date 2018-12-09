@@ -54,7 +54,7 @@ public class MultifeedListAdapter extends ArrayAdapter<Multifeed> {
 
         Multifeed multifeed = multifeeds.get(position);
         if (multifeed != null) {
-            viewHolder.multifeedName.setText(multifeed.getName());
+            viewHolder.multifeedName.setText(multifeed.getTitle());
             viewHolder.multifeedCount.setText(String.valueOf(multifeed.getFeedCount()));
             // set the multifeed's color
             GradientDrawable background = (GradientDrawable) viewHolder.multifeedViewColor.getBackground();

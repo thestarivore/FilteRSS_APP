@@ -49,7 +49,7 @@ public class ArticlesSlideFragment extends Fragment {
         ImageView articleImage = (ImageView) view.findViewById(R.id.imageViewArticleSlider);
 
         articleTitle.setText(mArticle.getTitle());
-        articleSource.setText(mArticle.getSource());
+        articleSource.setText(mArticle.getLink());
         new DownloadImageTask(articleImage)
                 .execute(mArticle.getThumbnail());
 

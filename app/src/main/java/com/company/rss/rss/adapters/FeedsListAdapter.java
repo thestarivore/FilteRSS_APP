@@ -47,7 +47,7 @@ public class FeedsListAdapter extends ArrayAdapter<Feed> {
 
         Feed feed = feeds.get(position);
         if (feed != null) {
-            viewHolder.feedName.setText(feed.getName());
+            viewHolder.feedName.setText(feed.getTitle());
             viewHolder.feedCategory.setText(feed.getCategory());
             if(removeIcon) viewHolder.feedActionIcon.setRotation(45); // Show delete icon
         }

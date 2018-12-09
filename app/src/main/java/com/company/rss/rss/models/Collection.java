@@ -2,23 +2,122 @@ package com.company.rss.rss.models;
 
 import android.graphics.Color;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Collection {
-    private final int id;
+public class Collection implements Serializable{
+    @SerializedName("id")
+    @Expose
+    private int id;
+
+    @SerializedName("title")
+    @Expose
+    private String title;
+
+    @SerializedName("user")
+    @Expose
+    private int user;
+
+    @SerializedName("color")
+    @Expose
     private int color;
-    private String name;
+
+    //TODO: aggiunto perche usato nella mockapp, ma non c'era nel ER_Model originale, valutare se gestire la lista degli articoli qui, oppure esternamente
     private List<Article> articles;
 
-    public Collection(int id, String name, int color) {
+    public Collection() {
+    }
+
+    public Collection(int id, String title, int color) {
         this.id = id;
-        this.name = name;
+        this.title = title;
         this.color = color;
+    }
+
+    public Collection(int id, String title, int user, int color) {
+        this.id = id;
+        this.title = title;
+        this.user = user;
+        this.color = color;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public int getUser() {
+        return user;
+    }
+
+    public void setUser(int user) {
+        this.user = user;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public List<Article> getArticles() {
+        return articles;
+    }
+
+    public void setArticles(List<Article> articles) {
+        this.articles = articles;
+    }
+
+    @Override
+    public String toString() {
+        return "Collection{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", user=" + user +
+                ", color=" + color +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Collection that = (Collection) o;
+
+        if (id != that.id) return false;
+        if (user != that.user) return false;
+        if (color != that.color) return false;
+        return title.equals(that.title);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + title.hashCode();
+        result = 31 * result + user;
+        result = 31 * result + color;
+        return result;
     }
 
     public static List<Collection> generateMockupCollections(int length) {
@@ -33,42 +132,5 @@ public class Collection {
             collections.get(i).setArticles(Article.generateMockupArticles(10));
         }
         return collections;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public int getColor() {
-        return color;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public List<Article> getArticles() {
-        return articles;
-    }
-
-    public void setColor(int color) {
-        this.color = color;
-    }
-
-    public void setArticles(List<Article> articles) {
-        this.articles = articles;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "Collection{" +
-                "id=" + id +
-                ", color=" + color +
-                ", name='" + name + '\'' +
-                '}';
     }
 }

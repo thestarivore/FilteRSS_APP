@@ -53,7 +53,7 @@ public class MultifeedEditFragment extends Fragment {
         SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekBarMultifeedEdit);
 
         multifeed = (Multifeed) getArguments().getSerializable("multifeed");
-        name.setText(multifeed.getName());
+        name.setText(multifeed.getTitle());
         // set the button's color
         GradientDrawable background = (GradientDrawable) color.getBackground();
         background.setColor(multifeed.getColor());
@@ -159,7 +159,7 @@ public class MultifeedEditFragment extends Fragment {
         View colorView = (View) view.findViewById(R.id.viewMultifeedEditColor);
         SeekBar seekBar = (SeekBar) view.findViewById(R.id.seekBarMultifeedEdit);
 
-        multifeed.setName(String.valueOf(name.getText()));
+        multifeed.setTitle(String.valueOf(name.getText()));
         multifeed.setImportance(seekBar.getProgress());
 
         Log.v(ArticleActivity.logTag, "Multifeed set " + multifeed.toString());

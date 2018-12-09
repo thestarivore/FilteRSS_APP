@@ -110,7 +110,7 @@ public class CollectionListFragment extends Fragment {
         final TextView collectionName = (TextView) dialogView.findViewById(R.id.editTextCollectionEditName);
         final View collectionColor = (View) dialogView.findViewById(R.id.viewCollectionEditColor);
 
-        collectionName.setText(collection.getName());
+        collectionName.setText(collection.getTitle());
         GradientDrawable background = (GradientDrawable) collectionColor.getBackground();
         background.setColor(collection.getColor());
 
@@ -149,7 +149,7 @@ public class CollectionListFragment extends Fragment {
                     @Override
                     public void onCancel(DialogInterface dialog) {
                         String name = collectionName.getText().toString();
-                        collection.setName(name);
+                        collection.setTitle(name);
                         Log.v(ArticleActivity.logTag, "Saving collection: " + collection.toString());
                         adapter.notifyDataSetChanged();
                     }

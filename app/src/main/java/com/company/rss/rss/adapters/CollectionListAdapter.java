@@ -51,7 +51,7 @@ public class CollectionListAdapter extends ArrayAdapter<Collection> {
 
         Collection multifeed = collections.get(position);
         if (multifeed != null) {
-            viewHolder.collectionName.setText(multifeed.getName());
+            viewHolder.collectionName.setText(multifeed.getTitle());
             // set the collection's color
             GradientDrawable background = (GradientDrawable) viewHolder.collectionViewColor.getBackground();
             background.setColor(multifeed.getColor());
