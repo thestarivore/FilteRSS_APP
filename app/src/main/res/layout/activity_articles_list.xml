@@ -21,6 +21,7 @@
             app:titleTextColor="@android:color/white" />
 
         <android.support.v4.widget.NestedScrollView
+            android:id="@+id/articleListNestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true">
@@ -38,7 +39,7 @@
                     android:layout_height="wrap_content" />
 
                 <fragment
-                    android:id="@+id/headlines_fragment2"
+                    android:id="@+id/articles_list_fragment"
                     android:name="com.company.rss.rss.fragments.ArticlesListFragment"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

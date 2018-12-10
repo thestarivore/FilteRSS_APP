@@ -125,4 +125,11 @@
     <string name="title_activity_collection_manager">CollectionManagerActivity</string>
     <string name="dialog_remove_collection_title">Remove this collection?</string>
     <string name="save">Save</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="create_account">No account yet? Create one</string>
+    <string name="login">Login</string>
+    <string name="authenticating">Authenticating...</string>
+    <string name="title_activity_signup">SignupActivity</string>
 </resources>

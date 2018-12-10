@@ -35,6 +35,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         Toolbar toolbar = findViewById(R.id.multifeed_manager_toolbar);
         setSupportActionBar(toolbar);
         actionbar = getSupportActionBar();
+        actionbar.setTitle(R.string.multifeeds);
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
 
@@ -77,6 +78,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
             showListFragment();
         } else { // separate activities
             editView = true;
+            actionbar.setTitle(multifeeds.get(position).getTitle());
             actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
             MultifeedEditFragment multifeedEditFragment = MultifeedEditFragment.newInstance(multifeeds.get(position));
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -91,6 +93,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         if(editView){
             showListFragment();
             editView = false;
+            actionbar.setTitle(R.string.multifeeds);
             actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
         } else {
             super.onBackPressed();

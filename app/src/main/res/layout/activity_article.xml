@@ -161,8 +161,8 @@
                 android:layout_gravity="bottom|end"
                 android:layout_margin="16dp"
                 android:visibility="invisible"
-                app:backgroundTint="@color/colorAccent"
-                app:srcCompat="@drawable/ic_plus_one_24dp" />
+                app:backgroundTint="@color/colorPrimary"
+                app:srcCompat="@drawable/ic_poll_white_24dp" />
 
         </android.support.design.widget.CoordinatorLayout>
     </LinearLayout>
