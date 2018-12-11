@@ -40,11 +40,12 @@
             android:text="@string/name" />
 
         <EditText
-            android:id="@+id/editTextCollectionEditName"
+            android:id="@+id/editTextCollectionEditTitle"
             style="@style/material_type_scale_h6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:hint="@string/collection_name"
             android:inputType="text"
             android:lines="1"
             android:maxLines="1"

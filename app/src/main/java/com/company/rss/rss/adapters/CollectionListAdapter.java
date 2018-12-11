@@ -41,20 +41,20 @@ public class CollectionListAdapter extends ArrayAdapter<Collection> {
             convertView = inflater.inflate(R.layout.collection_item, parent, false);
 
             viewHolder = new ViewHolderCollection();
-            viewHolder.collectionViewColor = (View) convertView.findViewById(R.id.viewCollectionColor);
-            viewHolder.collectionName = (TextView) convertView.findViewById(R.id.textViewCollectionName);
+            viewHolder.collectionViewColor = convertView.findViewById(R.id.viewCollectionColor);
+            viewHolder.collectionName = convertView.findViewById(R.id.textViewCollectionName);
 
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolderCollection) convertView.getTag();
         }
 
-        Collection multifeed = collections.get(position);
-        if (multifeed != null) {
-            viewHolder.collectionName.setText(multifeed.getTitle());
+        Collection collection = collections.get(position);
+        if (collection != null) {
+            viewHolder.collectionName.setText(collection.getTitle());
             // set the collection's color
             GradientDrawable background = (GradientDrawable) viewHolder.collectionViewColor.getBackground();
-            background.setColor(multifeed.getColor());
+            background.setColor(collection.getColor());
         }
         return convertView;
 

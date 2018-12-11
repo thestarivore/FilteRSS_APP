@@ -132,4 +132,18 @@
     <string name="login">Login</string>
     <string name="authenticating">Authenticating...</string>
     <string name="title_activity_signup">SignupActivity</string>
+    <string name="register">Register</string>
+    <string name="already_member">Already a member? Login</string>
+    <string name="creating_account">Creating account...</string>
+    <string name="login_failed">Login failed, check your credentials</string>
+    <string name="email_not_valid">Enter a valid email address</string>
+    <string name="password_not_valid">Between 4 and 10 alphanumeric characters</string>
+    <string name="signup_failed">Sign up failed</string>
+    <string name="name_not_valid">At least 3 characters</string>
+    <string name="dialog_add_article_to_collection">Add article to collection</string>
+    <string name="article_added_to_collection">Article added to collection</string>
+    <string name="error_adding_article">Error adding the article to the collection</string>
+    <string name="dialog_add_article_positive_button">Create new collection</string>
+    <string name="collection_name">Collection name</string>
+    <string name="registration_completed_login">Registration completed, login now with your credentials</string>
 </resources>

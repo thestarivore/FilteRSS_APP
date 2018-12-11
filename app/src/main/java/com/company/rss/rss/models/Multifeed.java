@@ -1,7 +1,9 @@
 package com.company.rss.rss.models;
 
 import android.graphics.Color;
+import android.util.Log;
 
+import com.company.rss.rss.ArticleActivity;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.thedeanda.lorem.Lorem;
@@ -136,10 +138,11 @@ public class Multifeed implements Serializable {
             multifeeds.add(new Multifeed(
                     random.nextInt(),
                     lorem.getName(),
-                    Color.argb(255, random.nextInt(256), random.nextInt(256), random.nextInt(256)),
-                    random.nextInt(5)));
+                    random.nextInt(5),
+                    Color.argb(255, random.nextInt(256), random.nextInt(256), random.nextInt(256))));
             multifeeds.get(i).setFeeds(Feed.generateMockupFeeds(random.nextInt(10)));
         }
+
         return multifeeds;
     }
 

@@ -8,6 +8,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -27,6 +28,7 @@ import java.util.List;
 
 public class FeedsSearchActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
+    private FeedsListAdapter adapter;
 
     // TODO: view https://developer.android.com/training/improving-layouts/smooth-scrolling#java
 
@@ -70,7 +72,7 @@ public class FeedsSearchActivity extends AppCompatActivity {
                 }
         );
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view_categories);
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
@@ -88,7 +90,7 @@ public class FeedsSearchActivity extends AppCompatActivity {
                 });
 
         final ListView listview = (ListView) findViewById(R.id.listViewFeedsList);
-        final FeedsListAdapter adapter = new FeedsListAdapter(this, feeds, false);
+        adapter = new FeedsListAdapter(this, feeds, false);
         listview.setAdapter(adapter);
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -117,7 +119,7 @@ public class FeedsSearchActivity extends AppCompatActivity {
                                             dialog.dismiss();
                                         } else {
                                             // TODO: show error
-                                            Toast.makeText(getApplicationContext(), R.string.feed_add_error , Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getApplicationContext(), R.string.feed_add_error, Toast.LENGTH_SHORT).show();
                                         }
 
                                     }
@@ -135,16 +137,6 @@ public class FeedsSearchActivity extends AppCompatActivity {
                             }
                         })
                         .show();
-
-                /*view.animate().setDuration(2000).alpha(0)
-                        .withEndAction(new Runnable() {
-                            @Override
-                            public void run() {
-                                *//*listview.remove(item);
-                                adapter.notifyDataSetChanged();
-                                view.setAlpha(1);*//*
-                            }
-                        });*/
             }
 
         });
@@ -155,12 +147,11 @@ public class FeedsSearchActivity extends AppCompatActivity {
 
         // Feed added
         Boolean feedAdded = true;
-        if(feedAdded)
+        if (feedAdded)
             return true;
         else
             return false;
     }
-
 
 
     @Override
@@ -190,10 +181,25 @@ public class FeedsSearchActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_feeds_search, menu);
 
-
         // TODO: retrieve values for feeds language from preferences
         CheckBox checkBox = (CheckBox) menu.findItem(R.id.itemLanguageSelectorEN).getActionView();
         checkBox.setChecked(true);
+
+        MenuItem item = menu.findItem(R.id.itemSearchFeeds);
+        SearchView searchView = (SearchView) item.getActionView();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                adapter.getFilter().filter(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return onQueryTextSubmit(newText);
+            }
+        });
 
         return true;
     }

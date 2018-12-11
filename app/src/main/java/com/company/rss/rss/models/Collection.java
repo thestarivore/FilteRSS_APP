@@ -133,4 +133,12 @@ public class Collection implements Serializable{
         }
         return collections;
     }
+
+    public static String[] toStrings(List<Collection> collections) {
+        String[] collectionsStrings = new String[collections.size()];
+        for (int i = 0; i < collections.size(); i++) {
+            collectionsStrings[i] = collections.get(i).getTitle();
+        }
+        return collectionsStrings;
+    }
 }

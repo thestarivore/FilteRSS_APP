@@ -84,10 +84,10 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
 
         //Instantiate the Middleware for the RESTful API's
-        api = new RESTMiddleware(this);
+        //api = new RESTMiddleware(this);
 
         //Calls all the RESTful APIs to test them
-        restApiTestCalls();
+        //restApiTestCalls();
 
         listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
         expListView.setAdapter(listAdapter);
@@ -167,28 +167,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         pager.setClipToPadding(false);
         pager.setPadding(0, 0, 60, 0);
         pager.setPageMargin(0);
-
-        /*// Show CollapsingToolbarLayout Title only when collapsed
-        final CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayoutArticlesList);
-        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.AppBarLayoutArticlesList);
-        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            boolean isShow = true;
-            int scrollRange = -1;
-
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange();
-                }
-                if (scrollRange + verticalOffset == 0) {
-                    collapsingToolbarLayout.setTitle("Title");
-                    isShow = true;
-                } else if (isShow) {
-                    collapsingToolbarLayout.setTitle(" ");
-                    isShow = false;
-                }
-            }
-        });*/
 
     }
 
