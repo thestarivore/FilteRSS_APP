@@ -18,10 +18,8 @@
             android:layout_width="128dp"
             android:layout_height="128dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="24dp"
-            android:src="@drawable/ic_launcher" />
+            android:src="@mipmap/ic_launcher_foreground" />
 
-        <!-- Email Label -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,7 +44,6 @@
                 android:inputType="textEmailAddress" />
         </android.support.design.widget.TextInputLayout>
 
-        <!-- Password Label -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -80,15 +77,14 @@
             android:text="@string/login" />
 
         <TextView
-            android:id="@+id/signupTextView"
-            style="@style/material_type_scale_h5"
+            android:id="@+id/signUpTextView"
+            style="@style/material_type_scale_h6"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:gravity="center"
             android:text="@string/create_account"
-            android:textColor="#ffffff"
-            android:textSize="16dip" />
+            android:textColor="#ffffff" />
 
     </LinearLayout>
 </ScrollView>

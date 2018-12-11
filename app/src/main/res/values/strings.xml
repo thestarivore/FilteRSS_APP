@@ -132,4 +132,12 @@
     <string name="login">Login</string>
     <string name="authenticating">Authenticating...</string>
     <string name="title_activity_signup">SignupActivity</string>
+    <string name="register">Register</string>
+    <string name="already_member">Already a member? Login</string>
+    <string name="creating_account">Creating account...</string>
+    <string name="login_failed">Login failed</string>
+    <string name="email_not_valid">Enter a valid email address</string>
+    <string name="password_not_valid">Between 4 and 10 alphanumeric characters</string>
+    <string name="signup_failed">Sign up failed</string>
+    <string name="name_not_valid">At least 3 characters</string>
 </resources>
