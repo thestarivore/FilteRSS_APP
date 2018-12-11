@@ -1,6 +1,7 @@
 package com.company.rss.rss;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -12,28 +13,40 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.company.rss.rss.models.User;
+import com.company.rss.rss.persistence.UserPrefs;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
-
+    private static final String TAG = "LoginActivity";
+    public static final String EXTRA_USER = "com.rss.rss.USER";
     private RESTMiddleware api;
     private Button loginButton;
     private TextView emailText;
     private TextView passwordText;
     private static final int REQUEST_SIGNUP = 0;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        context = this;
 
+        //Instantiate the Middleware for the RESTful API's
         api = new RESTMiddleware(this);
 
-        // skip login
-        //startArticlesListActivity();
+        //Get a SharedPreferences instance
+        UserPrefs prefs = new UserPrefs(context);
+
+        //Get the User Logged in
+        User user = prefs.retriveUser();
+        //Skip login if User already persisted
+        if(user != null) {
+            startArticlesListActivity();
+        }
 
         loginButton = findViewById(R.id.loginButton);
         TextView signUpTextView = findViewById(R.id.signUpTextView);
@@ -81,27 +94,36 @@ public class LoginActivity extends AppCompatActivity {
         final String email = emailText.getText().toString();
         final String password = passwordText.getText().toString();
 
-        // TODO: Implement your own authentication logic here.
+        //Authentication and Persistence of the User
+        api.getUserAuthentication(email, password, new UserCallback() {
+            @Override
+            public void onLoad(List<User> users) {
+                for(User user: users){
+                    Log.d(TAG, "\nUser authentication");
+                    Log.d(TAG, "\nUser: " + user.getId() +  ", " + user.getName() + ", " + user.getSurname() + ", " + user.getEmail() + ", " + user.getPassword());
 
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        api.getUserAuthentication(email, password, new UserCallback() {
-                            @Override
-                            public void onLoad(List<User> users) {
-                                onLoginSuccess();
-                            }
+                    //Get logged user
+                    if(users.isEmpty() == false) {
+                        User loggedUser = users.get(0);
 
-                            @Override
-                            public void onFailure() {
-                                onLoginFailed();
-                            }
-                        });
+                        //Get a SharedPreferences instance
+                        UserPrefs prefs = new UserPrefs( context);
 
-                        progressDialog.dismiss();
-
+                        //Persist the User Logged in
+                        prefs.storeUser(loggedUser);
                     }
-                }, 3000);
+                    progressDialog.dismiss();
+                    onLoginSuccess();
+                }
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(TAG, "\nFailure on: getUserAuthentication");
+                progressDialog.dismiss();
+                onLoginFailed();
+            }
+        });
     }
 
     @Override
@@ -125,7 +147,6 @@ public class LoginActivity extends AppCompatActivity {
     public void onLoginSuccess() {
         Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Login success");
         loginButton.setEnabled(true);
-
         startArticlesListActivity();
     }
 

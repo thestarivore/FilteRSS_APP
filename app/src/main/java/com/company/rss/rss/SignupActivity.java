@@ -1,6 +1,8 @@
 package com.company.rss.rss;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.company.rss.rss.models.SQLOperation;
+import com.company.rss.rss.models.User;
+import com.company.rss.rss.persistence.UserPrefs;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 
@@ -21,12 +25,15 @@ public class SignupActivity extends AppCompatActivity {
     private EditText nameEditText;
     private EditText emailEditText;
     private EditText passwordEditText;
+    private Context context;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
+        context = this;
 
+        //Instantiate the Middleware for the RESTful API's
         api = new RESTMiddleware(this);
 
         signUpButton = findViewById(R.id.signUpButton);
@@ -68,38 +75,42 @@ public class SignupActivity extends AppCompatActivity {
         final String email = emailEditText.getText().toString();
         final String password = passwordEditText.getText().toString();
 
-        // TODO: Implement your own signup logic here.
+        //Register User and persist it
+        api.registerNewUser(name, "", email, password, new SQLOperationCallback() {
+            @Override
+            public void onLoad(SQLOperation sqlOperation) {
+                User registredUser = new User(sqlOperation.getInsertId(), name, "", email, password);
 
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        api.registerNewUser(name, "", email, password, new SQLOperationCallback() {
-                            @Override
-                            public void onLoad(SQLOperation sqlOperation) {
-                                onSignupSuccess();
-                            }
+                //Get a SharedPreferences instance
+                UserPrefs prefs = new UserPrefs( context);
 
-                            @Override
-                            public void onFailure() {
-                                onSignupFailed();
-                            }
-                        });
-                        progressDialog.dismiss();
-                    }
-                }, 3000);
+                //Persist the Registred User
+                prefs.storeUser(registredUser);
+
+                onSignupSuccess();
+                progressDialog.dismiss();
+            }
+
+            @Override
+            public void onFailure() {
+                onSignupFailed();
+                progressDialog.dismiss();
+            }
+        });
+        progressDialog.dismiss();
     }
 
 
     public void onSignupSuccess() {
         Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Sign up success");
         signUpButton.setEnabled(true);
-        setResult(RESULT_OK, null);
+        //setResult(RESULT_OK, null);
+        startArticlesListActivity();
         finish();
     }
 
     public void onSignupFailed() {
         Toast.makeText(getBaseContext(), R.string.signup_failed, Toast.LENGTH_LONG).show();
-
         signUpButton.setEnabled(true);
     }
 
@@ -134,4 +145,8 @@ public class SignupActivity extends AppCompatActivity {
         return valid;
     }
 
+    private void startArticlesListActivity() {
+        Intent intent = new Intent(this, ArticlesListActivity.class);
+        startActivity(intent);
+    }
 }

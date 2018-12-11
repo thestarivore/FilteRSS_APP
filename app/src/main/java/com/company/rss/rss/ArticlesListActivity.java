@@ -33,6 +33,7 @@ import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.ReadArticle;
 import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.User;
+import com.company.rss.rss.persistence.UserPrefs;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.CategoryCallback;
@@ -73,15 +74,16 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         setContentView(R.layout.activity_articles_list);
         context = this;
 
-        // INPUT DATA
-        Intent intent = getIntent();
-        loggedUser = (User) intent.getSerializableExtra(LoginActivity.EXTRA_USER);
+        //Get a SharedPreferences instance
+        UserPrefs prefs = new UserPrefs(context);
+
+        //Get the User Logged in
+        loggedUser = prefs.retriveUser();
 
         // DRAWER AND TOOLBAR
         // Left Menu
         expListView = (ExpandableListView) findViewById(R.id.exp_list_view_article);
         prepareListData();
-
 
         //Instantiate the Middleware for the RESTful API's
         //api = new RESTMiddleware(this);
