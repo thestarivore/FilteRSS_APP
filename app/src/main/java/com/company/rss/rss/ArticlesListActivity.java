@@ -64,6 +64,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private RESTMiddleware api;
     private List<Feed> feedList = new ArrayList<Feed>();
     private Context context;
+    private User loggedUser;
 
 
     @Override
@@ -71,6 +72,10 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_articles_list);
         context = this;
+
+        // INPUT DATA
+        Intent intent = getIntent();
+        loggedUser = (User) intent.getSerializableExtra(LoginActivity.EXTRA_USER);
 
         // DRAWER AND TOOLBAR
         // Left Menu

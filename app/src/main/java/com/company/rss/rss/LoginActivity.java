@@ -7,18 +7,31 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class LoginActivity extends AppCompatActivity {
+import com.company.rss.rss.models.Article;
+import com.company.rss.rss.models.User;
+import com.company.rss.rss.restful_api.RESTMiddleware;
+import com.company.rss.rss.restful_api.callbacks.UserCallback;
 
+import java.util.List;
+
+import static com.company.rss.rss.ArticlesListActivity.EXTRA_ARTICLE;
+
+public class LoginActivity extends AppCompatActivity {
+    public static final String EXTRA_USER = "com.rss.rss.USER";
+    private static final String TAG = "LoginActivity";
     private Button loginButton;
     private TextView signUpTextView;
     private TextView emailText;
     private TextView passwordText;
+    private RESTMiddleware api;
+    private User loggedUser;
     private static final int REQUEST_SIGNUP = 0;
 
     @Override
@@ -33,6 +46,8 @@ public class LoginActivity extends AppCompatActivity {
         emailText = findViewById(R.id.loginMailEditText);
         passwordText = findViewById(R.id.loginPasswordEditText);
 
+        //Instantiate the Middleware for the RESTful API's
+        api = new RESTMiddleware(this);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
 
@@ -54,6 +69,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void login() {
+        final boolean userAuthDone = false;
+
         if (!validate()) {
             onLoginFailed();
             return;
@@ -70,9 +87,38 @@ public class LoginActivity extends AppCompatActivity {
         String email = emailText.getText().toString();
         String password = passwordText.getText().toString();
 
-        // TODO: Implement your own authentication logic here.
+        //Authentication
+        api.getUserAuthentication(email, password, new UserCallback() {
+            @Override
+            public void onLoad(List<User> users) {
+                for(User user: users){
+                    Log.d(TAG, "\nUser authentication");
+                    Log.d(TAG, "\nUser: " + user.getId() +  ", " + user.getName() + ", " + user.getSurname() + ", " + user.getEmail() + ", " + user.getPassword());
+                }
 
-        new android.os.Handler().postDelayed(
+                //If there is an User in the list, then the authentication was successful
+                //TODO: Persist the User's informations (we may need it's ID later)
+                if(users.isEmpty() == false) {
+                    //Get Authenticated User
+                    loggedUser = users.get(0);
+
+                    //Auth successful
+                    onLoginSuccess();
+                }
+                else
+                    onLoginFailed();
+                progressDialog.dismiss();
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(TAG, "\nFailure on: getUserAuthentication");
+                onLoginFailed();
+                progressDialog.dismiss();
+            }
+        });
+
+        /*new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
                         // On complete call either onLoginSuccess or onLoginFailed
@@ -80,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
                         // onLoginFailed();
                         progressDialog.dismiss();
                     }
-                }, 3000);
+                }, 3000);*/
     }
 
     @Override
@@ -103,6 +149,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void onLoginSuccess() {
         loginButton.setEnabled(true);
+        startArticleListActivity();
         finish();
     }
 
@@ -135,4 +182,9 @@ public class LoginActivity extends AppCompatActivity {
         return valid;
     }
 
+    private void startArticleListActivity() {
+        Intent intent = new Intent(this, ArticlesListActivity.class);
+        intent.putExtra(EXTRA_USER, loggedUser);
+        startActivity(intent);
+    }
 }
