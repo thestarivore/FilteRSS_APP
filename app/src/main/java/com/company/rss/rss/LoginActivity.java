@@ -33,7 +33,7 @@ public class LoginActivity extends AppCompatActivity {
         api = new RESTMiddleware(this);
 
         // skip login
-        //startArticlesListActivity();
+        startArticlesListActivity();
 
         loginButton = findViewById(R.id.loginButton);
         TextView signUpTextView = findViewById(R.id.signUpTextView);
