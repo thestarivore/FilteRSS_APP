@@ -3,18 +3,21 @@ package com.company.rss.rss;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.company.rss.rss.models.SQLOperation;
+import com.company.rss.rss.restful_api.RESTMiddleware;
+import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
+
 public class SignupActivity extends AppCompatActivity {
 
-
+    private RESTMiddleware api;
     private Button signUpButton;
-    private TextView loginTextView;
     private EditText nameEditText;
     private EditText emailEditText;
     private EditText passwordEditText;
@@ -24,13 +27,13 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
+        api = new RESTMiddleware(this);
 
         signUpButton = findViewById(R.id.signUpButton);
-        loginTextView = findViewById(R.id.loginTextView);
+        TextView loginTextView = findViewById(R.id.loginTextView);
         nameEditText = findViewById(R.id.signUpNameEditText);
         emailEditText = findViewById(R.id.signUpMailEditText);
         passwordEditText = findViewById(R.id.signUpPasswordEditText);
-
 
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,6 +48,7 @@ public class SignupActivity extends AppCompatActivity {
                 finish();
             }
         });
+
     }
 
     public void signup() {
@@ -55,25 +59,31 @@ public class SignupActivity extends AppCompatActivity {
 
         signUpButton.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this,
-                R.style.Theme_AppCompat_Dialog);
+        final ProgressDialog progressDialog = new ProgressDialog(SignupActivity.this);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage(getText(R.string.creating_account));
         progressDialog.show();
 
-        String name = nameEditText.getText().toString();
-        String email = emailEditText.getText().toString();
-        String password = passwordEditText.getText().toString();
+        final String name = nameEditText.getText().toString();
+        final String email = emailEditText.getText().toString();
+        final String password = passwordEditText.getText().toString();
 
         // TODO: Implement your own signup logic here.
 
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
-                        // On complete call either onSignupSuccess or onSignupFailed
-                        // depending on success
-                        onSignupSuccess();
-                        // onSignupFailed();
+                        api.registerNewUser(name, "", email, password, new SQLOperationCallback() {
+                            @Override
+                            public void onLoad(SQLOperation sqlOperation) {
+                                onSignupSuccess();
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                onSignupFailed();
+                            }
+                        });
                         progressDialog.dismiss();
                     }
                 }, 3000);
@@ -81,6 +91,7 @@ public class SignupActivity extends AppCompatActivity {
 
 
     public void onSignupSuccess() {
+        Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Sign up success");
         signUpButton.setEnabled(true);
         setResult(RESULT_OK, null);
         finish();

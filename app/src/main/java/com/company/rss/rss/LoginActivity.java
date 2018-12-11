@@ -3,17 +3,24 @@ package com.company.rss.rss;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.company.rss.rss.models.User;
+import com.company.rss.rss.restful_api.RESTMiddleware;
+import com.company.rss.rss.restful_api.callbacks.UserCallback;
+
+import java.util.List;
+
 public class LoginActivity extends AppCompatActivity {
 
+    private RESTMiddleware api;
     private Button loginButton;
-    private TextView signUpTextView;
     private TextView emailText;
     private TextView passwordText;
     private static final int REQUEST_SIGNUP = 0;
@@ -23,16 +30,15 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        api = new RESTMiddleware(this);
 
         // skip login
-        Intent intent = new Intent(this, ArticlesListActivity.class);
-        startActivity(intent);
+        //startArticlesListActivity();
 
         loginButton = findViewById(R.id.loginButton);
-        signUpTextView = findViewById(R.id.signUpTextView);
+        TextView signUpTextView = findViewById(R.id.signUpTextView);
         emailText = findViewById(R.id.loginMailEditText);
         passwordText = findViewById(R.id.loginPasswordEditText);
-
 
         loginButton.setOnClickListener(new View.OnClickListener() {
 
@@ -46,11 +52,17 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                // Start the Signup activity
+                Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Start the Sign up activity");
+
                 Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
                 startActivityForResult(intent, REQUEST_SIGNUP);
             }
         });
+    }
+
+    private void startArticlesListActivity() {
+        Intent intent = new Intent(this, ArticlesListActivity.class);
+        startActivity(intent);
     }
 
     public void login() {
@@ -61,24 +73,33 @@ public class LoginActivity extends AppCompatActivity {
 
         loginButton.setEnabled(false);
 
-        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this,
-                R.style.Theme_AppCompat_Dialog);
+        final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
         progressDialog.setIndeterminate(true);
         progressDialog.setMessage(getText(R.string.authenticating));
         progressDialog.show();
 
-        String email = emailText.getText().toString();
-        String password = passwordText.getText().toString();
+        final String email = emailText.getText().toString();
+        final String password = passwordText.getText().toString();
 
         // TODO: Implement your own authentication logic here.
 
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
-                        // On complete call either onLoginSuccess or onLoginFailed
-                        onLoginSuccess();
-                        // onLoginFailed();
+                        api.getUserAuthentication(email, password, new UserCallback() {
+                            @Override
+                            public void onLoad(List<User> users) {
+                                onLoginSuccess();
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                onLoginFailed();
+                            }
+                        });
+
                         progressDialog.dismiss();
+
                     }
                 }, 3000);
     }
@@ -87,10 +108,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SIGNUP) {
             if (resultCode == RESULT_OK) {
-
-                // TODO: Implement successful signup logic here
-                // By default we just finish the Activity and log them in automatically
-                this.finish();
+                Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Returned from Signup activity with RESULT_OK");
+                Snackbar.make(findViewById(R.id.login_activity_scroll_view), R.string.registration_completed_login, Snackbar.LENGTH_LONG);
+            } else {
+                Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Returned from Signup activity without RESULT_OK");
             }
         }
     }
@@ -102,11 +123,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLoginSuccess() {
+        Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Login success");
         loginButton.setEnabled(true);
-        finish();
+
+        startArticlesListActivity();
     }
 
     public void onLoginFailed() {
+        Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Login failed");
+
         Toast.makeText(getBaseContext(), R.string.login_failed, Toast.LENGTH_LONG).show();
 
         loginButton.setEnabled(true);
