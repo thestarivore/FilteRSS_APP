@@ -43,9 +43,9 @@ public class MultifeedListAdapter extends ArrayAdapter<Multifeed> {
             convertView = inflater.inflate(R.layout.multifeed_item, parent, false);
 
             viewHolder = new ViewHolderMultifeed();
-            viewHolder.multifeedViewColor = (View) convertView.findViewById(R.id.viewMultifeedColor);
-            viewHolder.multifeedName = (TextView) convertView.findViewById(R.id.textViewMultifeedName);
-            viewHolder.multifeedCount= (TextView) convertView.findViewById(R.id.textViewMultifeedCount);
+            viewHolder.multifeedViewColor = convertView.findViewById(R.id.viewMultifeedColor);
+            viewHolder.multifeedName = convertView.findViewById(R.id.textViewMultifeedName);
+            viewHolder.multifeedCount= convertView.findViewById(R.id.textViewMultifeedCount);
 
             convertView.setTag(viewHolder);
         } else {

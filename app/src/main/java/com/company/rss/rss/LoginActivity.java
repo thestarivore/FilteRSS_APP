@@ -23,6 +23,11 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+
+        // skip login
+        Intent intent = new Intent(this, ArticlesListActivity.class);
+        startActivity(intent);
+
         loginButton = findViewById(R.id.loginButton);
         signUpTextView = findViewById(R.id.signUpTextView);
         emailText = findViewById(R.id.loginMailEditText);

@@ -1,7 +1,6 @@
 package com.company.rss.rss.fragments;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -15,12 +14,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.company.rss.rss.ArticleActivity;
-import com.company.rss.rss.CollectionManagerActivity;
 import com.company.rss.rss.R;
 import com.company.rss.rss.adapters.CollectionListAdapter;
-import com.company.rss.rss.adapters.MultifeedListAdapter;
 import com.company.rss.rss.models.Collection;
-import com.company.rss.rss.models.Multifeed;
 
 import java.util.ArrayList;
 
@@ -107,10 +103,10 @@ public class CollectionListFragment extends Fragment {
         builder.setView(dialogView);
         final AlertDialog editCollectionDialog = builder.create();
 
-        final TextView collectionName = (TextView) dialogView.findViewById(R.id.editTextCollectionEditName);
-        final View collectionColor = (View) dialogView.findViewById(R.id.viewCollectionEditColor);
+        final TextView collectionTitle = dialogView.findViewById(R.id.editTextCollectionEditTitle);
+        final View collectionColor = dialogView.findViewById(R.id.viewCollectionEditColor);
 
-        collectionName.setText(collection.getTitle());
+        collectionTitle.setText(collection.getTitle());
         GradientDrawable background = (GradientDrawable) collectionColor.getBackground();
         background.setColor(collection.getColor());
 
@@ -148,7 +144,7 @@ public class CollectionListFragment extends Fragment {
                 new DialogInterface.OnCancelListener() {
                     @Override
                     public void onCancel(DialogInterface dialog) {
-                        String name = collectionName.getText().toString();
+                        String name = collectionTitle.getText().toString();
                         collection.setTitle(name);
                         Log.v(ArticleActivity.logTag, "Saving collection: " + collection.toString());
                         adapter.notifyDataSetChanged();
