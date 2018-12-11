@@ -54,6 +54,6 @@
         android:layout_gravity="end"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/drawer_view_categories_header"
-        app:menu="@menu/drawer_view_categories" />
+        app:menu="@menu/drawer_view_categories_en" />
 
 </android.support.v4.widget.DrawerLayout>
