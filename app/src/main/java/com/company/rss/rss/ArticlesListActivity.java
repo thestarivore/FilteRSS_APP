@@ -29,6 +29,7 @@ import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Category;
 import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
+import com.company.rss.rss.models.FeedGrouping;
 import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.ReadArticle;
 import com.company.rss.rss.models.SQLOperation;
@@ -39,6 +40,7 @@ import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.CategoryCallback;
 import com.company.rss.rss.restful_api.callbacks.CollectionCallback;
 import com.company.rss.rss.restful_api.callbacks.FeedCallback;
+import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
@@ -58,14 +60,19 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     public static final String EXTRA_ARTICLE = "com.rss.rss.ARTICLE";
     private ViewPager pager;
     private PagerAdapter pagerAdapter;
+
+    //Expandable List View on the Left Drawer
     private ExpandableListAdapter listAdapter;
-    private ExpandableListView expListView;
-    private List<String> listDataHeader;
-    private HashMap<String, List<String>> listDataChild;
+    private ExpandableListView expListViewMultifeeds;
+    private List<String> multifeedListHeaders;
+    private HashMap<String, List<String>> mollifiedListChild;
+
+
     private RESTMiddleware api;
     private List<Feed> feedList = new ArrayList<Feed>();
     private Context context;
     private User loggedUser;
+    private List<FeedGrouping> feedGroups;
 
 
     @Override
@@ -74,30 +81,28 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         setContentView(R.layout.activity_articles_list);
         context = this;
 
+        //Instantiate the Middleware for the RESTful API's
+        api = new RESTMiddleware(this);
+
         //Get a SharedPreferences instance
         UserPrefs prefs = new UserPrefs(context);
 
-        //Get the User Logged in
+        //Get the User info
         loggedUser = prefs.retriveUser();
+        feedGroups = prefs.retriveFeedGroups();
 
         // DRAWER AND TOOLBAR
         // Left Menu
-        expListView = (ExpandableListView) findViewById(R.id.exp_list_view_article);
-        prepareListData();
+        expListViewMultifeeds = (ExpandableListView) findViewById(R.id.exp_list_view_multifeeds);
+        prepareMultifeedsListData();
 
-        //Instantiate the Middleware for the RESTful API's
-        //api = new RESTMiddleware(this);
-
-        //Calls all the RESTful APIs to test them
-        //restApiTestCalls();
-
-        listAdapter = new ExpandableListAdapter(this, listDataHeader, listDataChild);
-        expListView.setAdapter(listAdapter);
-        expListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        listAdapter = new ExpandableListAdapter(this, multifeedListHeaders, mollifiedListChild);
+        expListViewMultifeeds.setAdapter(listAdapter);
+        expListViewMultifeeds.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id) {
 
-                long packedPosition = expListView.getExpandableListPosition(position);
+                long packedPosition = expListViewMultifeeds.getExpandableListPosition(position);
 
                 int itemType = ExpandableListView.getPackedPositionType(packedPosition);
                 int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
@@ -105,9 +110,9 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
                 if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
                     // multifeeds title long clicked
-                    if(listDataHeader.get(groupPosition).equals(getString(R.string.multifeeds))){
+                    if(multifeedListHeaders.get(groupPosition).equals(getString(R.string.multifeeds))){
                         startMultifeedManagerActivity();
-                    } else if(listDataHeader.get(groupPosition).equals(getString(R.string.collections))){
+                    } else if(multifeedListHeaders.get(groupPosition).equals(getString(R.string.collections))){
                         startCollectionManagerActivity();
                     }
                 }
@@ -172,27 +177,18 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
     }
 
-    private void prepareListData() {
-        listDataHeader = new ArrayList<String>();
-        listDataChild = new HashMap<String, List<String>>();
+    /**
+     * Prepare the Multifeeds Expandable List View on the Drawer
+     */
+    private void prepareMultifeedsListData() {
+        multifeedListHeaders = new ArrayList<String>();
+        mollifiedListChild = new HashMap<String, List<String>>();
 
-        // TODO: retrieve multifeed and collections
-
-        listDataHeader.add((String)getText(R.string.multifeeds));
-        listDataHeader.add((String)getText(R.string.collections));
-
-        List<String> multifeeds = new ArrayList<String>();
-        multifeeds.add("News");
-        multifeeds.add("Politics");
-
-        List<String> collections = new ArrayList<String>();
-        collections.add("Read it later");
-        collections.add("Saved");
-        collections.add("Interesting things");
-
-        listDataChild.put(listDataHeader.get(0), multifeeds);
-        listDataChild.put(listDataHeader.get(1), collections);
+        //TODO: fill with the data from the SharedPreferences
     }
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -456,6 +452,23 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                     @Override
                     public void onFailure() {
                         Log.d(TAG, "\nFailure on: getUserFeeds");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Get all the User's FeedGroups
+                Log.d(TAG, "\ngetUserFeedGroups:");
+                api.getUserFeedGroups(5, new FeedGroupCallback() {
+                    @Override
+                    public void onLoad(List<FeedGrouping> feedGroups) {
+                        for(FeedGrouping feedGroup:feedGroups) {
+                            Log.d(TAG, "\nFeed: " + feedGroup.getFeed() + "," + feedGroup.getMultifeed()+ "," + feedGroup.getArticleCheckpoint());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getUserFeedGroups");
                     }
                 });
                 try {Thread.sleep(1000); } catch (InterruptedException e) { }

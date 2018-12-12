@@ -6,6 +6,7 @@ import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.CategoryCallback;
 import com.company.rss.rss.restful_api.callbacks.CollectionCallback;
 import com.company.rss.rss.restful_api.callbacks.FeedCallback;
+import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
@@ -120,6 +121,14 @@ public class RESTMiddleware {
      */
     public void getUserFeeds(String userEmail, FeedCallback callback){
         RESTService.getInstance(context).getUserFeeds(userEmail, callback);
+    }
+
+    /**
+     * Gets the list of all the User's FeedGroups
+     * @param callback Callback for API response management
+     */
+    public void getUserFeedGroups(int userId, final FeedGroupCallback callback){
+        RESTService.getInstance(context).getUserFeedGroups(userId, callback);
     }
 
     /**

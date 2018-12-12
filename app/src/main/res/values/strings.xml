@@ -146,4 +146,7 @@
     <string name="dialog_add_article_positive_button">Create new collection</string>
     <string name="collection_name">Collection name</string>
     <string name="registration_completed_login">Registration completed, login now with your credentials</string>
+    <string name="multifeed_title">Multifeeds</string>
+    <string name="collections_title">Collections</string>
+
 </resources>

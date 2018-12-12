@@ -67,8 +67,31 @@
 
         <include layout="@layout/drawer_view_account_header"/>
 
+        <TextView
+            android:id="@+id/textViewMultifeedList"
+            style="@style/material_type_scale_h5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/multifeed_title" />
+
         <ExpandableListView
-            android:id="@+id/exp_list_view_article"
+            android:id="@+id/exp_list_view_multifeeds"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:choiceMode="multipleChoice"
+            android:dividerHeight="0dp"
+            android:childDivider="#00000000"/>
+
+        <TextView
+            android:id="@+id/textViewCollectionsList"
+            style="@style/material_type_scale_h5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/collections_title" />
+
+        <ExpandableListView
+            android:id="@+id/exp_list_view_collections"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="start"

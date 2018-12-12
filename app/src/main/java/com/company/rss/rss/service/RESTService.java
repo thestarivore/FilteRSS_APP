@@ -6,6 +6,7 @@ import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Category;
 import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
+import com.company.rss.rss.models.FeedGrouping;
 import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.ReadArticle;
 import com.company.rss.rss.models.SQLOperation;
@@ -14,6 +15,7 @@ import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.CategoryCallback;
 import com.company.rss.rss.restful_api.callbacks.CollectionCallback;
 import com.company.rss.rss.restful_api.callbacks.FeedCallback;
+import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
@@ -31,6 +33,7 @@ import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Query;
 
 public class RESTService {
 
@@ -42,8 +45,8 @@ public class RESTService {
 
     private RESTService(Context context){
         Retrofit retrofit = new Retrofit.Builder()
-                //.baseUrl("http://192.168.1.109:3000/")                                         //In local
-                .baseUrl("http://ec2-35-180-230-227.eu-west-3.compute.amazonaws.com:3000")      //On Amazon AWS
+                .baseUrl("http://192.168.1.22:3000/")                                         //In local
+                //.baseUrl("http://ec2-35-180-230-227.eu-west-3.compute.amazonaws.com:3000")      //On Amazon AWS
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -263,6 +266,30 @@ public class RESTService {
 
                     @Override
                     public void onFailure(Call<List<Feed>> call, Throwable t) {
+                        callback.onFailure();
+                    }
+                });
+    }
+
+    /**
+     * Gets the list of all the User's FeedGroups
+     * @param callback Callback for API response management
+     */
+    public void getUserFeedGroups(int userId, final FeedGroupCallback callback){
+        final List<FeedGrouping> feedGroups = new ArrayList<>();
+
+        userRESTInterface.getUserFeedGroups(userId)
+                .enqueue(new retrofit2.Callback<List<FeedGrouping>>() {
+                    @Override
+                    public void onResponse(Call<List<FeedGrouping>> call, Response<List<FeedGrouping>> response) {
+                        for (FeedGrouping feedGroup: response.body()) {
+                            feedGroups.add(feedGroup);
+                        }
+                        callback.onLoad(feedGroups);
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<FeedGrouping>> call, Throwable t) {
                         callback.onFailure();
                     }
                 });

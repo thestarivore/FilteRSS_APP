@@ -14,8 +14,11 @@ import android.widget.Toast;
 
 import com.company.rss.rss.models.User;
 import com.company.rss.rss.persistence.UserPrefs;
+import com.company.rss.rss.restful_api.LoadUserData;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
+import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
+import com.company.rss.rss.rss_parser.LoadRSSFeed;
 
 import java.util.List;
 
@@ -28,25 +31,13 @@ public class LoginActivity extends AppCompatActivity {
     private TextView passwordText;
     private static final int REQUEST_SIGNUP = 0;
     private Context context;
+    private User loggedUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         context = this;
-
-        //Instantiate the Middleware for the RESTful API's
-        api = new RESTMiddleware(this);
-
-        //Get a SharedPreferences instance
-        UserPrefs prefs = new UserPrefs(context);
-
-        //Get the User Logged in
-        User user = prefs.retriveUser();
-        //Skip login if User already persisted
-        if(user != null) {
-            startArticlesListActivity();
-        }
 
         loginButton = findViewById(R.id.loginButton);
         TextView signUpTextView = findViewById(R.id.signUpTextView);
@@ -71,6 +62,19 @@ public class LoginActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_SIGNUP);
             }
         });
+
+        //Instantiate the Middleware for the RESTful API's
+        api = new RESTMiddleware(this);
+
+        //Get a SharedPreferences instance
+        UserPrefs prefs = new UserPrefs(context);
+
+        //Get the User Logged in
+        loggedUser = prefs.retriveUser();
+        //Skip login if User already persisted
+        if(loggedUser != null) {
+            onLoginSuccess();
+        }
     }
 
     private void startArticlesListActivity() {
@@ -78,6 +82,9 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Login procedure
+     */
     public void login() {
         if (!validate()) {
             onLoginFailed();
@@ -104,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     //Get logged user
                     if(users.isEmpty() == false) {
-                        User loggedUser = users.get(0);
+                        loggedUser = users.get(0);
 
                         //Get a SharedPreferences instance
                         UserPrefs prefs = new UserPrefs( context);
@@ -147,7 +154,15 @@ public class LoginActivity extends AppCompatActivity {
     public void onLoginSuccess() {
         Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Login success");
         loginButton.setEnabled(true);
-        startArticlesListActivity();
+
+        //Start an AsyncTask to gather all the User's information before stepping into the main Activity
+        new LoadUserData(new AsyncResponse() {
+            @Override
+            public void processFinish(Object output) {
+                //All the data has been gathered so we can open the main activity
+                startArticlesListActivity();
+            }
+        }, context, loggedUser.getId()).execute();
     }
 
     public void onLoginFailed() {

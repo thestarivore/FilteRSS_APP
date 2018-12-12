@@ -5,6 +5,7 @@ package com.company.rss.rss.restful_api.interfaces;
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
+import com.company.rss.rss.models.FeedGrouping;
 import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.ReadArticle;
 import com.company.rss.rss.models.SQLOperation;
@@ -24,6 +25,9 @@ public interface UserRESTInterface {
     /*********************** User - Feeds *********************************/
     @GET("/v1/user/feeds")
     public Call<List<Feed>> getUserFeeds(@Query("email") String userEmail);
+
+    @GET("/v1/user/feeds/group")
+    public Call<List<FeedGrouping>> getUserFeedGroups(@Query("userId") int userId);
 
     @GET("/v1/user/feeds/checkpoint")
     public Call<List<Article>> getUserFeedCheckpoint(@Query("feed") int feed,
