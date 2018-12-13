@@ -104,7 +104,7 @@ public class MultifeedCreationActivity extends AppCompatActivity implements Mult
 
                 @Override
                 public void onFailure() {
-                    Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed not saved ");
+                    Log.e(ArticleActivity.logTag + ":" + TAG, "Multifeed not saved ");
                     setResult(Activity.RESULT_CANCELED, returnIntent);
                     finish();
                 }

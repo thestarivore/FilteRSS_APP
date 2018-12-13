@@ -17,7 +17,14 @@ public interface FeedsRESTInterface {
     public Call<List<Feed>> getAllFeeds();
 
     @GET("/v1/feeds")
-    public Call<List<Feed>> getFilteredFeeds(@Query("search") String searchFilter);
+    public Call<List<Feed>> getFilteredFeedsBySearch(@Query("search") String searchFilter);
+
+    @GET("/v1/feeds")
+    public Call<List<Feed>> getFilteredFeedsByCategory(@Query("category") String category);
+
+    @GET("/v1/feeds")
+    public Call<List<Feed>> getFilteredFeedsBySearchAndCategory(@Query("search") String searchFilter,
+                                                                @Query("category") String category);
 
     @FormUrlEncoded
     @POST("/v1/feeds")

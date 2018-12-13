@@ -403,7 +403,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 try {Thread.sleep(1000); } catch (InterruptedException e) { }
 
                 //Get all the Feeds Filtered by a string
-                api.getFilteredFeeds("UniqueTitle", new FeedCallback() {
+                api.getFilteredFeeds("UniqueTitle", null, new FeedCallback() {
                     @Override
                     public void onLoad(List<Feed> feeds) {
                         for(Feed feed:feeds) {

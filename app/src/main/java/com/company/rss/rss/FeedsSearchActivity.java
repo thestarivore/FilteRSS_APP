@@ -28,6 +28,7 @@ import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.User;
 import com.company.rss.rss.persistence.UserPrefs;
 import com.company.rss.rss.restful_api.RESTMiddleware;
+import com.company.rss.rss.restful_api.callbacks.FeedCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 
 import java.util.List;
@@ -44,6 +45,7 @@ public class FeedsSearchActivity extends AppCompatActivity {
     private NavigationView navigationView;
 
     private List<Multifeed> multifeeds;
+    private List<Feed> feeds;
 
     // TODO: view https://developer.android.com/training/improving-layouts/smooth-scrolling#java
 
@@ -66,10 +68,23 @@ public class FeedsSearchActivity extends AppCompatActivity {
             actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
         }
 
-        // TODO: get feeds and multifeeds from the API
-        final List<Feed> feeds = Feed.generateMockupFeeds(10);
-
+        // final List<Feed> feeds = Feed.generateMockupFeeds(10);
         // final List<Multifeed> multifeeds = Multifeed.generateMockupMultifeeds(4);
+
+        // TODO: substitute this with getTop10Feeds
+        api.getAllFeeds(new FeedCallback() {
+            @Override
+            public void onLoad(List<Feed> feedsReply) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "All Feeds Loaded: " + feedsReply.size());
+                feeds = feedsReply;
+                setFeedsList();
+            }
+
+            @Override
+            public void onFailure() {
+                Log.e(ArticleActivity.logTag + ":" + TAG, "All Feeds Error");
+            }
+        });
 
         drawerLayout = findViewById(R.id.drawer_layout_feeds_search);
         drawerLayout.addDrawerListener(
@@ -111,17 +126,31 @@ public class FeedsSearchActivity extends AppCompatActivity {
                         // close drawer when item is tapped
                         drawerLayout.closeDrawers();
 
-                        // Add code here to update the UI based on the item selected
-                        // For example, swap UI fragments here
-                        // TODO: call the API and update the feed
-                        String category = (String) menuItem.getTitle();
+                        // Update the UI based on the item selected
+                        final String category = (String) menuItem.getTitle();
                         Log.d(ArticleActivity.logTag + ":" + TAG, "Looking for " + category + " feeds");
+
+                        api.getFilteredFeeds(null, category, new FeedCallback() {
+                            @Override
+                            public void onLoad(List<Feed> feedsReply) {
+                                Log.d(ArticleActivity.logTag + ":" + TAG, "Feeds for " + category + " loaded : " + feedsReply.size());
+                                feeds = feedsReply;
+                                adapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                Log.e(ArticleActivity.logTag + ":" + TAG, "Feeds for " + category + " error");
+                            }
+                        });
 
                         return true;
                     }
                 });
 
-        
+    }
+
+    private void setFeedsList() {
         // Get the feed list
         final ListView feedsListview = findViewById(R.id.listViewFeedsList);
         // Set the adapter
@@ -184,14 +213,18 @@ public class FeedsSearchActivity extends AppCompatActivity {
         api.getUserMultifeeds(loggedUser.getEmail(), new MultifeedCallback() {
             @Override
             public void onLoad(List<Multifeed> multifeedsReply) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "User's Multifeed Loaded" + multifeedsReply.toString());
                 multifeeds = multifeedsReply;
             }
 
             @Override
             public void onFailure() {
+                Log.e(ArticleActivity.logTag + ":" + TAG, "User's Multifeed Error");
 
             }
         });
+
+
     }
 
     private boolean addFeedToMultifeed(Feed feed, Multifeed multifeed) {

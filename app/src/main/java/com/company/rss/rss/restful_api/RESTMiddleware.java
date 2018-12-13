@@ -92,11 +92,12 @@ public class RESTMiddleware {
 
     /**
      * Gets the list of all the Filtered Feeds (Search)
-     * @param searchFilter String containing the string pattern used to filter/search the desired feeds
+     * @param searchFilter String containing the string pattern used to filter/search the desired feeds, if any
+     * @param category String containing the category, if any
      * @param callback Callback for API response management
      */
-    public void getFilteredFeeds(String searchFilter, FeedCallback callback){
-        RESTService.getInstance(context).getFilteredFeeds(searchFilter, callback);
+    public void getFilteredFeeds(String searchFilter, String category, FeedCallback callback){
+        RESTService.getInstance(context).getFilteredFeeds(searchFilter, category, callback);
     }
 
     /**

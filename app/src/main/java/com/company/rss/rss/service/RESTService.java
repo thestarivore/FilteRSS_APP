@@ -197,28 +197,73 @@ public class RESTService {
 
     /**
      * Gets the list of all the Filtered Feeds (Search)
-     * @param searchFilter String containing the string pattern used to filter/search the desired feeds
+     * @param searchFilter String containing the string pattern used to filter/search the desired feeds, if any
+     * @param category String containing the cateogry, if any
      * @param callback Callback for API response management
      */
-    public void getFilteredFeeds(String searchFilter, final FeedCallback callback){
+    public void getFilteredFeeds(String searchFilter, String category, final FeedCallback callback){
         final List<Feed> feeds = new ArrayList<>();
 
-        feedsRESTInterface.getFilteredFeeds(searchFilter)
-                .enqueue(new retrofit2.Callback<List<Feed>>() {
-                    @Override
-                    public void onResponse(Call<List<Feed>> call, Response<List<Feed>> response) {
-                        for (Feed feed: response.body()) {
-                            feeds.add(feed);
+        if(searchFilter != null && category != null) {
+            feedsRESTInterface.getFilteredFeedsBySearchAndCategory(searchFilter, category)
+                    .enqueue(new retrofit2.Callback<List<Feed>>() {
+                        @Override
+                        public void onResponse(Call<List<Feed>> call, Response<List<Feed>> response) {
+                            for (Feed feed: response.body()) {
+                                feeds.add(feed);
+                            }
+
+                            callback.onLoad(feeds);
                         }
 
-                        callback.onLoad(feeds);
-                    }
+                        @Override
+                        public void onFailure(Call<List<Feed>> call, Throwable t) {
+                            callback.onFailure();
+                        }
+                    });
+            return;
+        }
 
-                    @Override
-                    public void onFailure(Call<List<Feed>> call, Throwable t) {
-                        callback.onFailure();
-                    }
-                });
+        if(searchFilter != null){
+            feedsRESTInterface.getFilteredFeedsBySearch(searchFilter)
+                    .enqueue(new retrofit2.Callback<List<Feed>>() {
+                        @Override
+                        public void onResponse(Call<List<Feed>> call, Response<List<Feed>> response) {
+                            for (Feed feed: response.body()) {
+                                feeds.add(feed);
+                            }
+
+                            callback.onLoad(feeds);
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<Feed>> call, Throwable t) {
+                            callback.onFailure();
+                        }
+                    });
+            return;
+        }
+
+
+        if(category != null){
+            feedsRESTInterface.getFilteredFeedsByCategory(category)
+                    .enqueue(new retrofit2.Callback<List<Feed>>() {
+                        @Override
+                        public void onResponse(Call<List<Feed>> call, Response<List<Feed>> response) {
+                            for (Feed feed: response.body()) {
+                                feeds.add(feed);
+                            }
+
+                            callback.onLoad(feeds);
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<Feed>> call, Throwable t) {
+                            callback.onFailure();
+                        }
+                    });
+            return;
+        }
     }
 
     /**
