@@ -19,7 +19,7 @@ import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 
 public class SignupActivity extends AppCompatActivity {
-
+    private final String TAG = getClass().getName();
     private RESTMiddleware api;
     private Button signUpButton;
     private EditText nameEditText;
@@ -102,7 +102,7 @@ public class SignupActivity extends AppCompatActivity {
 
 
     public void onSignupSuccess() {
-        Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Sign up success");
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Sign up success");
         signUpButton.setEnabled(true);
         //setResult(RESULT_OK, null);
         startArticlesListActivity();

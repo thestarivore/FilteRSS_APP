@@ -23,15 +23,16 @@ import com.company.rss.rss.rss_parser.LoadRSSFeed;
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
-    private static final String TAG = "LoginActivity";
+    private final String TAG = getClass().getName();
     public static final String EXTRA_USER = "com.rss.rss.USER";
     private RESTMiddleware api;
+    private User loggedUser;
+
     private Button loginButton;
     private TextView emailText;
     private TextView passwordText;
     private static final int REQUEST_SIGNUP = 0;
     private Context context;
-    private User loggedUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Start the Sign up activity");
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Starting the Sign up activity...");
 
                 Intent intent = new Intent(getApplicationContext(), SignupActivity.class);
                 startActivityForResult(intent, REQUEST_SIGNUP);
@@ -86,6 +87,8 @@ public class LoginActivity extends AppCompatActivity {
      * Login procedure
      */
     public void login() {
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Logging in user...");
+
         if (!validate()) {
             onLoginFailed();
             return;
@@ -102,12 +105,16 @@ public class LoginActivity extends AppCompatActivity {
         final String password = passwordText.getText().toString();
 
         //Authentication and Persistence of the User
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Authenticating user...");
         api.getUserAuthentication(email, password, new UserCallback() {
             @Override
             public void onLoad(List<User> users) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "\nUser authentication " + users.size());
+
+
                 for(User user: users){
-                    Log.d(TAG, "\nUser authentication");
-                    Log.d(TAG, "\nUser: " + user.getId() +  ", " + user.getName() + ", " + user.getSurname() + ", " + user.getEmail() + ", " + user.getPassword());
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "\nUser authentication");
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "\nUser: " + user.getId() +  ", " + user.getName() + ", " + user.getSurname() + ", " + user.getEmail() + ", " + user.getPassword());
 
                     //Get logged user
                     if(users.isEmpty() == false) {
@@ -126,7 +133,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure() {
-                Log.d(TAG, "\nFailure on: getUserAuthentication");
+                Log.d(ArticleActivity.logTag + ":" + TAG, "\nFailure on: getUserAuthentication");
                 progressDialog.dismiss();
                 onLoginFailed();
             }
@@ -137,10 +144,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SIGNUP) {
             if (resultCode == RESULT_OK) {
-                Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Returned from Signup activity with RESULT_OK");
-                Snackbar.make(findViewById(R.id.login_activity_scroll_view), R.string.registration_completed_login, Snackbar.LENGTH_LONG);
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Returned from Signup activity with RESULT_OK");
+                Snackbar.make(findViewById(android.R.id.content), R.string.registration_completed_login, Snackbar.LENGTH_LONG).show();
             } else {
-                Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Returned from Signup activity without RESULT_OK");
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Returned from Signup activity without RESULT_OK");
             }
         }
     }
@@ -152,7 +159,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLoginSuccess() {
-        Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Login success");
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Login success");
         loginButton.setEnabled(true);
 
         //Start an AsyncTask to gather all the User's information before stepping into the main Activity
@@ -166,14 +173,16 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void onLoginFailed() {
-        Log.v(ArticleActivity.logTag + ":" + getClass().getName(), "Login failed");
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Login failed");
 
-        Toast.makeText(getBaseContext(), R.string.login_failed, Toast.LENGTH_LONG).show();
+        Snackbar.make(findViewById(android.R.id.content), R.string.login_failed, Snackbar.LENGTH_LONG).show();
 
         loginButton.setEnabled(true);
     }
 
     public boolean validate() {
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Validating user...");
+
         boolean valid = true;
 
         String email = emailText.getText().toString();

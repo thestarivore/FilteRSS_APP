@@ -148,5 +148,9 @@
     <string name="registration_completed_login">Registration completed, login now with your credentials</string>
     <string name="multifeed_title">Multifeeds</string>
     <string name="collections_title">Collections</string>
+    <string name="new_multifeed">New Multifeed</string>
+    <string name="multifeed_name">Multifeed Name</string>
+    <string name="multifeed_saved">Multifeed saved successfully</string>
+    <string name="multifeed_not_saved">Error with the creation of the multifeed</string>
 
 </resources>
