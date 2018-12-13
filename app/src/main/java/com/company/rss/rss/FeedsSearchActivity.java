@@ -25,11 +25,13 @@ import android.widget.Toast;
 import com.company.rss.rss.adapters.FeedsListAdapter;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.Multifeed;
+import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.User;
 import com.company.rss.rss.persistence.UserPrefs;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.FeedCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
+import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 
 import java.util.List;
 
@@ -46,6 +48,7 @@ public class FeedsSearchActivity extends AppCompatActivity {
 
     private List<Multifeed> multifeeds;
     private List<Feed> feeds;
+    private ListView feedsListview;
 
     // TODO: view https://developer.android.com/training/improving-layouts/smooth-scrolling#java
 
@@ -67,9 +70,6 @@ public class FeedsSearchActivity extends AppCompatActivity {
             actionbar.setDisplayHomeAsUpEnabled(true);
             actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
         }
-
-        // final List<Feed> feeds = Feed.generateMockupFeeds(10);
-        // final List<Multifeed> multifeeds = Multifeed.generateMockupMultifeeds(4);
 
         // TODO: substitute this with getTop10Feeds
         api.getAllFeeds(new FeedCallback() {
@@ -130,19 +130,32 @@ public class FeedsSearchActivity extends AppCompatActivity {
                         final String category = (String) menuItem.getTitle();
                         Log.d(ArticleActivity.logTag + ":" + TAG, "Looking for " + category + " feeds");
 
-                        api.getFilteredFeeds(null, category, new FeedCallback() {
-                            @Override
-                            public void onLoad(List<Feed> feedsReply) {
-                                Log.d(ArticleActivity.logTag + ":" + TAG, "Feeds for " + category + " loaded : " + feedsReply.size());
-                                feeds = feedsReply;
-                                adapter.notifyDataSetChanged();
-                            }
+                        // If the category is All get all the feeds otherwise get the feed by category
+                        if(category.equals("All")){
+                            api.getAllFeeds(new FeedCallback() {
+                                @Override
+                                public void onLoad(List<Feed> feedsReply) {
+                                    updateFeedsList(feedsReply);
+                                }
 
-                            @Override
-                            public void onFailure() {
-                                Log.e(ArticleActivity.logTag + ":" + TAG, "Feeds for " + category + " error");
-                            }
-                        });
+                                @Override
+                                public void onFailure() {
+                                    Log.e(ArticleActivity.logTag + ":" + TAG, "All Feeds Error");
+                                }
+                            });
+                        } else {
+                            api.getFilteredFeeds(null, category, new FeedCallback() {
+                                @Override
+                                public void onLoad(List<Feed> feedsReply) {
+                                    updateFeedsList(feedsReply);
+                                }
+
+                                @Override
+                                public void onFailure() {
+                                    Log.e(ArticleActivity.logTag + ":" + TAG, "Feeds for " + category + " error");
+                                }
+                            });
+                        }
 
                         return true;
                     }
@@ -150,9 +163,12 @@ public class FeedsSearchActivity extends AppCompatActivity {
 
     }
 
+    /*
+    Initializes the feed list
+     */
     private void setFeedsList() {
         // Get the feed list
-        final ListView feedsListview = findViewById(R.id.listViewFeedsList);
+        feedsListview = findViewById(R.id.listViewFeedsList);
         // Set the adapter
         adapter = new FeedsListAdapter(this, feeds, false);
         feedsListview.setAdapter(adapter);
@@ -173,18 +189,7 @@ public class FeedsSearchActivity extends AppCompatActivity {
                                     public void onClick(DialogInterface dialog, int selectedIndex) {
                                         Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed " + selectedIndex + " clicked, info: " + multifeeds.get(selectedIndex).toString());
 
-                                        boolean added = addFeedToMultifeed(feed, multifeeds.get(selectedIndex));
-
-                                        if (added) {
-                                            // Animate add (+) button that becomes remove (x) button
-                                            ImageView imageViewAdd = view.findViewById(R.id.imageViewFeedsSearchActionIcon);
-                                            imageViewAdd.animate().setDuration(500).rotation(45);
-                                            dialog.dismiss();
-                                        } else {
-                                            // TODO: show error
-                                            Toast.makeText(getApplicationContext(), R.string.feed_add_error, Toast.LENGTH_SHORT).show();
-                                        }
-
+                                        addFeedToMultifeed(feed, multifeeds.get(selectedIndex), dialog, view);
                                     }
                                 })
                         // The positive button allows the creation of a new multifeed
@@ -206,6 +211,19 @@ public class FeedsSearchActivity extends AppCompatActivity {
         });
     }
 
+    /*
+    Update the list with the new feedsReply
+    */
+    private void updateFeedsList(List<Feed> feedsReply) {
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Feeds updated: " + feedsReply.size());
+        feeds = feedsReply;
+        adapter.updateFeeds(feeds);    // update the feeds in the adapter
+        feedsListview.setSelection(0); // set scroll position to 0
+    }
+
+    /*
+    onResume update the user's multifeed
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -227,17 +245,43 @@ public class FeedsSearchActivity extends AppCompatActivity {
 
     }
 
-    private boolean addFeedToMultifeed(Feed feed, Multifeed multifeed) {
-        // TODO: call the API and add the feed to the multifeed
+    /*
+    Add the selected feed to the user's multifeed
+     */
+    private void addFeedToMultifeed(final Feed feed, final Multifeed multifeed, final DialogInterface dialog, final View view) {
+        api.addUserFeed(feed.getId(), multifeed.getId(), new SQLOperationCallback() {
+            @Override
+            public void onLoad(SQLOperation sqlOperation) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Feed " + feed.getId() + " added to multifeed " + multifeed.getId());
 
-        // Feed added
-        Boolean feedAdded = true;
-        if (feedAdded)
-            return true;
-        else
-            return false;
+                ImageView imageViewAdd = view.findViewById(R.id.imageViewFeedsSearchActionIcon);
+                imageViewAdd.animate().setDuration(500).rotation(45);
+                dialog.dismiss();
+
+                Snackbar.make(findViewById(android.R.id.content), feed.getTitle() + " " +
+                        getText(R.string.saved_in) + " " + multifeed.getTitle(), Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure() {
+                Log.e(ArticleActivity.logTag + ":" + TAG, "Feed " + feed.getId() + " NOT added to multifeed " + multifeed.getId());
+
+                Snackbar.make(findViewById(android.R.id.content), R.string.error_adding_feed, Snackbar.LENGTH_LONG).show();
+            }
+        });
+
+
     }
 
+
+    /*
+    Start the activity for the creation of a new Multifeed
+     */
+    private void startMultifeedCreationActivity() {
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Starting multifeed creation...");
+        Intent intent = new Intent(this, MultifeedCreationActivity.class);
+        startActivityForResult(intent, REQUEST_CREATE_MULTIFEED);
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -305,17 +349,6 @@ public class FeedsSearchActivity extends AppCompatActivity {
 
         return true;
     }
-
-
-    /*
-    Start the activity for the creation of a new Multifeed
-     */
-    private void startMultifeedCreationActivity() {
-        Log.d(ArticleActivity.logTag + ":" + TAG, "Starting multifeed creation...");
-        Intent intent = new Intent(this, MultifeedCreationActivity.class);
-        startActivityForResult(intent, REQUEST_CREATE_MULTIFEED);
-    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

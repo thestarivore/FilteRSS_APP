@@ -152,5 +152,8 @@
     <string name="multifeed_name">Multifeed Name</string>
     <string name="multifeed_saved">Multifeed saved successfully</string>
     <string name="multifeed_not_saved">Error with the creation of the multifeed</string>
+    <string name="feed">Feed</string>
+    <string name="saved_in">saved in</string>
+    <string name="error_adding_feed">Error adding feed</string>
 
 </resources>

@@ -22,11 +22,18 @@ import java.util.List;
 public class FeedsListAdapter extends ArrayAdapter<Feed> implements Filterable {
     private final Context context;
     private List<Feed> feeds;
-    private final List<Feed> allFeeds;
+    private List<Feed> allFeeds;
     private final boolean removeIcon;
     private Filter filter;
 
 
+    static class ViewHolderFeed {
+
+        TextView feedName;
+        TextView feedCategory;
+        ImageView feedIcon;
+        ImageView feedActionIcon;
+    }
     public FeedsListAdapter(Context context, List<Feed> feeds, boolean removeIcon) {
         super(context, -1, feeds);
         this.context = context;
@@ -67,12 +74,13 @@ public class FeedsListAdapter extends ArrayAdapter<Feed> implements Filterable {
 
     }
 
-    static class ViewHolderFeed {
-        TextView feedName;
-        TextView feedCategory;
-        ImageView feedIcon;
-        ImageView feedActionIcon;
+
+    public void updateFeeds(List<Feed> feeds) {
+        this.feeds = new ArrayList<>(feeds);
+        this.allFeeds = new ArrayList<>(feeds);
+        notifyDataSetChanged();
     }
+
 
     @Override
     public int getCount() {
@@ -86,8 +94,8 @@ public class FeedsListAdapter extends ArrayAdapter<Feed> implements Filterable {
         return filter;
     }
 
-
     class FeedFilter extends Filter {
+
 
         List<Feed> filteredResult = new ArrayList<>();
 
