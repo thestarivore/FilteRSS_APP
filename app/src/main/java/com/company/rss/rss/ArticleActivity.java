@@ -7,6 +7,8 @@ import android.graphics.Point;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
@@ -29,17 +31,28 @@ import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Collection;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import top.defaults.colorpicker.ColorPickerPopup;
 
 import static android.text.Layout.JUSTIFICATION_MODE_INTER_WORD;
 
-public class ArticleActivity extends AppCompatActivity {
+public class ArticleActivity extends AppCompatActivity implements
+        TextToSpeech.OnInitListener {
 
     public final static String logTag = "RSSLOG";
+    private final String TAG = getClass().getName();
+    private TextToSpeech tts;
+
     private boolean fabVisible;
     private Article article;
+
+    private String articleBody;
+    private String articleTitle;
+    private MenuItem ttsPlayItem;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,14 +67,17 @@ public class ArticleActivity extends AppCompatActivity {
 
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
 
+        // Init tts
+        tts = new TextToSpeech(this, this);
+
         // INPUT DATA
         Intent intent = getIntent();
         article = (Article) intent.getSerializableExtra(ArticlesListActivity.EXTRA_ARTICLE);
 
         String articleImage = article.getImgLink();
         String articleSubtitle = article.getLink();
-        String articleTitle = article.getTitle();
-        String articleBody = article.getDescription();
+        articleTitle = article.getTitle();
+        articleBody = article.getDescription();
         int readingTime = article.getReadingTime();
 
         // SETTERS
@@ -150,42 +166,18 @@ public class ArticleActivity extends AppCompatActivity {
             }
         });
 
+
     }
 
     private void sendArticlesRead(Article article) {
         // TODO: call the API and increment the article reads counter
-        Log.v(ArticleActivity.logTag, "Sending article count increment for " + article.toString());
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Sending article count increment for " + article.toString());
 
     }
 
     private void sendArticlesFeedback(Article article, int i) {
         // TODO: call the API and send the feedback
-        Log.v(ArticleActivity.logTag, "Sending feedback " + i + " for " + article.toString());
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_article, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.itemSaveArticle:
-                showDialogCollectionsList();
-                return (true);
-            case R.id.itemShareArticle:
-                //add the function to perform here
-                return (true);
-            case R.id.about:
-                //add the function to perform here
-                return (true);
-            case R.id.exit:
-                //add the function to perform here
-                return (true);
-        }
-        return (super.onOptionsItemSelected(item));
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback " + i + " for " + article.toString());
     }
 
     private void showDialogCollectionsList() {
@@ -254,7 +246,7 @@ public class ArticleActivity extends AppCompatActivity {
                 // TODO: call the API and create the collection
                 collection.setTitle(title);
 
-                Log.v(ArticleActivity.logTag, "Saving collection: " + collection.toString());
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Saving collection: " + collection.toString());
             }
         });
 
@@ -305,9 +297,142 @@ public class ArticleActivity extends AppCompatActivity {
 
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_article, menu);
+
+        ttsPlayItem = menu.findItem(R.id.itemReadArticle);
+        // Disable play button until tts is initialized
+        ttsPlayItem.setEnabled(false);
+        ttsPlayItem.getIcon().setAlpha(130);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.itemReadArticle:
+                speakOut();
+                return (true);
+            case R.id.itemSaveArticle:
+                showDialogCollectionsList();
+                return (true);
+            case R.id.itemShareArticle:
+                //add the function to perform here
+                return (true);
+            case R.id.about:
+                //add the function to perform here
+                return (true);
+            case R.id.exit:
+                //add the function to perform here
+                return (true);
+        }
+        return (super.onOptionsItemSelected(item));
+    }
+
+    @Override
     public void finish() {
         super.finish();
         overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right);
     }
+
+    /*
+    TTS initialization
+     */
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+
+            int result = tts.setLanguage(Locale.getDefault());
+
+            // tts.setPitch(5); // set pitch level
+
+            // tts.setSpeechRate(2); // set speech speed rate
+
+            if (result == TextToSpeech.LANG_MISSING_DATA
+                    || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                Log.e(ArticleActivity.logTag + ":" + TAG, "TTS: Language is not supported");
+
+                /*// missing data, install it
+                Intent installIntent = new Intent();
+                installIntent.setAction(
+                        TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                startActivity(installIntent);*/
+            } else {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "TTS: init with locale " + Locale.getDefault());
+                // Init completed show play button
+                ttsPlayItem.setEnabled(true);
+                ttsPlayItem.getIcon().setAlpha(255);
+            }
+
+        } else {
+            Log.e(ArticleActivity.logTag + ":" + TAG, "TTS: init failed");
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
+    }
+
+
+    private void speakOut() {
+        if (tts.isSpeaking()) {
+            Log.d(ArticleActivity.logTag + ":" + TAG, "TTS: stopped");
+            // Stop the player
+            tts.stop();
+            // Show play button
+            ttsPlayItem.setIcon(R.drawable.ic_play_circle_outline_white_24dp);
+        } else {
+            Log.d(ArticleActivity.logTag + ":" + TAG, "TTS: started");
+            // Start the player
+            tts.speak(articleTitle, TextToSpeech.QUEUE_FLUSH, null);
+
+            speech(articleBody);
+
+            // Show stop icon
+            ttsPlayItem.setIcon(R.drawable.ic_stop_white_24dp);
+        }
+
+    }
+
+
+    private void speech(String charSequence) {
+
+        int position = 0;
+
+        int sizeOfChar= charSequence.length();
+        String substring= charSequence.substring(position,sizeOfChar);
+
+        int next = 20;
+        int pos =0;
+        while(true) {
+            String temp="";
+
+            try {
+
+                temp = substring.substring(pos, next);
+                HashMap<String, String> params = new HashMap<String, String>();
+                params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, temp);
+                tts.speak(temp, TextToSpeech.QUEUE_ADD, params);
+
+                pos = pos + 20;
+                next = next + 20;
+
+            } catch (Exception e) {
+                temp = substring.substring(pos, substring.length());
+                tts.speak(temp, TextToSpeech.QUEUE_ADD, null);
+                break;
+
+            }
+
+        }
+
+    }
+
 
 }

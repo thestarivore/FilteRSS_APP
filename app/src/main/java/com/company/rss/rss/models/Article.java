@@ -231,7 +231,7 @@ public class Article implements Serializable {
 
     private static String makeBody() {
         Lorem lorem = LoremIpsum.getInstance();
-        return lorem.getParagraphs(2, 40);
+        return lorem.getParagraphs(1, 1);
     }
 
     private static String makeTitle() {
