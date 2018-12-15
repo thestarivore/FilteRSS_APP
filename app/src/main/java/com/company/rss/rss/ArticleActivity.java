@@ -405,13 +405,13 @@ public class ArticleActivity extends AppCompatActivity implements
 
         int position = 0;
 
-        int sizeOfChar= charSequence.length();
-        String substring= charSequence.substring(position,sizeOfChar);
+        int sizeOfChar = charSequence.length();
+        String substring = charSequence.substring(position, sizeOfChar);
 
         int next = 20;
-        int pos =0;
-        while(true) {
-            String temp="";
+        int pos = 0;
+        while (true) {
+            String temp = "";
 
             try {
 

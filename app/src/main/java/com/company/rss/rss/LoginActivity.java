@@ -76,10 +76,7 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void startArticlesListActivity() {
-        Intent intent = new Intent(this, ArticlesListActivity.class);
-        startActivity(intent);
-    }
+
 
     /**
      * Login procedure
@@ -152,32 +149,30 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // disable going back to the MainActivity
+        // disable going back to the LoadingActivity
         moveTaskToBack(true);
+    }
+
+    private void startLoadingActivity() {
+        Intent intent = new Intent(this, LoadingActivity.class);
+        intent.putExtra("logged-user", loggedUser);
+        intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(intent);
     }
 
     public void onLoginSuccess() {
         Log.d(ArticleActivity.logTag + ":" + TAG, "Login success");
         loginButton.setEnabled(true);
 
+        startLoadingActivity();
+
         //Start a Loading Spinner Dialog
-        final ProgressDialog progress = new ProgressDialog(this);
+        /*final ProgressDialog progress = new ProgressDialog(this);
         progress.setTitle("Loading");
         progress.setMessage("Wait while loading...");
         progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-        progress.show();
+        progress.show();*/
 
-        //Start an AsyncTask to gather all the User's information before stepping into the main Activity
-        new LoadUserData(new AsyncResponse() {
-            @Override
-            public void processFinish(Object output) {
-                //All the data has been gathered so we can open the main activity
-                startArticlesListActivity();
-
-                //Dismiss the Dialog
-                progress.dismiss();
-            }
-        }, context, loggedUser).execute();
     }
 
     public void onLoginFailed() {
