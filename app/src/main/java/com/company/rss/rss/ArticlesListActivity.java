@@ -34,7 +34,7 @@ import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.ReadArticle;
 import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.User;
-import com.company.rss.rss.persistence.UserPrefs;
+import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.CategoryCallback;
@@ -65,14 +65,18 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private ExpandableListAdapter listAdapter;
     private ExpandableListView expListViewMultifeeds;
     private List<String> multifeedListHeaders;
-    private HashMap<String, List<String>> mollifiedListChild;
+    private HashMap<String, List<String>> multifeedListChild;
 
 
     private RESTMiddleware api;
     private List<Feed> feedList = new ArrayList<Feed>();
     private Context context;
+    private UserData userData;
     private User loggedUser;
-    private List<FeedGrouping> feedGroups;
+    private List<FeedGrouping>  feedGroups;
+    private List<Feed>          feeds;
+    private List<Multifeed>     multifeeds;
+    private List<Collection>    collections;
 
 
     @Override
@@ -85,18 +89,26 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         api = new RESTMiddleware(this);
 
         //Get a SharedPreferences instance
-        UserPrefs prefs = new UserPrefs(context);
+        /*UserPrefs prefs = new UserPrefs(context);
 
         //Get the User info
-        loggedUser = prefs.retriveUser();
-        feedGroups = prefs.retriveFeedGroups();
+        loggedUser  = prefs.retrieveUser();
+        feedGroups  = prefs.retrieveFeedGroups();
+        feeds       = prefs.retrieveFeeds();
+        multifeeds  = prefs.retrieveMultifeeds();
+        collections = prefs.retrieveCollections();*/
+
+        //Get a UserData instance
+        userData = new UserData();
+        userData.loadPersistedData(context);
+        userData.processUserData();
 
         // DRAWER AND TOOLBAR
         // Left Menu
         expListViewMultifeeds = (ExpandableListView) findViewById(R.id.exp_list_view_multifeeds);
         prepareMultifeedsListData();
 
-        listAdapter = new ExpandableListAdapter(this, multifeedListHeaders, mollifiedListChild);
+        listAdapter = new ExpandableListAdapter(this, multifeedListHeaders, multifeedListChild);
         expListViewMultifeeds.setAdapter(listAdapter);
         expListViewMultifeeds.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -182,9 +194,15 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
      */
     private void prepareMultifeedsListData() {
         multifeedListHeaders = new ArrayList<String>();
-        mollifiedListChild = new HashMap<String, List<String>>();
+        multifeedListChild = new HashMap<String, List<String>>();
 
-        //TODO: fill with the data from the SharedPreferences
+        //For each user's multifeed
+        for (Multifeed multifeed: userData.getMultifeedList()){
+            //Add the multifeed header
+            multifeedListHeaders.add(multifeed.getTitle());
+            //Add the associated feed list
+            multifeedListChild.put(multifeed.getTitle(), userData.getMapFeedTitlesListByKey(multifeed));
+        }
     }
 
 

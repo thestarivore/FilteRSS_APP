@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.company.rss.rss.models.User;
 import com.company.rss.rss.persistence.UserPrefs;
@@ -18,7 +17,6 @@ import com.company.rss.rss.restful_api.LoadUserData;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
-import com.company.rss.rss.rss_parser.LoadRSSFeed;
 
 import java.util.List;
 
@@ -71,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         UserPrefs prefs = new UserPrefs(context);
 
         //Get the User Logged in
-        loggedUser = prefs.retriveUser();
+        loggedUser = prefs.retrieveUser();
         //Skip login if User already persisted
         if(loggedUser != null) {
             onLoginSuccess();
@@ -162,14 +160,24 @@ public class LoginActivity extends AppCompatActivity {
         Log.d(ArticleActivity.logTag + ":" + TAG, "Login success");
         loginButton.setEnabled(true);
 
+        //Start a Loading Spinner Dialog
+        final ProgressDialog progress = new ProgressDialog(this);
+        progress.setTitle("Loading");
+        progress.setMessage("Wait while loading...");
+        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
+        progress.show();
+
         //Start an AsyncTask to gather all the User's information before stepping into the main Activity
         new LoadUserData(new AsyncResponse() {
             @Override
             public void processFinish(Object output) {
                 //All the data has been gathered so we can open the main activity
                 startArticlesListActivity();
+
+                //Dismiss the Dialog
+                progress.dismiss();
             }
-        }, context, loggedUser.getId()).execute();
+        }, context, loggedUser).execute();
     }
 
     public void onLoginFailed() {

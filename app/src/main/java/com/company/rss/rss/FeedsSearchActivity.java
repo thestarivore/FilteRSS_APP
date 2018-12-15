@@ -58,7 +58,7 @@ public class FeedsSearchActivity extends AppCompatActivity {
         setContentView(R.layout.activity_feeds_search);
 
         UserPrefs prefs = new UserPrefs(this);
-        loggedUser = prefs.retriveUser();
+        loggedUser = prefs.retrieveUser();
 
         api = new RESTMiddleware(this);
 

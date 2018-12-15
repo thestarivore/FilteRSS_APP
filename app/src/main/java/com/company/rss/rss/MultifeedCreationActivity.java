@@ -3,17 +3,13 @@ package com.company.rss.rss;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.company.rss.rss.fragments.MultifeedEditFragment;
 import com.company.rss.rss.models.Multifeed;
@@ -37,7 +33,7 @@ public class MultifeedCreationActivity extends AppCompatActivity implements Mult
         setContentView(R.layout.activity_multifeed_creation);
 
         UserPrefs prefs = new UserPrefs(this);
-        loggedUser = prefs.retriveUser();
+        loggedUser = prefs.retrieveUser();
 
         api = new RESTMiddleware(this);
 
