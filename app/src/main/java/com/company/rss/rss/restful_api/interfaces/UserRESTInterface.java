@@ -83,7 +83,10 @@ public interface UserRESTInterface {
 
     /*********************** User - Articles *********************************/
     @GET("/v1/user/articles")
-    public Call<List<Article>> getUserArticles(@Query("feed") int feed);
+    public Call<List<Article>> getUserArticlesByFeed(@Query("feed") int feed);
+
+    @GET("/v1/user/articles")
+    public Call<List<Article>> getUserArticles(@Query("userId") int userId);
 
     @FormUrlEncoded
     @PUT("/v1/user/articles")

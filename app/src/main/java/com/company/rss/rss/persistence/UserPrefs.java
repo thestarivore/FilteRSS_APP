@@ -7,6 +7,7 @@ import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.FeedGrouping;
 import com.company.rss.rss.models.Multifeed;
+import com.company.rss.rss.models.SavedArticle;
 import com.company.rss.rss.models.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -179,4 +180,5 @@ public class UserPrefs{
         Type type = new TypeToken<List<Collection>>(){}.getType();
         return gson.fromJson(collectionsJson, type);
     }
+
 }

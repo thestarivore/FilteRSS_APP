@@ -46,8 +46,8 @@ public class RESTService {
 
     private RESTService(Context context){
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.1.109:3000/")                                         //In local Nicholas
-                //.baseUrl("http://192.168.1.22:3000/")                                         //In local Eddy
+                //.baseUrl("http://192.168.1.109:3000/")                                         //In local Nicholas
+                .baseUrl("http://192.168.1.22:3000/")                                         //In local Eddy
                 //.baseUrl("http://ec2-35-180-230-227.eu-west-3.compute.amazonaws.com:3000")      //On Amazon AWS
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -581,14 +581,39 @@ public class RESTService {
     /*********************** User - Articles *********************************/
 
     /**
-     * Gets the list of all the User's Articles
+     * Gets the list of all the User's Articles by feed
      * @param feed
      * @param callback Callback for API response management
      */
-    public void getUserArticles(int feed, final ArticleCallback callback){
+    public void getUserArticlesByFeed(int feed, final ArticleCallback callback){
         final List<Article> articles = new ArrayList<>();
 
-        userRESTInterface.getUserArticles(feed)
+        userRESTInterface.getUserArticlesByFeed(feed)
+                .enqueue(new retrofit2.Callback<List<Article>>() {
+                    @Override
+                    public void onResponse(Call<List<Article>> call, Response<List<Article>> response) {
+                        for (Article article: response.body()) {
+                            articles.add(article);
+                        }
+                        callback.onLoad(articles);
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<Article>> call, Throwable t) {
+                        callback.onFailure();
+                    }
+                });
+    }
+
+    /**
+     * Gets the list of all the User's Articles by user id
+     * @param userId
+     * @param callback Callback for API response management
+     */
+    public void getUserArticles(int userId, final ArticleCallback callback){
+        final List<Article> articles = new ArrayList<>();
+
+        userRESTInterface.getUserArticles(userId)
                 .enqueue(new retrofit2.Callback<List<Article>>() {
                     @Override
                     public void onResponse(Call<List<Article>> call, Response<List<Article>> response) {

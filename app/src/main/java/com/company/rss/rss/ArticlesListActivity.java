@@ -690,9 +690,26 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                         });
                 try {Thread.sleep(1000); } catch (InterruptedException e) { }
 
-                //Gets the list of all the User's Articles
+                //Gets the list of all the User's Articles by feed
+                Log.d(TAG, "\ngetUserArticlesByFeed:");
+                api.getUserArticlesByFeed(1032, new ArticleCallback() {
+                    @Override
+                    public void onLoad(List<Article> articles) {
+                        for(Article article:articles) {
+                            Log.d(TAG, "\nArticle: " + article.getHashId() + "," + article.getTitle()+ "," + article.getLink());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getUserArticlesByFeed");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Gets the list of all the User's Articles by user id
                 Log.d(TAG, "\ngetUserArticles:");
-                api.getUserArticles(1032, new ArticleCallback() {
+                api.getUserArticles(16, new ArticleCallback() {
                     @Override
                     public void onLoad(List<Article> articles) {
                         for(Article article:articles) {

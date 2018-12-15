@@ -9,6 +9,7 @@ import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.FeedGrouping;
 import com.company.rss.rss.models.Multifeed;
+import com.company.rss.rss.models.SavedArticle;
 import com.company.rss.rss.models.User;
 import com.company.rss.rss.persistence.UserPrefs;
 import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
@@ -16,6 +17,7 @@ import com.company.rss.rss.restful_api.callbacks.CollectionCallback;
 import com.company.rss.rss.restful_api.callbacks.FeedCallback;
 import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
+import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
 
 import java.util.List;
@@ -40,6 +42,8 @@ public class LoadUserData extends AsyncTask<Void, Void, Object> {
     private boolean gotFeeds;
     private boolean gotMultifeeds;
     private boolean gotCollections;
+    private boolean gotSavedArticles;
+    private boolean gotArticles;
 
     /**
      * Constructor of LoadUserData class
@@ -60,6 +64,8 @@ public class LoadUserData extends AsyncTask<Void, Void, Object> {
         gotFeeds        = false;
         gotMultifeeds   = false;
         gotCollections  = false;
+        gotSavedArticles= false;
+        gotArticles     = false;
 
         //Instantiate the Middleware for the RESTful API's
         api = new RESTMiddleware(parent);
@@ -150,23 +156,43 @@ public class LoadUserData extends AsyncTask<Void, Void, Object> {
             }
         });
 
-
-
-
-
         //Gets the list of all the User's SavedArticles
-        Log.d(TAG, "\ngetUserArticlesSavedInCollection:");
-        api.getUserArticlesSavedInCollection(3, new ArticleCallback() {
+        Log.d(TAG, "\ngetUserSavedArticles:");
+        api.getUserSavedArticles(user.getId(), new SavedArticleCallback() {
             @Override
-            public void onLoad(List<Article> articles) {
-                for(Article article:articles) {
-                    Log.d(TAG, "\nSavedArticle: " + article.getHashId() + "," + article.getTitle()+ "," + article.getLink());
+            public void onLoad(List<SavedArticle> savedArticles) {
+                for(SavedArticle savedArticle:savedArticles) {
+                    Log.d(TAG, "\nSavedArticle: " + savedArticle.getArticle() + "," + savedArticle.getCollection());
                 }
+
+                //Persist the SavedArticles
+                //prefs.storeSavedArticles(savedArticles);
+                gotSavedArticles = true;
             }
 
             @Override
             public void onFailure() {
-                Log.d(TAG, "\nFailure on: getUserArticlesSavedInCollection");
+                Log.d(TAG, "\nFailure on: getUserSavedArticles");
+            }
+        });
+
+        //Gets the list of all the User's Articles by user id
+        Log.d(TAG, "\ngetUserArticles:");
+        api.getUserArticles(user.getId(), new ArticleCallback() {
+            @Override
+            public void onLoad(List<Article> articles) {
+                for(Article article:articles) {
+                    Log.d(TAG, "\nArticle: " + article.getHashId() + "," + article.getTitle()+ "," + article.getLink());
+                }
+
+                //Persist the Articles
+                //prefs.storeArticles(savedArticles);
+                gotArticles = true;
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(TAG, "\nFailure on: getUserArticles");
             }
         });
 
@@ -197,7 +223,7 @@ public class LoadUserData extends AsyncTask<Void, Void, Object> {
      * @return True if is still downloading False otherwise
      */
     private boolean isStillDownloading(){
-        if(gotFeedGroups && gotFeeds && gotMultifeeds && gotCollections)
+        if(gotFeedGroups && gotFeeds && gotMultifeeds && gotCollections && gotSavedArticles && gotArticles)
             return false;
         else
             return true;

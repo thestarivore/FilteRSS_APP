@@ -244,12 +244,21 @@ public class RESTMiddleware {
      *                       User - Articles
      ********************************************************************/
     /**
-     * Gets the list of all the User's Articles
+     * Gets the list of all the User's Articles by feed
      * @param feed
      * @param callback Callback for API response management
      */
-    public void getUserArticles(int feed, ArticleCallback callback){
-        RESTService.getInstance(context).getUserArticles(feed, callback);
+    public void getUserArticlesByFeed(int feed, ArticleCallback callback){
+        RESTService.getInstance(context).getUserArticlesByFeed(feed, callback);
+    }
+
+    /**
+     * Gets the list of all the User's Articles by user id
+     * @param userId
+     * @param callback Callback for API response management
+     */
+    public void getUserArticles(int userId, ArticleCallback callback){
+        RESTService.getInstance(context).getUserArticles(userId, callback);
     }
 
     /**
