@@ -64,21 +64,22 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private PagerAdapter pagerAdapter;
 
     //Expandable List View on the Left Drawer
-    private ExpandableListAdapter listAdapter;
-    private ExpandableListView expListViewMultifeeds;
-    private List<String> multifeedListHeaders;
-    private HashMap<String, List<String>> multifeedListChild;
+    //Multifeeds List
+    private ExpandableListAdapter           multifeedListAdapter;
+    private ExpandableListView              expListViewMultifeeds;
+    private List<String>                    multifeedListHeaders;
+    private HashMap<String, List<String>>   multifeedListChild;
+    //Collections List
+    private ExpandableListAdapter           collectionListAdapter;
+    private ExpandableListView              expListViewCollections;
+    private List<String>                    collectionListHeaders;
+    private HashMap<String, List<String>>   collectionListChild;
 
 
     private RESTMiddleware api;
-    private List<Feed> feedList = new ArrayList<Feed>();
+    private List<Feed> feedList = new ArrayList<>();
     private Context context;
     private UserData userData;
-    private User loggedUser;
-    private List<FeedGrouping>  feedGroups;
-    private List<Feed>          feeds;
-    private List<Multifeed>     multifeeds;
-    private List<Collection>    collections;
 
 
     @Override
@@ -90,16 +91,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         //Instantiate the Middleware for the RESTful API's
         api = new RESTMiddleware(this);
 
-        //Get a SharedPreferences instance
-        /*UserPrefs prefs = new UserPrefs(context);
-
-        //Get the User info
-        loggedUser  = prefs.retrieveUser();
-        feedGroups  = prefs.retrieveFeedGroups();
-        feeds       = prefs.retrieveFeeds();
-        multifeeds  = prefs.retrieveMultifeeds();
-        collections = prefs.retrieveCollections();*/
-
         //Get a UserData instance
         userData = new UserData();
         userData.loadPersistedData(context);
@@ -107,36 +98,41 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
         // DRAWER AND TOOLBAR
         // Left Menu
+        //Multifeed Expandable List
         expListViewMultifeeds = (ExpandableListView) findViewById(R.id.exp_list_view_multifeeds);
         prepareMultifeedsListData();
-
-        listAdapter = new ExpandableListAdapter(this, multifeedListHeaders, multifeedListChild);
-        expListViewMultifeeds.setAdapter(listAdapter);
+        multifeedListAdapter = new ExpandableListAdapter(this, multifeedListHeaders, multifeedListChild);
+        expListViewMultifeeds.setAdapter(multifeedListAdapter);
         expListViewMultifeeds.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id) {
-
                 long packedPosition = expListViewMultifeeds.getExpandableListPosition(position);
-
                 int itemType = ExpandableListView.getPackedPositionType(packedPosition);
-                int groupPosition = ExpandableListView.getPackedPositionGroup(packedPosition);
-                int childPosition = ExpandableListView.getPackedPositionChild(packedPosition);
-
                 if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-                    // multifeeds title long clicked
-                    if(multifeedListHeaders.get(groupPosition).equals(getString(R.string.multifeeds))){
-                        startMultifeedManagerActivity();
-                    } else if(multifeedListHeaders.get(groupPosition).equals(getString(R.string.collections))){
-                        startCollectionManagerActivity();
-                    }
+                    startMultifeedManagerActivity();
                 }
-                /*else if (itemType == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-                    onChildLongClick(groupPosition, childPosition);
-                }*/
 
                 return false;
             }
         });
+
+        //Collection Expandable List
+        expListViewCollections = (ExpandableListView) findViewById(R.id.exp_list_view_collections);
+        prepareCollectionsListData();
+        collectionListAdapter = new ExpandableListAdapter(this, collectionListHeaders, collectionListChild);
+        expListViewCollections.setAdapter(collectionListAdapter);
+        expListViewCollections.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id) {
+                long packedPosition = expListViewCollections.getExpandableListPosition(position);
+                int itemType = ExpandableListView.getPackedPositionType(packedPosition);
+                if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+                    startCollectionManagerActivity();
+                }
+                return false;
+            }
+        });
+
 
         // Drawer
         drawerLayout = findViewById(R.id.drawer_layout_articles_list);
@@ -207,7 +203,21 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         }
     }
 
+    /**
+     * Prepare the Collection Expandable List View on the Drawer
+     */
+    private void prepareCollectionsListData() {
+        collectionListHeaders = new ArrayList<String>();
+        collectionListChild = new HashMap<String, List<String>>();
 
+        //For each user's collection
+        for (Collection collection: userData.getCollectionList()){
+            //Add the multifeed header
+            collectionListHeaders.add(collection.getTitle());
+            //Add the associated feed list
+            collectionListChild.put(collection.getTitle(), userData.getMapArticleTitlesListByKey(collection));
+        }
+    }
 
 
     @Override

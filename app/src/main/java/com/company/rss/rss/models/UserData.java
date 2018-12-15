@@ -18,10 +18,12 @@ public class UserData {
     private User    user;
 
     //Unprocessed Data Lists
-    private List<Feed>            feedList;
-    private List<Multifeed>       multifeedList;
-    private List<FeedGrouping>    feedGroupList;
-    private List<Collection>      collectionList;
+    private List<Feed>              feedList;
+    private List<Multifeed>         multifeedList;
+    private List<FeedGrouping>      feedGroupList;      //Feed-Multifeed connections
+    private List<Collection>        collectionList;
+    private List<SavedArticle>      savedArticleList;   //Article-Collection connections
+    private List<Article>           articleList;        //User's saved/read articles
 
     //Maps
     private Map<Multifeed,List<Feed>>       multifeedMap;
@@ -39,10 +41,12 @@ public class UserData {
     /**
      * Load all the User's persisted data, which includes:
      * - The logged User
-     * - the list of User's Feed-Multifeed Groups
+     * - the list of User's Feed-Multifeed Groups (FeedGroups)
      * - The list of User's Feeds
      * - The list of User's Multifeeds
      * - The list of User's Collections
+     * - The list of User's Article-Collection Groups (SavedArticles)
+     * - The list of User's Articles
      * @param context Activity's context
      */
     public void loadPersistedData(Context context){
@@ -51,10 +55,12 @@ public class UserData {
 
         //Get the User data
         user  = prefs.retrieveUser();
-        feedGroupList  = prefs.retrieveFeedGroups();
-        feedList       = prefs.retrieveFeeds();
-        multifeedList  = prefs.retrieveMultifeeds();
-        collectionList = prefs.retrieveCollections();
+        feedGroupList   = prefs.retrieveFeedGroups();
+        feedList        = prefs.retrieveFeeds();
+        multifeedList   = prefs.retrieveMultifeeds();
+        collectionList  = prefs.retrieveCollections();
+        savedArticleList= prefs.retrieveSavedArticles();
+        articleList     = prefs.retrieveArticles();
     }
 
     /**
@@ -63,6 +69,7 @@ public class UserData {
      */
     public void processUserData(){
         processMultifeedMap();
+        processCollectionMap();
     }
 
     /**
@@ -89,6 +96,29 @@ public class UserData {
     }
 
     /**
+     *  Process the User's Data and Build a Collection Map (Collection --> List<Article>).
+     *  It iterates all the user's multifeeds, and for each of them finds which feeds are
+     *  associated.
+     */
+    public void processCollectionMap(){
+        //For every collection we must map the list of articles
+        for(Collection collection: collectionList){
+            List<Article>  articleList = new ArrayList<>();      //Article List to map to the collection
+            int collectionId = collection.getId();
+
+            //For every SavedArticle (Article-Collection association), find the associated articles and build the list
+            for(SavedArticle savedArticle: savedArticleList){
+                if(savedArticle.getCollection() == collectionId){
+                    articleList.add(getArticleById(savedArticle.getArticle()));
+                }
+            }
+
+            //Add the ArticleList associated Collection in the CollectionMap
+            collectionMap.put(collection, articleList);
+        }
+    }
+
+    /**
      * Search the Feed that has the needed ID and return it
      * @param feedId Feed's Id
      * @return Feed object with the required Id
@@ -97,6 +127,19 @@ public class UserData {
         for(Feed feed: feedList){
             if (feed.getId() == feedId)
                 return feed;
+        }
+        return null;
+    }
+
+    /**
+     * Search the Article that has the needed ID and return it
+     * @param articleId Article's Id
+     * @return Feed object with the required Id
+     */
+    private Article getArticleById(long articleId) {
+        for (Article article: articleList){
+            if (article.getHashId() == articleId)
+                return article;
         }
         return null;
     }
@@ -116,8 +159,22 @@ public class UserData {
         return feedTitlesList;
     }
 
+    /**
+     * Get a Titles List of the article stored in the map with the desired key
+     * @param collectionKey Collection Key in the Collection Map
+     * @return List<String> object
+     */
+    public List<String> getMapArticleTitlesListByKey(Collection collectionKey){
+        List<String> articleTitlesList = new ArrayList<>();
 
+        //For each Article in the ArticleList with the key "collectionKey"
+        for (Article article: collectionMap.get(collectionKey)){
+            articleTitlesList.add(article.getTitle());
+        }
+        return articleTitlesList;
+    }
 
+    /********************************************/
     public User getUser() {
         return user;
     }
@@ -172,5 +229,60 @@ public class UserData {
 
     public void setCollectionMap(Map<Collection, List<Article>> collectionMap) {
         this.collectionMap = collectionMap;
+    }
+
+    public List<SavedArticle> getSavedArticleList() {
+        return savedArticleList;
+    }
+
+    public void setSavedArticleList(List<SavedArticle> savedArticleList) {
+        this.savedArticleList = savedArticleList;
+    }
+
+    public List<Article> getArticleList() {
+        return articleList;
+    }
+
+    public void setArticleList(List<Article> articleList) {
+        this.articleList = articleList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UserData userData = (UserData) o;
+
+        if (user != null ? !user.equals(userData.user) : userData.user != null) return false;
+        if (feedList != null ? !feedList.equals(userData.feedList) : userData.feedList != null)
+            return false;
+        if (multifeedList != null ? !multifeedList.equals(userData.multifeedList) : userData.multifeedList != null)
+            return false;
+        if (feedGroupList != null ? !feedGroupList.equals(userData.feedGroupList) : userData.feedGroupList != null)
+            return false;
+        if (collectionList != null ? !collectionList.equals(userData.collectionList) : userData.collectionList != null)
+            return false;
+        if (savedArticleList != null ? !savedArticleList.equals(userData.savedArticleList) : userData.savedArticleList != null)
+            return false;
+        if (articleList != null ? !articleList.equals(userData.articleList) : userData.articleList != null)
+            return false;
+        if (multifeedMap != null ? !multifeedMap.equals(userData.multifeedMap) : userData.multifeedMap != null)
+            return false;
+        return collectionMap != null ? collectionMap.equals(userData.collectionMap) : userData.collectionMap == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = user != null ? user.hashCode() : 0;
+        result = 31 * result + (feedList != null ? feedList.hashCode() : 0);
+        result = 31 * result + (multifeedList != null ? multifeedList.hashCode() : 0);
+        result = 31 * result + (feedGroupList != null ? feedGroupList.hashCode() : 0);
+        result = 31 * result + (collectionList != null ? collectionList.hashCode() : 0);
+        result = 31 * result + (savedArticleList != null ? savedArticleList.hashCode() : 0);
+        result = 31 * result + (articleList != null ? articleList.hashCode() : 0);
+        result = 31 * result + (multifeedMap != null ? multifeedMap.hashCode() : 0);
+        result = 31 * result + (collectionMap != null ? collectionMap.hashCode() : 0);
+        return result;
     }
 }

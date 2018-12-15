@@ -3,6 +3,7 @@ package com.company.rss.rss.persistence;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.FeedGrouping;
@@ -23,11 +24,13 @@ public class UserPrefs{
     private static final String PREFS_NAME = "com.company.rss.rss.persistence.UserPrefs";
 
     /** JSON Object Labels */
-    private static final String USER_OBJECT = "LoggedUser";
-    private static final String FEEDGROUP_LIST_OBJECT = "FeedGroupList";
-    private static final String FEED_LIST_OBJECT = "FeedList";
-    private static final String MULTIFEED_LIST_OBJECT = "MultifeedList";
-    private static final String COLLECTION_LIST_OBJECT = "CollectionList";
+    private static final String USER_OBJECT                 = "LoggedUser";
+    private static final String FEEDGROUP_LIST_OBJECT       = "FeedGroupList";
+    private static final String FEED_LIST_OBJECT            = "FeedList";
+    private static final String MULTIFEED_LIST_OBJECT       = "MultifeedList";
+    private static final String COLLECTION_LIST_OBJECT      = "CollectionList";
+    private static final String SAVEDARTICLES_LIST_OBJECT   = "SavedArticlesList";
+    private static final String ARTICLES_LIST_OBJECT        = "ArticleList";
 
     /** This application's preferences */
     private static SharedPreferences settings;
@@ -123,6 +126,34 @@ public class UserPrefs{
         editor.commit();
     }
 
+    /**
+     * Store a SavedArticle List in the Shared Preferences
+     * @param savedArticles a list of Collection Objects
+     */
+    public void storeSavedArticles(List<SavedArticle> savedArticles){
+        // convert to JSON format
+        Gson gson = new Gson();
+        String sa_json = gson.toJson(savedArticles);
+
+        // store in SharedPreferences
+        editor.putString(SAVEDARTICLES_LIST_OBJECT, sa_json);
+        editor.commit();
+    }
+
+    /**
+     * Store a Article List in the Shared Preferences
+     * @param articles a list of Collection Objects
+     */
+    public void storeArticles(List<Article> articles) {
+        // convert to JSON format
+        Gson gson = new Gson();
+        String a_json = gson.toJson(articles);
+
+        // store in SharedPreferences
+        editor.putString(ARTICLES_LIST_OBJECT, a_json);
+        editor.commit();
+    }
+
 
     /***************************************************
      *                    RETRIEVE
@@ -179,6 +210,28 @@ public class UserPrefs{
         String collectionsJson = settings.getString(COLLECTION_LIST_OBJECT, "");
         Type type = new TypeToken<List<Collection>>(){}.getType();
         return gson.fromJson(collectionsJson, type);
+    }
+
+    /**
+     * Retrive the SavedArticle List from the Shared Preferences
+     * @return A list of SavedArticle Objects
+     */
+    public List<SavedArticle> retrieveSavedArticles(){
+        Gson gson = new Gson();
+        String savedArticlesJson = settings.getString(SAVEDARTICLES_LIST_OBJECT, "");
+        Type type = new TypeToken<List<SavedArticle>>(){}.getType();
+        return gson.fromJson(savedArticlesJson, type);
+    }
+
+    /**
+     * Retrive the Article List from the Shared Preferences
+     * @return A list of Article Objects
+     */
+    public List<Article> retrieveArticles(){
+        Gson gson = new Gson();
+        String articlesJson = settings.getString(ARTICLES_LIST_OBJECT, "");
+        Type type = new TypeToken<List<Article>>(){}.getType();
+        return gson.fromJson(articlesJson, type);
     }
 
 }

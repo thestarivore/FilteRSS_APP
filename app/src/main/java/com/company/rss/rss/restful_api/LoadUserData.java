@@ -166,7 +166,7 @@ public class LoadUserData extends AsyncTask<Void, Void, Object> {
                 }
 
                 //Persist the SavedArticles
-                //prefs.storeSavedArticles(savedArticles);
+                prefs.storeSavedArticles(savedArticles);
                 gotSavedArticles = true;
             }
 
@@ -186,7 +186,7 @@ public class LoadUserData extends AsyncTask<Void, Void, Object> {
                 }
 
                 //Persist the Articles
-                //prefs.storeArticles(savedArticles);
+                prefs.storeArticles(articles);
                 gotArticles = true;
             }
 
