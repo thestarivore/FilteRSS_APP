@@ -55,7 +55,7 @@ import java.util.List;
 
 
 public class ArticlesListActivity extends AppCompatActivity implements ArticlesListFragment.OnListFragmentInteractionListener, ArticlesSlideFragment.OnFragmentInteractionListener {
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "LoadingActivity";
 
     // TODO: refactor this
     private DrawerLayout drawerLayout;
