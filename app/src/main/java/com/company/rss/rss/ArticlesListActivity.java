@@ -33,6 +33,7 @@ import com.company.rss.rss.models.FeedGrouping;
 import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.ReadArticle;
 import com.company.rss.rss.models.SQLOperation;
+import com.company.rss.rss.models.SavedArticle;
 import com.company.rss.rss.models.User;
 import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.restful_api.RESTMiddleware;
@@ -44,6 +45,7 @@ import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
+import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 import com.company.rss.rss.rss_parser.LoadRSSFeed;
 
@@ -747,13 +749,30 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 });
                 try {Thread.sleep(1000); } catch (InterruptedException e) { }
 
-                //Gets the list of all the User's SavedArticle
-                Log.d(TAG, "\ngetUserSavedArticles:");
-                api.getUserSavedArticles(3, new ArticleCallback() {
+                //Gets the list of all the User's Articles saved in a Collection
+                Log.d(TAG, "\ngetUserArticlesSavedInCollection:");
+                api.getUserArticlesSavedInCollection(3, new ArticleCallback() {
                     @Override
                     public void onLoad(List<Article> articles) {
                         for(Article article:articles) {
                             Log.d(TAG, "\nSavedArticle: " + article.getHashId() + "," + article.getTitle()+ "," + article.getLink());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(TAG, "\nFailure on: getUserArticlesSavedInCollection");
+                    }
+                });
+                try {Thread.sleep(1000); } catch (InterruptedException e) { }
+
+                //Gets the list of all the User's SavedArticles
+                Log.d(TAG, "\ngetUserSavedArticles:");
+                api.getUserSavedArticles(16, new SavedArticleCallback() {
+                    @Override
+                    public void onLoad(List<SavedArticle> savedArticles) {
+                        for(SavedArticle savedArticle:savedArticles) {
+                            Log.d(TAG, "\nSavedArticle: " + savedArticle.getArticle() + "," + savedArticle.getCollection());
                         }
                     }
 

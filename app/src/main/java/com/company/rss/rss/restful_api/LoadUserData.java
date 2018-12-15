@@ -9,15 +9,14 @@ import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.FeedGrouping;
 import com.company.rss.rss.models.Multifeed;
-import com.company.rss.rss.models.RSSFeed;
 import com.company.rss.rss.models.User;
 import com.company.rss.rss.persistence.UserPrefs;
+import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.CollectionCallback;
 import com.company.rss.rss.restful_api.callbacks.FeedCallback;
 import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
-import com.company.rss.rss.rss_parser.DOMParser;
 
 import java.util.List;
 
@@ -148,6 +147,26 @@ public class LoadUserData extends AsyncTask<Void, Void, Object> {
             @Override
             public void onFailure() {
                 Log.d(TAG, "\nFailure on: getUserCollections");
+            }
+        });
+
+
+
+
+
+        //Gets the list of all the User's SavedArticles
+        Log.d(TAG, "\ngetUserArticlesSavedInCollection:");
+        api.getUserArticlesSavedInCollection(3, new ArticleCallback() {
+            @Override
+            public void onLoad(List<Article> articles) {
+                for(Article article:articles) {
+                    Log.d(TAG, "\nSavedArticle: " + article.getHashId() + "," + article.getTitle()+ "," + article.getLink());
+                }
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(TAG, "\nFailure on: getUserArticlesSavedInCollection");
             }
         });
 

@@ -9,6 +9,7 @@ import com.company.rss.rss.models.FeedGrouping;
 import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.ReadArticle;
 import com.company.rss.rss.models.SQLOperation;
+import com.company.rss.rss.models.SavedArticle;
 
 import java.util.List;
 
@@ -102,7 +103,10 @@ public interface UserRESTInterface {
 
     /*********************** User - SavedArticles *********************************/
     @GET("/v1/user/articles/saved")
-    public Call<List<Article>> getUserSavedArticles(@Query("id") int id);
+    public Call<List<Article>> getUserArticlesSavedInCollection(@Query("id") int collectionId);
+
+    @GET("/v1/user/articles/saved")
+    public Call<List<SavedArticle>> getUserSavedArticles(@Query("userId") int userId);
 
     @FormUrlEncoded
     @PUT("/v1/user/articles/saved")

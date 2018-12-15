@@ -10,6 +10,7 @@ import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
+import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 import com.company.rss.rss.service.RESTService;
 
@@ -282,12 +283,21 @@ public class RESTMiddleware {
      *                       User - SavedArticles
      ********************************************************************/
     /**
-     * Gets the list of all the User's SavedArticles
-     * @param id
+     * Gets the list of all the User's Articles saved in Collection (Search by collection id)
+     * @param collectionId Collection Id
      * @param callback Callback for API response management
      */
-    public void getUserSavedArticles(int id, ArticleCallback callback){
-        RESTService.getInstance(context).getUserSavedArticles(id, callback);
+    public void getUserArticlesSavedInCollection(int collectionId, ArticleCallback callback){
+        RESTService.getInstance(context).getUserArticlesSavedInCollection(collectionId, callback);
+    }
+
+    /**
+     * Gets the list of all the User's SavedArticles saved the user with the specified userId
+     * @param userId    User's Id
+     * @param callback Callback for API response management
+     */
+    public void getUserSavedArticles(int userId, SavedArticleCallback callback){
+        RESTService.getInstance(context).getUserSavedArticles(userId, callback);
     }
 
     /**

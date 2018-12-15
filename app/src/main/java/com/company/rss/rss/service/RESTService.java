@@ -10,6 +10,7 @@ import com.company.rss.rss.models.FeedGrouping;
 import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.ReadArticle;
 import com.company.rss.rss.models.SQLOperation;
+import com.company.rss.rss.models.SavedArticle;
 import com.company.rss.rss.models.User;
 import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.CategoryCallback;
@@ -19,6 +20,7 @@ import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
+import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 import com.company.rss.rss.restful_api.interfaces.AuthenticationRESTInterface;
 import com.company.rss.rss.restful_api.interfaces.CategoryRESTInterface;
@@ -33,7 +35,6 @@ import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Query;
 
 public class RESTService {
 
@@ -657,14 +658,14 @@ public class RESTService {
 
     /*********************** User - SavedArticles *********************************/
     /**
-     * Gets the list of all the User's SavedArticles
-     * @param id
+     * Gets the list of all the User's Articles saved in Collection by collectionId
+     * @param collectionId Collection's Id
      * @param callback Callback for API response management
      */
-    public void getUserSavedArticles(int id, final ArticleCallback callback){
+    public void getUserArticlesSavedInCollection(int collectionId, final ArticleCallback callback){
         final List<Article> articles = new ArrayList<>();
 
-        userRESTInterface.getUserSavedArticles(id)
+        userRESTInterface.getUserArticlesSavedInCollection(collectionId)
                 .enqueue(new retrofit2.Callback<List<Article>>() {
                     @Override
                     public void onResponse(Call<List<Article>> call, Response<List<Article>> response) {
@@ -676,6 +677,32 @@ public class RESTService {
 
                     @Override
                     public void onFailure(Call<List<Article>> call, Throwable t) {
+                        callback.onFailure();
+                    }
+                });
+    }
+
+
+    /**
+     * Gets the list of all the User's SavedArticles saved the user with the specified userId
+     * @param userId    User's Id
+     * @param callback Callback for API response management
+     */
+    public void getUserSavedArticles(int userId, final SavedArticleCallback callback){
+        final List<SavedArticle> savedArticles = new ArrayList<>();
+
+        userRESTInterface.getUserSavedArticles(userId)
+                .enqueue(new retrofit2.Callback<List<SavedArticle>>() {
+                    @Override
+                    public void onResponse(Call<List<SavedArticle>> call, Response<List<SavedArticle>> response) {
+                        for (SavedArticle savedArticle: response.body()) {
+                            savedArticles.add(savedArticle);
+                        }
+                        callback.onLoad(savedArticles);
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<SavedArticle>> call, Throwable t) {
                         callback.onFailure();
                     }
                 });
