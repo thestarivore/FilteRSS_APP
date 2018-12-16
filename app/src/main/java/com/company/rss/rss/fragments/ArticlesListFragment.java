@@ -113,12 +113,11 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     }
 
     /**
-     * Transfer User Data from Activity to the Fragment
-     * @param userData
+     * Callback launched (on Fragment Attach) from the activity to inform the fragment that the UserData has been loaded
      */
-    public void onTransferUserData(UserData userData) {
+    public void onUserDataLoaded() {
         //Get the Transferred UserData
-        this.userData = userData;
+        this.userData = UserData.getInstance();
 
         //Prepare the articles list
         this.articles =  new ArrayList<>();

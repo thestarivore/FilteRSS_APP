@@ -199,8 +199,8 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
             //Get a UserData instance
             loadUserData();
 
-            //Transfer the UserData to the fragment too
-            articlesListFragment.onTransferUserData(userData);
+            //Notify the fragment
+            articlesListFragment.onUserDataLoaded();
         }
 
     }
@@ -211,7 +211,7 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
     private void loadUserData(){
         if(userData == null) {
             //Get a UserData instance
-            userData = new UserData();
+            userData = UserData.getInstance();
             userData.loadPersistedData(context);
             userData.processUserData();
         }

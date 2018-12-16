@@ -14,6 +14,9 @@ import java.util.Map;
  * the reason being to access and precess the data more easily
  */
 public class UserData {
+    //Singleton Instance
+    private static final UserData ourInstance = new UserData();
+
     //Logged User
     private User    user;
 
@@ -28,6 +31,14 @@ public class UserData {
     //Maps
     private Map<Multifeed,List<Feed>>       multifeedMap;
     private Map<Collection,List<Article>>   collectionMap;
+
+    /**
+     * Get Singleton's instance
+     * @return
+     */
+    public static UserData getInstance() {
+        return ourInstance;
+    }
 
     /**
      * Simple Constructor
