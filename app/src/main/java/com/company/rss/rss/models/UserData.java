@@ -32,6 +32,16 @@ public class UserData {
     private Map<Multifeed,List<Feed>>       multifeedMap;
     private Map<Collection,List<Article>>   collectionMap;
 
+    //AllFeedArticles, AllMultifeedArticles, FeedArticles, CollectionArticles ArticleList Visualization
+    public static int MODE_ALL_MULTIFEEDS_FEEDS    = 0;
+    public static int MODE_MULTIFEED_ARTICLES      = 1;
+    public static int MODE_FEED_ARTICLES           = 2;
+    public static int MODE_COLLECTION_ARTICLES     = 3;
+    private int visualizationMode;
+    private int multifeedPosition;
+    private int feedPosition;
+    private int collectionPosition;
+
     /**
      * Get Singleton's instance
      * @return
@@ -47,6 +57,9 @@ public class UserData {
         //Init of Hash Maps
         multifeedMap   = new HashMap<>();
         collectionMap  = new HashMap<>();
+
+        //Default visualization Mode
+        visualizationMode = MODE_ALL_MULTIFEEDS_FEEDS;
     }
 
     /**
@@ -256,6 +269,38 @@ public class UserData {
 
     public void setArticleList(List<Article> articleList) {
         this.articleList = articleList;
+    }
+
+    public int getVisualizationMode() {
+        return visualizationMode;
+    }
+
+    public void setVisualizationMode(int visualizationMode) {
+        this.visualizationMode = visualizationMode;
+    }
+
+    public int getMultifeedPosition() {
+        return multifeedPosition;
+    }
+
+    public void setMultifeedPosition(int multifeedPosition) {
+        this.multifeedPosition = multifeedPosition;
+    }
+
+    public int getFeedPosition() {
+        return feedPosition;
+    }
+
+    public void setFeedPosition(int feedPosition) {
+        this.feedPosition = feedPosition;
+    }
+
+    public int getCollectionPosition() {
+        return collectionPosition;
+    }
+
+    public void setCollectionPosition(int collectionPosition) {
+        this.collectionPosition = collectionPosition;
     }
 
     @Override

@@ -16,7 +16,9 @@ import com.company.rss.rss.ArticlesListActivity;
 import com.company.rss.rss.R;
 import com.company.rss.rss.adapters.ArticleRecyclerViewAdapter;
 import com.company.rss.rss.models.Article;
+import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
+import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.RSSFeed;
 import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.restful_api.interfaces.AsyncRSSFeedResponse;
@@ -116,28 +118,59 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
      * Callback launched (on Fragment Attach) from the activity to inform the fragment that the UserData has been loaded
      */
     public void onUserDataLoaded() {
+        List<Feed> feedList = new ArrayList<>();
+        List<Article> articleList = new ArrayList<>();
+
         //Get the Transferred UserData
         this.userData = UserData.getInstance();
 
         //Prepare the articles list
         this.articles =  new ArrayList<>();
 
-        //Start Downloading the Articles, even if the UI hasn't loaded yet
-        for (Feed feed: this.userData.getFeedList()){
-            new LoadRSSFeed(new AsyncRSSFeedResponse() {
-                @Override
-                public void processFinish(Object output, RSSFeed rssFeed) {
-                    for (Article article: rssFeed.getItemList()){
-                        articles.add(article);
+        //Get the list of feeds to show in the RecyclerView
+        //All Multifeeds Feeds Articles
+        if(userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
+            feedList.addAll(userData.getFeedList());
+        }
+        //Multifeed Articles
+        else if(userData.getVisualizationMode() == UserData.MODE_MULTIFEED_ARTICLES) {
+            Multifeed multifeed = userData.getMultifeedList().get(userData.getMultifeedPosition());
+            feedList.addAll(userData.getMultifeedMap().get(multifeed));
+        }
+        //Feed Articles
+        else if(userData.getVisualizationMode() == UserData.MODE_FEED_ARTICLES) {
+            Multifeed multifeed = userData.getMultifeedList().get(userData.getMultifeedPosition());
+            feedList.add(userData.getMultifeedMap().get(multifeed).get(userData.getFeedPosition()));
+        }
+        //Collection Articles
+        else if(userData.getVisualizationMode() == UserData.MODE_COLLECTION_ARTICLES) {
+            Collection collection = userData.getCollectionList().get(userData.getCollectionPosition());
+            articleList.addAll(userData.getCollectionMap().get(collection));
+        }
+
+        //MODE_ALL_MULTIFEEDS_FEEDS || MODE_MULTIFEED_ARTICLES || MODE_FEED_ARTICLES
+        if(userData.getVisualizationMode() != UserData.MODE_COLLECTION_ARTICLES){
+            //Start Downloading the Articles, even if the UI hasn't loaded yet
+            for (Feed feed: feedList){
+                new LoadRSSFeed(new AsyncRSSFeedResponse() {
+                    @Override
+                    public void processFinish(Object output, RSSFeed rssFeed) {
+                        for (Article article: rssFeed.getItemList()){
+                            articles.add(article);
+                        }
+
+                        //Wait for onCreateView to set RecyclerView's Adapter
+                        while(recyclerView == null || recyclerView.getAdapter() == null);
+
+                        //Notify a change in the RecyclerView's Article List
+                        recyclerView.getAdapter().notifyDataSetChanged();
                     }
-
-                    //Wait for onCreateView to set RecyclerView's Adapter
-                    while(recyclerView == null || recyclerView.getAdapter() == null);
-
-                    //Notify a change in the RecyclerView's Article List
-                    recyclerView.getAdapter().notifyDataSetChanged();
-                }
-            }, getContext(), feed).execute();
+                }, getContext(), feed).execute();
+            }
+        }
+        //MODE_COLLECTION_ARTICLES
+        else{
+            articles.addAll(articleList);
         }
     }
 

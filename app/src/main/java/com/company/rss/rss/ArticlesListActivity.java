@@ -1,5 +1,6 @@
 package com.company.rss.rss;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -106,6 +107,11 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
         prepareMultifeedsListData();
         multifeedListAdapter = new ExpandableListAdapter(this, multifeedListHeaders, multifeedListChild);
         expListViewMultifeeds.setAdapter(multifeedListAdapter);
+        //Expand all the groups
+        for (int i=0; i < multifeedListAdapter.getGroupCount(); i++){
+            expListViewMultifeeds.expandGroup(i);
+        }
+        //Item LongClick
         expListViewMultifeeds.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id) {
@@ -118,12 +124,43 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
                 return false;
             }
         });
+        //Child Click
+        expListViewMultifeeds.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                Log.d(TAG, "Feed click:"+groupPosition+","+childPosition+":"
+                        +userData.getMultifeedList().get(groupPosition).getTitle()+"-"
+                        +userData.getMultifeedMap().get(userData.getMultifeedList().get(groupPosition)).get(childPosition).getTitle());
+
+                //Prepare the new ListToVisualize and Restart Activity
+                userData.setVisualizationMode(UserData.MODE_FEED_ARTICLES);
+                userData.setMultifeedPosition(groupPosition);
+                userData.setFeedPosition(childPosition);
+                restartActivity();
+                return false;
+            }
+        });
+        //Group Click
+        expListViewMultifeeds.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v,
+                                        int groupPosition, long id) {
+                Log.d(TAG, "Multifeed click:"+groupPosition+":"+userData.getMultifeedList().get(groupPosition).getTitle());
+
+                //Prepare the new ListToVisualize and Restart Activity
+                userData.setVisualizationMode(UserData.MODE_MULTIFEED_ARTICLES);
+                userData.setMultifeedPosition(groupPosition);
+                restartActivity();
+                return true; // This way the expander cannot be collapsed
+            }
+        });
 
         //Collection Expandable List
         expListViewCollections = (ExpandableListView) findViewById(R.id.exp_list_view_collections);
         prepareCollectionsListData();
         collectionListAdapter = new ExpandableListAdapter(this, collectionListHeaders, collectionListChild);
         expListViewCollections.setAdapter(collectionListAdapter);
+        //Item LongClick
         expListViewCollections.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick( AdapterView<?> parent, View view, int position, long id) {
@@ -133,6 +170,20 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
                     startCollectionManagerActivity();
                 }
                 return false;
+            }
+        });
+        //Group Click
+        expListViewCollections.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v,
+                                        int groupPosition, long id) {
+                Log.d(TAG, "Collection click:"+groupPosition+":"+userData.getCollectionList().get(groupPosition).getTitle());
+
+                //Prepare the new ListToVisualize and Restart Activity
+                userData.setVisualizationMode(UserData.MODE_COLLECTION_ARTICLES);
+                userData.setCollectionPosition(groupPosition);
+                restartActivity();
+                return true; // This way the expander cannot be collapsed
             }
         });
 
@@ -316,6 +367,12 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
 
     private void startCollectionManagerActivity() {
         Intent intent = new Intent(this, CollectionManagerActivity.class);
+        startActivity(intent);
+    }
+
+    private void restartActivity(){
+        Intent intent = getIntent();
+        finish();
         startActivity(intent);
     }
 
