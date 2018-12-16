@@ -91,28 +91,44 @@ public class DOMParser {
 						// Set the string to be the value of the node
 						nodeString = nodeChild.item(j).getFirstChild().getNodeValue();
 					}
-					// If the string isn't null
+					// If the node string value isn't null
 					if (nodeString != null) {
-						// Set the appropriate value
+						// Set the Title
 						if ("title".equals(nodeName)) {
 							item.setTitle(nodeString);
 						}
+						// Set the Description
 						else if ("content:encoded".equals(nodeName)) {
 							item.setDescription(nodeString);
 						}
+						// Set the PublicationDate
 						else if ("pubDate".equals(nodeName)) {
 							item.setPubDate(new Date(nodeString.replace(" +0000", "")));
 						}
-						//else if ("author".equals(nodeName) || "dc:creator".equals(nodeName)) {
-						//	item.setAuthor(nodeString);
-						//}
+						// Set the Author
+						else if ("author".equals(nodeName) || "dc:creator".equals(nodeName)) {
+							item.setAuthor(nodeString);
+						}
+						// Set the Article's Link
 						else if ("link".equals(nodeName)){
 							item.setLink(nodeString);
 						}
-						//else if ("thumbnail".equals(nodeName)){
-						//	item.setThumb(nodeString);
-						//}
+						// Set the Thumbnail/ImageLink
+						else if ("thumbnail".equals(nodeName)){
+							item.setImgLink(nodeString);
+						}
+                        // Set the Article's Comments
+                        else if ("comments".equals(nodeName)){
+                            item.setComment(nodeString);
+                        }
 					}
+                    // Self closing TAGs with no node string value
+					else{
+                        // Set the Thumbnail/ImageLink
+						if ("media:thumbnail".equals(nodeName)){
+                            item.setImgLink(nodeChild.item(j).getAttributes().getNamedItem("url").getNodeValue());
+                        }
+                    }
 				}
 				// Add the new item to the RSS feed
 				feed.addItem(item);

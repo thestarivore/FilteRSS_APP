@@ -53,6 +53,7 @@ public class Article implements Serializable {
     private String thumbnail;
     //TODO: aggiunto perche usato nella mockapp, ma non c'era nel ER_Model originale, valutare se serve
     private String excerpt;
+    private String author;      //TODO: Valutare se aggiungere sul DB
 
     public Article() {
     }
@@ -166,6 +167,14 @@ public class Article implements Serializable {
 
     public void setExcerpt(String excerpt) {
         this.excerpt = excerpt;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     @Override

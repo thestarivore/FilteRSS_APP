@@ -12,10 +12,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.company.rss.rss.ArticleListSwipeController;
+import com.company.rss.rss.ArticlesListActivity;
 import com.company.rss.rss.R;
 import com.company.rss.rss.adapters.ArticleRecyclerViewAdapter;
 import com.company.rss.rss.models.Article;
+import com.company.rss.rss.models.Feed;
+import com.company.rss.rss.models.RSSFeed;
+import com.company.rss.rss.models.UserData;
+import com.company.rss.rss.restful_api.interfaces.AsyncRSSFeedResponse;
+import com.company.rss.rss.rss_parser.LoadRSSFeed;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,10 +33,12 @@ import java.util.List;
  */
 public class ArticlesListFragment extends Fragment implements ArticleListSwipeController.RecyclerItemTouchHelperListener {
 
+    private RecyclerView recyclerView = null;
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
-    List<Article> articles =  Article.generateMockupArticles(25);
+    List<Article> articles;// = Article.generateMockupArticles(25);
+    private UserData userData;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -61,10 +70,10 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_article_list, container, false);
 
-        // Set the adapter
+        // Create the RecyclerView and Set it's adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView = (RecyclerView) view;
 
             // Set the swipe controller
             ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ArticleListSwipeController(0, ItemTouchHelper.RIGHT, this);
@@ -101,6 +110,36 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
         mListener.onListFragmentInteractionSwipe(articles.get(position));
+    }
+
+    /**
+     * Transfer User Data from Activity to the Fragment
+     * @param userData
+     */
+    public void onTransferUserData(UserData userData) {
+        //Get the Transferred UserData
+        this.userData = userData;
+
+        //Prepare the articles list
+        this.articles =  new ArrayList<>();
+
+        //Start Downloading the Articles, even if the UI hasn't loaded yet
+        for (Feed feed: this.userData.getFeedList()){
+            new LoadRSSFeed(new AsyncRSSFeedResponse() {
+                @Override
+                public void processFinish(Object output, RSSFeed rssFeed) {
+                    for (Article article: rssFeed.getItemList()){
+                        articles.add(article);
+                    }
+
+                    //Wait for onCreateView to set RecyclerView's Adapter
+                    while(recyclerView == null || recyclerView.getAdapter() == null);
+
+                    //Notify a change in the RecyclerView's Article List
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                }
+            }, getContext(), feed).execute();
+        }
     }
 
     /**

@@ -2,9 +2,15 @@ package com.company.rss.rss;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LevelListDrawable;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -15,6 +21,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -31,6 +39,11 @@ import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Collection;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -40,7 +53,7 @@ import top.defaults.colorpicker.ColorPickerPopup;
 import static android.text.Layout.JUSTIFICATION_MODE_INTER_WORD;
 
 public class ArticleActivity extends AppCompatActivity implements
-        TextToSpeech.OnInitListener {
+        TextToSpeech.OnInitListener, Html.ImageGetter {
 
     public final static String logTag = "RSSLOG";
     private final String TAG = getClass().getName();
@@ -52,6 +65,8 @@ public class ArticleActivity extends AppCompatActivity implements
     private String articleBody;
     private String articleTitle;
     private MenuItem ttsPlayItem;
+
+    private TextView articleBodyTextView;
 
 
     @Override
@@ -96,11 +111,22 @@ public class ArticleActivity extends AppCompatActivity implements
         TextView articleTitleTextView = (TextView) findViewById(R.id.textViewArticleTitle);
         articleTitleTextView.setText(articleTitle);
 
-        TextView articleBodyTextView = (TextView) findViewById(R.id.textViewArticleBody);
-        articleBodyTextView.setText(articleBody);
+        //Set Article Body View
+        articleBodyTextView = (TextView) findViewById(R.id.textViewArticleBody);
+        if(articleBody != null) {
+            Spanned spannedBody = Html.fromHtml(articleBody, this, null);
+            articleBodyTextView.setText(spannedBody);
+        }
+        else{
+            articleBodyTextView.setText("");
+        }
+        /*if (articleBody != null)
+            articleBodyTextView.setText(Html.fromHtml(articleBody));        //Render HTTML code
+        else
+            articleBodyTextView.setText("");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             articleBodyTextView.setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
-        }
+        }*/
 
         TextView articleReadTimeTextView = (TextView) findViewById(R.id.textViewReadTime);
         String articleReadTime = readingTime + "M";
@@ -434,5 +460,57 @@ public class ArticleActivity extends AppCompatActivity implements
 
     }
 
+    @Override
+    public Drawable getDrawable(String source) {
+        LevelListDrawable d = new LevelListDrawable();
+        Drawable empty = getResources().getDrawable(R.drawable.ic_launcher);
+        d.addLevel(0, 0, empty);
+        d.setBounds(0, 0, empty.getIntrinsicWidth(), empty.getIntrinsicHeight());
 
+        //Start the AsyncTask that will load the images in the body text
+        new LoadImage().execute(source, d);
+
+        return d;
+    }
+
+    /**
+     * AsyncTask that loads the images in the Article's TextBody
+     */
+    class LoadImage extends AsyncTask<Object, Void, Bitmap> {
+        private LevelListDrawable mDrawable;
+
+        @Override
+        protected Bitmap doInBackground(Object... params) {
+            String source = (String) params[0];
+            mDrawable = (LevelListDrawable) params[1];
+            Log.d(TAG, "doInBackground " + source);
+            try {
+                InputStream is = new URL(source).openStream();
+                return BitmapFactory.decodeStream(is);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            Log.d(TAG, "onPostExecute drawable " + mDrawable);
+            Log.d(TAG, "onPostExecute bitmap " + bitmap);
+            if (bitmap != null) {
+                BitmapDrawable d = new BitmapDrawable(bitmap);
+                mDrawable.addLevel(1, 1, d);
+                mDrawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
+                mDrawable.setLevel(1);
+                // i don't know yet a better way to refresh TextView
+                // TextView articleBodyTextView.invalidate() doesn't work as expected
+                CharSequence t = articleBodyTextView.getText();
+                articleBodyTextView.setText(t);
+            }
+        }
+    }
 }

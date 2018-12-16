@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -31,6 +32,7 @@ import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.FeedGrouping;
 import com.company.rss.rss.models.Multifeed;
+import com.company.rss.rss.models.RSSFeed;
 import com.company.rss.rss.models.ReadArticle;
 import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.SavedArticle;
@@ -47,6 +49,7 @@ import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
+import com.company.rss.rss.restful_api.interfaces.AsyncRSSFeedResponse;
 import com.company.rss.rss.rss_parser.LoadRSSFeed;
 
 import java.util.ArrayList;
@@ -54,7 +57,8 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class ArticlesListActivity extends AppCompatActivity implements ArticlesListFragment.OnListFragmentInteractionListener, ArticlesSlideFragment.OnFragmentInteractionListener {
+public class ArticlesListActivity extends AppCompatActivity implements  ArticlesListFragment.OnListFragmentInteractionListener,
+                                                                        ArticlesSlideFragment.OnFragmentInteractionListener {
     private static final String TAG = "LoadingActivity";
 
     // TODO: refactor this
@@ -92,9 +96,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         api = new RESTMiddleware(this);
 
         //Get a UserData instance
-        userData = new UserData();
-        userData.loadPersistedData(context);
-        userData.processUserData();
+        loadUserData();     // Fragment's onAttachFragment should run first, but this function
+                            // loads the UserData only if there is no copy retrieved yet
 
         // DRAWER AND TOOLBAR
         // Left Menu
@@ -187,6 +190,33 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
     }
 
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+        if (fragment instanceof ArticlesListFragment) {
+            ArticlesListFragment articlesListFragment = (ArticlesListFragment) fragment;
+
+            //Get a UserData instance
+            loadUserData();
+
+            //Transfer the UserData to the fragment too
+            articlesListFragment.onTransferUserData(userData);
+        }
+
+    }
+
+    /**
+     * Load the UserData object persisted in the SharedMemory
+     */
+    private void loadUserData(){
+        if(userData == null) {
+            //Get a UserData instance
+            userData = new UserData();
+            userData.loadPersistedData(context);
+            userData.processUserData();
+        }
+    }
+
     /**
      * Prepare the Multifeeds Expandable List View on the Drawer
      */
@@ -214,8 +244,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         for (Collection collection: userData.getCollectionList()){
             //Add the multifeed header
             collectionListHeaders.add(collection.getTitle());
-            //Add the associated feed list
-            collectionListChild.put(collection.getTitle(), userData.getMapArticleTitlesListByKey(collection));
+            //Add the associated feed list --> don't show the articles here
+            //collectionListChild.put(collection.getTitle(), userData.getMapArticleTitlesListByKey(collection));
         }
     }
 
@@ -401,8 +431,11 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
                         // Start parsing the first 20 feeds
                         for(int i = 0 ; i<20 ; i++) {
-                            String feedURL = feeds.get(i).getLink();
-                            new LoadRSSFeed(context, feedURL).execute();
+                            //String feedURL = feeds.get(i).getLink();
+                            new LoadRSSFeed(new AsyncRSSFeedResponse() {
+                                @Override
+                                public void processFinish(Object output, RSSFeed rssFeed) {}
+                            }, context, feeds.get(i)).execute();
                         }
                     }
 

@@ -51,7 +51,7 @@ public class ArticlesSlideFragment extends Fragment {
         articleTitle.setText(mArticle.getTitle());
         articleSource.setText(mArticle.getLink());
         new DownloadImageTask(articleImage)
-                .execute(mArticle.getThumbnail());
+                .execute(mArticle.getImgLink());
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override

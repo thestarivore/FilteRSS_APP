@@ -1,6 +1,7 @@
 package com.company.rss.rss.adapters;
 
 
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -46,9 +47,12 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
 
         // show The Image in a ImageView
         new DownloadImageTask(holder.mImageView)
-                .execute(mArticles.get(position).getThumbnail());
+                //.execute(mArticles.get(position).getThumbnail());
+                .execute(mArticles.get(position).getImgLink());
 
-        holder.mImageView.setClipToOutline(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            holder.mImageView.setClipToOutline(true);
+        }
 
         holder.mTitleView.post(new Runnable() {
             @Override

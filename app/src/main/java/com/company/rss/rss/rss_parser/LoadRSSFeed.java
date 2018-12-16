@@ -5,37 +5,50 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.company.rss.rss.models.Article;
+import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.RSSFeed;
+import com.company.rss.rss.restful_api.interfaces.AsyncRSSFeedResponse;
 
 /**
- * Loads an RSS feed from a given URL and writes the object
+ * Loads an RSS rssFeed from a given URL and writes the object
  * to a file in the application's /data directory. Parses 
- * through the feed and starts the main fragment control
+ * through the rssFeed and starts the main fragment control
  * upon completion.
  */
-public class LoadRSSFeed extends AsyncTask<Void, Void, Void> {
+public class LoadRSSFeed extends AsyncTask<Void, Void, Object> {
 	private static final String TAG = "LoadRSSFeed";
+
+	//Call back interface
+	public AsyncRSSFeedResponse delegate = null;
 
 	// The parent context
 	private Context parent;
 
 	// The RSSFeed object
-	private RSSFeed feed;
+	private RSSFeed rssFeed;
 
 	// The URL we're parsing from
 	private String RSSFEEDURL;
 
-	public LoadRSSFeed(Context c, String url){
+	/**
+	 * AsyncTask LoadRSSFeed Constructor
+	 * @param asyncRSSFeedResponse	AsyncTask response listener Callback
+	 * @param c						Activity Context
+	 * @param feed					Feed Object, whose articles to download
+	 */
+	public LoadRSSFeed(AsyncRSSFeedResponse asyncRSSFeedResponse, Context c, Feed feed){
+		//Assigning call back interface through constructor
+		delegate = asyncRSSFeedResponse;
 		// Set the parent
 		parent = c;
-		// Set the feed URL
-		RSSFEEDURL = url;
+		// Set the rssFeed URL
+		RSSFEEDURL = feed.getLink();
 	}
 
 	@Override
 	protected Void doInBackground(Void... params) {
 		// Parse the RSSFeed and save the object
-		feed = new DOMParser().parseXML(RSSFEEDURL);
+		rssFeed = new DOMParser().parseXML(RSSFEEDURL);
 		return null;
 	}
 
@@ -45,12 +58,13 @@ public class LoadRSSFeed extends AsyncTask<Void, Void, Void> {
 	}
 
 	@Override
-	protected void onPostExecute(Void result) {
+	protected void onPostExecute(Object result) {
 		super.onPostExecute(result);
+		delegate.processFinish(result, rssFeed);
 
         //Print all the Articles
 		Log.d(TAG, "\n### LIST of Articles for: "+ RSSFEEDURL +" ###");
-		for(Article article: feed.getItemList()){
+		for(Article article: rssFeed.getItemList()){
 			Log.d(TAG, "\n\n\n---Article: " + article.getTitle() + ", " + article.getLink() + ", " + article.getDescription() + ", " + article.getPubDate());
 		}
 	}
