@@ -1,6 +1,5 @@
 package com.company.rss.rss;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.company.rss.rss.adapters.ArticleSlidePagerAdapter;
@@ -79,6 +79,9 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
     private ExpandableListView              expListViewCollections;
     private List<String>                    collectionListHeaders;
     private HashMap<String, List<String>>   collectionListChild;
+    //Other
+    private TextView textViewAllMultifeedList;
+    private TextView textViewAccountEmail;
 
 
     private RESTMiddleware api;
@@ -100,9 +103,120 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
         loadUserData();     // Fragment's onAttachFragment should run first, but this function
                             // loads the UserData only if there is no copy retrieved yet
 
-        // DRAWER AND TOOLBAR
-        // Left Menu
+        //DRAWER Left Menu
         //Multifeed Expandable List
+        initMultifeedListOnDrawer();
+        //Collection Expandable List
+        initCollectionListOnDrawer();
+        //AllMultifeed TextView
+        initAllMultifeedTextClick();
+
+        // Drawer
+        drawerLayout = findViewById(R.id.drawer_layout_articles_list);
+        drawerLayout.addDrawerListener(
+                new DrawerLayout.DrawerListener() {
+                    @Override
+                    public void onDrawerSlide(View drawerView, float slideOffset) {
+                        // Respond when the drawer's position changes
+                    }
+
+                    @Override
+                    public void onDrawerOpened(View drawerView) {
+                        // Respond when the drawer is opened
+                    }
+
+                    @Override
+                    public void onDrawerClosed(View drawerView) {
+                        // Respond when the drawer is closed
+                    }
+
+                    @Override
+                    public void onDrawerStateChanged(int newState) {
+                        // Respond when the drawer motion state changes
+                    }
+                }
+        );
+        //Init User's Email TextView
+        textViewAccountEmail = (TextView) findViewById(R.id.textViewAccountEmail);
+        textViewAccountEmail.setText(userData.getUser().getEmail());
+
+        //TOOLBAR
+        initToolbar();
+
+        // TOP ARTICLES - SLIDER
+        // Set the slider to half the size of the viewport
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pagerArticles);
+        viewPager.getLayoutParams().height = size.y / 3;
+
+        // Create mock articles for top articles
+        List<Article> topArticles = Article.generateMockupArticles(6);
+
+        pager = (ViewPager) findViewById(R.id.pagerArticles);
+        pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
+        pager.setAdapter(pagerAdapter);
+        pager.setCurrentItem(1, true);
+        pager.setClipToPadding(false);
+        pager.setPadding(0, 0, 60, 0);
+        pager.setPageMargin(0);
+
+    }
+
+    /**
+     * Initialize the Activity's Toolbar(ActionBar)
+     */
+    private void initToolbar(){
+        Toolbar toolbar = findViewById(R.id.articles_list_toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
+
+        //Set the appropriate title
+        //All Multifeeds Feeds Articles
+        if(userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
+            actionbar.setTitle("All");
+        }
+        //Multifeed Articles
+        else if(userData.getVisualizationMode() == UserData.MODE_MULTIFEED_ARTICLES) {
+            Multifeed multifeed = userData.getMultifeedList().get(userData.getMultifeedPosition());
+            actionbar.setTitle(multifeed.getTitle());
+        }
+        //Feed Articles
+        else if(userData.getVisualizationMode() == UserData.MODE_FEED_ARTICLES) {
+            Multifeed multifeed = userData.getMultifeedList().get(userData.getMultifeedPosition());
+            Feed feed           = userData.getMultifeedMap().get(multifeed).get(userData.getFeedPosition());
+            actionbar.setTitle(feed.getTitle());
+        }
+        //Collection Articles
+        else if(userData.getVisualizationMode() == UserData.MODE_COLLECTION_ARTICLES) {
+            Collection collection = userData.getCollectionList().get(userData.getCollectionPosition());
+            actionbar.setTitle(collection.getTitle());
+        }
+    }
+
+    /**
+     * Initialize AllMultifeedList TextView and OnClick listener -> Restart the Activity and show all
+     * the Multifeeds Feeds Articles.
+     */
+    private void initAllMultifeedTextClick(){
+        textViewAllMultifeedList = (TextView) findViewById(R.id.textViewMultifeedList);
+        textViewAllMultifeedList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Prepare the new ListToVisualize and Restart Activity
+                userData.setVisualizationMode(UserData.MODE_ALL_MULTIFEEDS_FEEDS);
+                restartActivity();
+            }
+        });
+    }
+
+    /**
+     * Initialize Multifeed Expandable List on the Left Drawer
+     */
+    private void initMultifeedListOnDrawer(){
         expListViewMultifeeds = (ExpandableListView) findViewById(R.id.exp_list_view_multifeeds);
         prepareMultifeedsListData();
         multifeedListAdapter = new ExpandableListAdapter(this, multifeedListHeaders, multifeedListChild);
@@ -154,8 +268,12 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
                 return true; // This way the expander cannot be collapsed
             }
         });
+    }
 
-        //Collection Expandable List
+    /**
+     * Initialize Collection Expandable List on the Left Drawer
+     */
+    private void initCollectionListOnDrawer(){
         expListViewCollections = (ExpandableListView) findViewById(R.id.exp_list_view_collections);
         prepareCollectionsListData();
         collectionListAdapter = new ExpandableListAdapter(this, collectionListHeaders, collectionListChild);
@@ -186,59 +304,6 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
                 return true; // This way the expander cannot be collapsed
             }
         });
-
-
-        // Drawer
-        drawerLayout = findViewById(R.id.drawer_layout_articles_list);
-        drawerLayout.addDrawerListener(
-                new DrawerLayout.DrawerListener() {
-                    @Override
-                    public void onDrawerSlide(View drawerView, float slideOffset) {
-                        // Respond when the drawer's position changes
-                    }
-
-                    @Override
-                    public void onDrawerOpened(View drawerView) {
-                        // Respond when the drawer is opened
-                    }
-
-                    @Override
-                    public void onDrawerClosed(View drawerView) {
-                        // Respond when the drawer is closed
-                    }
-
-                    @Override
-                    public void onDrawerStateChanged(int newState) {
-                        // Respond when the drawer motion state changes
-                    }
-                }
-        );
-        Toolbar toolbar = findViewById(R.id.articles_list_toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionbar = getSupportActionBar();
-        actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
-
-
-        // TOP ARTICLES - SLIDER
-        // Set the slider to half the size of the viewport
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pagerArticles);
-        viewPager.getLayoutParams().height = size.y / 3;
-
-        // Create mock articles for top articles
-        List<Article> topArticles = Article.generateMockupArticles(6);
-
-        pager = (ViewPager) findViewById(R.id.pagerArticles);
-        pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
-        pager.setAdapter(pagerAdapter);
-        pager.setCurrentItem(1, true);
-        pager.setClipToPadding(false);
-        pager.setPadding(0, 0, 60, 0);
-        pager.setPageMargin(0);
-
     }
 
     @Override
