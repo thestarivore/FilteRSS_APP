@@ -65,7 +65,11 @@ public interface UserRESTInterface {
     @HTTP(method = "DELETE", path = "/v1/user/multifeeds", hasBody = true)
     public Call<SQLOperation> deleteUserMultifeed(@Field("id") int id);
 
-
+    @FormUrlEncoded
+    @PATCH("/v1/user/multifeeds")
+    public Call<SQLOperation> updateUserMultifeed(@Field("id") int userId,
+                                                    @Field("title") String newTitle,
+                                                    @Field("color") int newColor);
     /*********************** User - Collections *********************************/
     @GET("/v1/user/collections")
     public Call<List<Collection>> getUserCollections(@Query("email") String userEmail);
@@ -80,7 +84,11 @@ public interface UserRESTInterface {
     @HTTP(method = "DELETE", path = "/v1/user/collections", hasBody = true)
     public Call<SQLOperation> deleteUserCollection(@Field("id") int id);
 
-
+    @FormUrlEncoded
+    @PATCH("/v1/user/collections")
+    public Call<SQLOperation> updateUserCollection(@Field("id") int userId,
+                                                  @Field("title") String newTitle,
+                                                  @Field("color") int newColor);
     /*********************** User - Articles *********************************/
     @GET("/v1/user/articles")
     public Call<List<Article>> getUserArticlesByFeed(@Query("feed") int feed);

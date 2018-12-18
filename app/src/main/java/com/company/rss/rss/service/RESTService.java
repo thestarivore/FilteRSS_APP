@@ -46,8 +46,8 @@ public class RESTService {
 
     private RESTService(Context context){
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.1.109:3000/")                                         //In local Nicholas
-                //.baseUrl("http://192.168.1.22:3000/")                                         //In local Eddy
+                //.baseUrl("http://192.168.1.109:3000/")                                         //In local Nicholas
+                .baseUrl("http://192.168.1.22:3000/")                                         //In local Eddy
                 //.baseUrl("http://ec2-35-180-230-227.eu-west-3.compute.amazonaws.com:3000")      //On Amazon AWS
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -505,6 +505,27 @@ public class RESTService {
         });
     }
 
+    /**
+     * Update a Multifeed with a certain id
+     * @param id        Multifeed's Id
+     * @param newTitle  The new title to set instead of the old one
+     * @param newColor  The new color to set instead of the old one
+     */
+    public void updateUserMultifeed(int id, String newTitle, int newColor, final SQLOperationCallback callback){
+        userRESTInterface.updateUserMultifeed(id, newTitle, newColor).enqueue(new retrofit2.Callback<SQLOperation>() {
+            @Override
+            public void onResponse(Call<SQLOperation> call, Response<SQLOperation> response) {
+                SQLOperation sqlOperation = response.body();
+                callback.onLoad(sqlOperation);
+            }
+
+            @Override
+            public void onFailure(Call<SQLOperation> call, Throwable t) {
+                callback.onFailure();
+            }
+        });
+    }
+
     /*********************** User - Collections *********************************/
 
     /**
@@ -576,6 +597,26 @@ public class RESTService {
         });
     }
 
+    /**
+     * Update a Collection with a certain id
+     * @param id        Collection's Id
+     * @param newTitle  The new title to set instead of the old one
+     * @param newColor  The new color to set instead of the old one
+     */
+    public void updateUserCollection(int id, String newTitle, int newColor, final SQLOperationCallback callback){
+        userRESTInterface.updateUserCollection(id, newTitle, newColor).enqueue(new retrofit2.Callback<SQLOperation>() {
+            @Override
+            public void onResponse(Call<SQLOperation> call, Response<SQLOperation> response) {
+                SQLOperation sqlOperation = response.body();
+                callback.onLoad(sqlOperation);
+            }
+
+            @Override
+            public void onFailure(Call<SQLOperation> call, Throwable t) {
+                callback.onFailure();
+            }
+        });
+    }
 
 
     /*********************** User - Articles *********************************/
@@ -848,4 +889,5 @@ public class RESTService {
             }
         });
     }
+
 }

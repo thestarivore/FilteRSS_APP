@@ -207,6 +207,16 @@ public class RESTMiddleware {
         RESTService.getInstance(context).deleteUserMultifeed(id, callback);
     }
 
+    /**
+     * Update a Multifeed with a certain id
+     * @param id        Multifeed's identification number
+     * @param newTitle  The new title to set instead of the old one
+     * @param newColor  The new color to set instead of the old one
+     */
+    public void updateUserMultifeed(int id, String newTitle, int newColor, SQLOperationCallback callback){
+        RESTService.getInstance(context).updateUserMultifeed(id, newTitle, newColor, callback);
+    }
+
     /********************************************************************
      *                       User - Collections
      ********************************************************************/
@@ -239,6 +249,15 @@ public class RESTMiddleware {
         RESTService.getInstance(context).deleteUserCollection(id, callback);
     }
 
+    /**
+     * Update a Collection with a certain id
+     * @param id        Collection's identification number
+     * @param newTitle  The new title to set instead of the old one
+     * @param newColor  The new color to set instead of the old one
+     */
+    public void updateUserCollection(int id, String newTitle, int newColor, SQLOperationCallback callback){
+        RESTService.getInstance(context).updateUserCollection(id, newTitle, newColor, callback);
+    }
 
     /********************************************************************
      *                       User - Articles

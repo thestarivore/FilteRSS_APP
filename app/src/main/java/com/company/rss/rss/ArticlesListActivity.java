@@ -488,8 +488,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                     multifeedListAdapter.notifyDataSetChanged();
 
                     Snackbar.make(findViewById(android.R.id.content), R.string.user_information_updated, Snackbar.LENGTH_LONG).show();
-
-
                 }
             }, this, userData.getUser()).execute();
 
@@ -514,8 +512,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                     collectionListAdapter.notifyDataSetChanged();
 
                     Snackbar.make(findViewById(android.R.id.content), R.string.user_information_updated, Snackbar.LENGTH_LONG).show();
-
-
                 }
             }, this, userData.getUser()).execute();
 
