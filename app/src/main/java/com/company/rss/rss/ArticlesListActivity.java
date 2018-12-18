@@ -42,7 +42,6 @@ import com.company.rss.rss.models.SavedArticle;
 import com.company.rss.rss.models.User;
 import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.restful_api.LoadUserCollections;
-import com.company.rss.rss.restful_api.LoadUserData;
 import com.company.rss.rss.restful_api.LoadUserMultifeeds;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
@@ -249,7 +248,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                     startMultifeedManagerActivity();
                 }
 
-                return false;
+                return true;
             }
         });
         //Child Click
@@ -265,7 +264,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.setMultifeedPosition(groupPosition);
                 userData.setFeedPosition(childPosition);
                 restartActivity();
-                return false;
+                return true;
             }
         });
         //Group Click

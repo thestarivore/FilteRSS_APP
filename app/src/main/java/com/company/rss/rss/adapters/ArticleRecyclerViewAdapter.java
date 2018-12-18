@@ -5,6 +5,7 @@ import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.PixelCopy;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,6 +17,7 @@ import com.company.rss.rss.R;
 import com.company.rss.rss.fragments.ArticlesListFragment.OnListFragmentInteractionListener;
 import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -45,10 +47,9 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         holder.mExcerptView.setText(mArticles.get(position).getExcerpt());
         holder.mSubView.setText(mArticles.get(position).getLink());
 
-        // show The Image in a ImageView
-        new DownloadImageTask(holder.mImageView)
-                //.execute(mArticles.get(position).getThumbnail());
-                .execute(mArticles.get(position).getImgLink());
+        Log.d("RSSLOG", "Image link " + mArticles.get(position).getImgLink());
+
+        Picasso.get().load(mArticles.get(position).getImgLink()).into(holder.mImageView);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             holder.mImageView.setClipToOutline(true);

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.company.rss.rss.R;
 import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
+import com.squareup.picasso.Picasso;
 
 public class ArticlesSlideFragment extends Fragment {
     private static final String ARTICLE = "article";
@@ -50,8 +52,11 @@ public class ArticlesSlideFragment extends Fragment {
 
         articleTitle.setText(mArticle.getTitle());
         articleSource.setText(mArticle.getLink());
-        new DownloadImageTask(articleImage)
-                .execute(mArticle.getImgLink());
+
+        Log.d("RSSLOG", "Image link " + mArticle.getImgLink());
+
+
+        Picasso.get().load(mArticle.getImgLink()).into(articleImage);
 
         view.setOnClickListener(new View.OnClickListener() {
             @Override

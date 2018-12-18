@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import com.company.rss.rss.fragments.MultifeedEditFragment;
 import com.company.rss.rss.fragments.MultifeedListFragment;
 import com.company.rss.rss.models.Multifeed;
+import com.company.rss.rss.models.UserData;
 
 import java.util.ArrayList;
 
@@ -24,13 +25,15 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
     private boolean editView = false;
     private ArrayList<Multifeed> multifeeds;
     private ActionBar actionbar;
-    private DrawerLayout drawerLayout;
+    private UserData userData;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multifeed_manager);
+
+        loadUserData();
 
         Toolbar toolbar = findViewById(R.id.multifeed_manager_toolbar);
         setSupportActionBar(toolbar);
@@ -43,8 +46,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
 
         determinePaneLayout();
 
-        // TODO: get user's multifeeds
-        multifeeds = (ArrayList<Multifeed>) Multifeed.generateMockupMultifeeds(4);
+        multifeeds = (ArrayList<Multifeed>) userData.getMultifeedList();
 
         showListFragment();
     }
@@ -61,6 +63,15 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         if (fragmentItemDetail != null) {
             // large layout is used
             isTwoPane = true;
+        }
+    }
+
+    private void loadUserData() {
+        if (userData == null) {
+            //Get a UserData instance
+            userData = UserData.getInstance();
+            userData.loadPersistedData(this);
+            userData.processUserData();
         }
     }
 

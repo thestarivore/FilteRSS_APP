@@ -86,10 +86,6 @@ public class Multifeed implements Serializable {
         this.feeds = feeds;
     }
 
-    public int getFeedCount() {
-        return feeds.size();
-    }
-
     public int getImportance() {
         return importance;
     }
