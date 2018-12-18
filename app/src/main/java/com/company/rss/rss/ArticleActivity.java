@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LevelListDrawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
@@ -91,7 +93,7 @@ public class ArticleActivity extends AppCompatActivity implements
         article = (Article) intent.getSerializableExtra(ArticlesListActivity.EXTRA_ARTICLE);
 
         String articleImage = article.getImgLink();
-        String articleSubtitle = article.getLink();
+        final String articleLink = article.getLink();
         articleTitle = article.getTitle();
         articleBody = article.getDescription();
         int readingTime = article.getReadingTime();
@@ -107,7 +109,7 @@ public class ArticleActivity extends AppCompatActivity implements
         articleImageView.getLayoutParams().height = size.y / 2;
 
         TextView articleSubtitleTextView = (TextView) findViewById(R.id.textViewArticleSubtitle);
-        articleSubtitleTextView.setText(articleSubtitle);
+        articleSubtitleTextView.setText(articleLink);
 
         TextView articleTitleTextView = (TextView) findViewById(R.id.textViewArticleTitle);
         articleTitleTextView.setText(articleTitle);
@@ -132,6 +134,14 @@ public class ArticleActivity extends AppCompatActivity implements
         TextView articleReadTimeTextView = (TextView) findViewById(R.id.textViewReadTime);
         String articleReadTime = readingTime + "M";
         articleReadTimeTextView.setText(articleReadTime);
+
+        Button buttonOpenArticle = findViewById(R.id.buttonArticleUrlOpen);
+        buttonOpenArticle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openWebPage(articleLink);
+            }
+        });
 
         // EVENTS LISTENER
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabFeedbackButtonArticle);
@@ -322,6 +332,11 @@ public class ArticleActivity extends AppCompatActivity implements
             return false;
     }
 
+    public void openWebPage(String url) {
+        Intent intent = new Intent(this, BrowserActivity.class);
+        intent.putExtra(BrowserActivity.URL, url);
+        startActivity(intent);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

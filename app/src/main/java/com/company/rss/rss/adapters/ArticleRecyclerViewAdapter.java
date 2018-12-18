@@ -47,8 +47,6 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         holder.mExcerptView.setText(mArticles.get(position).getExcerpt());
         holder.mSubView.setText(mArticles.get(position).getLink());
 
-        Log.d("RSSLOG", "Image link " + mArticles.get(position).getImgLink());
-
         Picasso.get().load(mArticles.get(position).getImgLink()).into(holder.mImageView);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

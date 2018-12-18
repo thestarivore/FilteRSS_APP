@@ -1,10 +1,9 @@
 package com.company.rss.rss;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,17 +12,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
+import com.company.rss.rss.adapters.FeedsListAdapter;
 import com.company.rss.rss.fragments.MultifeedEditFragment;
 import com.company.rss.rss.fragments.MultifeedListFragment;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.Multifeed;
+import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.UserData;
+import com.company.rss.rss.restful_api.RESTMiddleware;
+import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class MultifeedManagerActivity extends AppCompatActivity implements MultifeedEditFragment.MultifeedEditInterface, MultifeedListFragment.OnMultifeedListListener {
+    private final String TAG = getClass().getName();
+    private RESTMiddleware api;
     private boolean isTwoPane = false;
     private boolean editView = false;
     private ActionBar actionbar;
@@ -37,6 +42,8 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         setContentView(R.layout.activity_multifeed_manager);
 
         loadUserData();
+
+        api = new RESTMiddleware(this);
 
         Toolbar toolbar = findViewById(R.id.multifeed_manager_toolbar);
         setSupportActionBar(toolbar);
@@ -60,21 +67,6 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         showListFragment();
     }
 
-    private void showListFragment() {
-        MultifeedListFragment multifeedListFragment = MultifeedListFragment.newInstance(multifeeds);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.multifeedListFrameLayout, multifeedListFragment);
-        ft.commit();
-    }
-
-    private void determinePaneLayout() {
-        FrameLayout fragmentItemDetail = (FrameLayout) findViewById(R.id.multifeedEditFrameLayout);
-        if (fragmentItemDetail != null) {
-            // large layout is used
-            isTwoPane = true;
-        }
-    }
-
     private void loadUserData() {
         if (userData == null) {
             //Get a UserData instance
@@ -84,9 +76,26 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         }
     }
 
+    private void showListFragment() {
+        MultifeedListFragment multifeedListFragment = MultifeedListFragment.newInstance(multifeeds);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.multifeedListFrameLayout, multifeedListFragment);
+        ft.commit();
+    }
+
+    /**
+     * isTwoPane is used to determine if master-detail is used or not
+     */
+    private void determinePaneLayout() {
+        FrameLayout fragmentItemDetail = findViewById(R.id.multifeedEditFrameLayout);
+        if (fragmentItemDetail != null) {
+            // large layout is used
+            isTwoPane = true;
+        }
+    }
+
     @Override
     public void onMultifeedSelected(int position) {
-
         if (isTwoPane) { // single activity with multifeed and detail
             // Replace frame layout with correct edit fragment
             MultifeedEditFragment multifeedEditFragment = MultifeedEditFragment.newInstance(multifeeds.get(position));
@@ -110,22 +119,59 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
 
     @Override
     public void onBackPressed() {
-        Log.d(ArticleActivity.logTag, "onBackPressed Called");
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Back pressed...");
         if(editView){
             showListFragment();
             editView = false;
             actionbar.setTitle(R.string.multifeeds);
             actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
         } else {
-            super.onBackPressed();
+            // Return RESULT_OK to notify that data changed
+            Intent intent = getIntent();
+            setResult(RESULT_OK, intent);
+            finish();
         }
     }
 
+
+    /**
+     * The function is called by the MultifeedEditFragment when the multifeed is modified
+     * @param multifeed the updated multifeed
+     */
     @Override
     public void onSaveMultifeed(Multifeed multifeed) {
         // TODO: call the API and update the multifeed
-        Log.v(ArticleActivity.logTag, "Saving multifeed to API: " + multifeed.toString());
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Saving multifeed to API: " + multifeed.toString());
 
+    }
+
+
+    /**
+     * The function is called when a feed is delete from a multifeed. When the API returns a successful
+     * response the feed is remove from the list
+     * @param multifeed the multifeed from which the feed is removed
+     * @param feed the removed feed
+     * @param feeds the list of feeds that need to be updated
+     * @param position the position of the feed to remove
+     * @param adapter the adapter set on the list of feed
+     */
+    @Override
+    public void onDeleteFeed(final Multifeed multifeed, final Feed feed, final List<Feed> feeds, final int position, final FeedsListAdapter adapter) {
+        api.deleteUserFeed(feed.getId(), multifeed.getId(), new SQLOperationCallback() {
+            @Override
+            public void onLoad(SQLOperation sqlOperation) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Feed " + feed.getTitle() + " delete from Multifeed " + multifeed.getTitle());
+                feeds.remove(position);
+                adapter.updateFeeds(feeds);
+                Snackbar.make(findViewById(android.R.id.content), R.string.feed_deleted_successfully, Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Feed " + feed.getTitle() + "NOT delete from Multifeed " + multifeed.getTitle());
+                Snackbar.make(findViewById(android.R.id.content), R.string.feed_deletion_error, Snackbar.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override
@@ -147,5 +193,6 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         }
         return super.onOptionsItemSelected(item);
     }
+
 }
 

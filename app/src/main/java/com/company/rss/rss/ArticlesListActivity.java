@@ -87,7 +87,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private List<String> collectionListHeaders;
     private HashMap<String, List<String>> collectionListChild;
     //Other
-    private TextView textViewAllMultifeedList;
+    private TextView textViewMultifeedList;
+    private TextView textViewCollectionsList;
     private TextView textViewAccountEmail;
 
 
@@ -122,6 +123,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         initCollectionListOnDrawer();
         //AllMultifeed TextView
         initAllMultifeedTextClick();
+        //Collectio TextView
+        initCollectionsTextClick();
 
         // Drawer
         drawerLayout = findViewById(R.id.drawer_layout_articles_list);
@@ -215,13 +218,36 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
      * the Multifeeds Feeds Articles.
      */
     private void initAllMultifeedTextClick() {
-        textViewAllMultifeedList = (TextView) findViewById(R.id.textViewMultifeedList);
-        textViewAllMultifeedList.setOnClickListener(new View.OnClickListener() {
+        textViewMultifeedList = findViewById(R.id.textViewMultifeedList);
+        textViewMultifeedList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Prepare the new ListToVisualize and Restart Activity
                 userData.setVisualizationMode(UserData.MODE_ALL_MULTIFEEDS_FEEDS);
                 restartActivity();
+            }
+        });
+        textViewMultifeedList.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                startMultifeedManagerActivity();
+                return true;
+            }
+        });
+    }
+
+    private void initCollectionsTextClick() {
+        textViewCollectionsList = findViewById(R.id.textViewCollectionsList);
+        textViewCollectionsList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+        textViewCollectionsList.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                startCollectionManagerActivity();
+                return true;
             }
         });
     }
@@ -392,19 +418,20 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         return super.onOptionsItemSelected(item);
     }
 
-    /*
-    Handles the interactions with the list, click
+    /**
+     * Handles the interactions with the list, click
+     * @param article the clicked article
      */
-
     @Override
     public void onListFragmentInteractionClick(Article article) {
         Log.v(ArticleActivity.logTag, article.toString());
         startArticleActivity(article);
     }
-    /*
-    Handles the interactions with the list, swipe
-     */
 
+    /**
+     * Handles the interactions with the list, swipe
+     * @param article the swiped article
+     */
     @Override
     public void onListFragmentInteractionSwipe(Article article) {
         Log.v(ArticleActivity.logTag, article.toString());
@@ -416,8 +443,9 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         }
     }
 
-    /*
-    Handles the interactions with the top slider
+    /**
+     * Handles the interactions with the top slider
+     * @param article the article clicked on the slider
      */
     @Override
     public void onFragmentInteraction(Article article) {
@@ -455,8 +483,9 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
     /**
      * When returning from an activity that performs changes on the data we need to refresh
-     * the drawer with the new data
-     *
+     * the drawer with the new data.
+     * REQUEST_CODE_MULTIFEED_EDIT is used for changes to Multifeed
+     * REQUEST_CODE_COLLECTION_EDIT is used for changes to Collections
      * @param requestCode
      * @param resultCode
      * @param data

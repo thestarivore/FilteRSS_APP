@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ArticleActivity">
+
+    <item
+        android:id="@+id/itemSaveArticleBrowser"
+        android:icon="@drawable/ic_local_offer_white_24dp"
+        android:title="Save"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/itemShareArticleBrowser"
+        android:icon="@drawable/ic_share_white_24dp"
+        android:title="Share"
+        app:showAsAction="always" />
+
+</menu>

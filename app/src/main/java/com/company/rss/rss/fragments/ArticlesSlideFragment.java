@@ -53,8 +53,6 @@ public class ArticlesSlideFragment extends Fragment {
         articleTitle.setText(mArticle.getTitle());
         articleSource.setText(mArticle.getLink());
 
-        Log.d("RSSLOG", "Image link " + mArticle.getImgLink());
-
         Picasso.get().load(mArticle.getImgLink()).into(articleImage);
 
         view.setOnClickListener(new View.OnClickListener() {
