@@ -23,7 +23,7 @@ import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
 import java.util.List;
 
 /**
- * Loads User's Data: Feeds, FeedGroups, Multifeeds, Collections and persist them
+ * Retrieve User's Data from the API: Feeds, FeedGroups, Multifeeds, Collections and persist them
  */
 public class LoadUserData extends AsyncTask<Void, Void, Object> {
     private static final String TAG = "LoadUserData";

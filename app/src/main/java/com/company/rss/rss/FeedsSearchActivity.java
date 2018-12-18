@@ -1,6 +1,7 @@
 package com.company.rss.rss;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.User;
+import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.persistence.UserPrefs;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.FeedCallback;
@@ -38,7 +40,9 @@ import java.util.List;
 public class FeedsSearchActivity extends AppCompatActivity {
     private final String TAG = getClass().getName();
     private RESTMiddleware api;
-    private User loggedUser;
+    private UserData userData;
+    private Context context;
+
 
     private static final int REQUEST_CREATE_MULTIFEED = 0;
 
@@ -56,11 +60,11 @@ public class FeedsSearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feeds_search);
-
-        UserPrefs prefs = new UserPrefs(this);
-        loggedUser = prefs.retrieveUser();
+        context = this;
 
         api = new RESTMiddleware(this);
+
+        loadUserData();
 
         Toolbar toolbar = findViewById(R.id.feeds_search_toolbar);
         setSupportActionBar(toolbar);
@@ -163,8 +167,17 @@ public class FeedsSearchActivity extends AppCompatActivity {
 
     }
 
-    /*
-    Initializes the feed list
+    private void loadUserData(){
+        if(userData == null) {
+            //Get a UserData instance
+            userData = UserData.getInstance();
+            userData.loadPersistedData(this);
+            userData.processUserData();
+        }
+    }
+
+    /**
+     * Initializes the feed list setting the adapter and the click listener on a list's item
      */
     private void setFeedsList() {
         // Get the feed list
@@ -211,9 +224,10 @@ public class FeedsSearchActivity extends AppCompatActivity {
         });
     }
 
-    /*
-    Update the list with the new feedsReply
-    */
+    /**
+     * Update the list with the new feedsReply, used when filtering feeds
+     * @param feedsReply The feeds returned that has to be showed in the feed list
+     */
     private void updateFeedsList(List<Feed> feedsReply) {
         Log.d(ArticleActivity.logTag + ":" + TAG, "Feeds updated: " + feedsReply.size());
         feeds = feedsReply;
@@ -221,33 +235,30 @@ public class FeedsSearchActivity extends AppCompatActivity {
         feedsListview.setSelection(0); // set scroll position to 0
     }
 
-    /*
-    onResume update the user's multifeed
+    /**
+     * onResume update the user's multifeed refreshing the list from userData
      */
     @Override
     protected void onResume() {
         super.onResume();
 
-        api.getUserMultifeeds(loggedUser.getEmail(), new MultifeedCallback() {
-            @Override
-            public void onLoad(List<Multifeed> multifeedsReply) {
-                Log.d(ArticleActivity.logTag + ":" + TAG, "User's Multifeed Loaded" + multifeedsReply.toString());
-                multifeeds = multifeedsReply;
-            }
+        // Refresh the list of multifeed saved locally
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Refreshing User's Multifeed...");
+        userData.loadPersistedData(this);
+        userData.processUserData();
 
-            @Override
-            public void onFailure() {
-                Log.e(ArticleActivity.logTag + ":" + TAG, "User's Multifeed Error");
-
-            }
-        });
-
+        multifeeds = userData.getMultifeedList();
 
     }
 
-    /*
-    Add the selected feed to the user's multifeed
+    /**
+     * Add the selected feed to the user's multifeed
+     * @param feed The selected feed that has to be added the the selected multifeed
+     * @param multifeed The multifeed where the feed has to be added
+     * @param dialog The dialog showed to the user during the adding operation
+     * @param view
      */
+
     private void addFeedToMultifeed(final Feed feed, final Multifeed multifeed, final DialogInterface dialog, final View view) {
         api.addUserFeed(feed.getId(), multifeed.getId(), new SQLOperationCallback() {
             @Override
@@ -274,8 +285,8 @@ public class FeedsSearchActivity extends AppCompatActivity {
     }
 
 
-    /*
-    Start the activity for the creation of a new Multifeed
+    /**
+     *  Start the activity for the creation of a new Multifeed
      */
     private void startMultifeedCreationActivity() {
         Log.d(ArticleActivity.logTag + ":" + TAG, "Starting multifeed creation...");
@@ -362,5 +373,17 @@ public class FeedsSearchActivity extends AppCompatActivity {
 
             }
         }
+    }
+
+
+    /**
+     * Return to the activity RESULT_OK, to notify that new data is present
+     */
+    @Override
+    public void onBackPressed() {
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Back pressed...");
+        Intent intent = getIntent();
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }

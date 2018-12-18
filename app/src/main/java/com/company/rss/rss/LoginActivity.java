@@ -13,10 +13,8 @@ import android.widget.TextView;
 
 import com.company.rss.rss.models.User;
 import com.company.rss.rss.persistence.UserPrefs;
-import com.company.rss.rss.restful_api.LoadUserData;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
-import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
 
 import java.util.List;
 

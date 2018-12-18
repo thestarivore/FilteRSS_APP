@@ -2,7 +2,9 @@ package com.company.rss.rss.persistence;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
+import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
@@ -99,6 +101,23 @@ public class UserPrefs{
     }
 
     /**
+     * Store a Feed in the Feeds list Shared Preferences
+     * @param feed the feed to add to the list
+     */
+    public void storeFeed(Feed feed){
+        List<Feed> feeds = retrieveFeeds();
+        feeds.add(feed);
+
+        // convert to JSON format
+        Gson gson = new Gson();
+        String f_json = gson.toJson(feeds);
+
+        // store in SharedPreferences
+        editor.putString(FEED_LIST_OBJECT, f_json);
+        editor.commit();
+    }
+
+    /**
      * Store a Multifeed List in the Shared Preferences
      * @param multifeeds a list of Multifeed Objects
      */
@@ -106,6 +125,26 @@ public class UserPrefs{
         // convert to JSON format
         Gson gson = new Gson();
         String mf_json = gson.toJson(multifeeds);
+
+        // store in SharedPreferences
+        editor.putString(MULTIFEED_LIST_OBJECT, mf_json);
+        editor.commit();
+    }
+
+    /**
+     * Add a Multifeed to the Multifeed list in the Shared Preferences
+     * @param multifeed the multifeed to add to the list
+     */
+    public void storeMultifeed(Multifeed multifeed){
+        List<Multifeed> multifeeds = retrieveMultifeeds();
+        multifeeds.add(multifeed);
+
+        // convert to JSON format
+        Gson gson = new Gson();
+        String mf_json = gson.toJson(multifeeds);
+
+        Log.d(ArticleActivity.logTag + ":" + "STORING", mf_json);
+
 
         // store in SharedPreferences
         editor.putString(MULTIFEED_LIST_OBJECT, mf_json);
@@ -197,6 +236,8 @@ public class UserPrefs{
     public List<Multifeed> retrieveMultifeeds(){
         Gson gson = new Gson();
         String multifeedsJson = settings.getString(MULTIFEED_LIST_OBJECT, "");
+        Log.d(ArticleActivity.logTag + ":" + "RETRIEVING", multifeedsJson);
+
         Type type = new TypeToken<List<Multifeed>>(){}.getType();
         return gson.fromJson(multifeedsJson, type);
     }

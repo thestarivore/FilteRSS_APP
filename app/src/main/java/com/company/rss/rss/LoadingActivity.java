@@ -2,12 +2,7 @@ package com.company.rss.rss;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.company.rss.rss.models.User;
@@ -58,7 +53,7 @@ public class LoadingActivity extends AppCompatActivity {
             "Creating time-loop inversion field...",
             "Spinning the wheel of fortune...",
             "All I really need is a kilobit...",
-            "I feel like im supposed to be loading something...",
+            "I feel like I'm supposed to be loading something...",
             "Adjusting flux capacitor...",
             "I swear it's almost done...",
             "Let's take a mindfulness minute...",

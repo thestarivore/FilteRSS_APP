@@ -15,6 +15,7 @@ import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.ArticlesListActivity;
 import com.company.rss.rss.R;
 import com.company.rss.rss.models.Feed;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +68,8 @@ public class FeedsListAdapter extends ArrayAdapter<Feed> implements Filterable {
         if (feed != null) {
             viewHolder.feedName.setText(feed.getTitle());
             viewHolder.feedCategory.setText(feed.getCategory());
+            Picasso.get().load("http://i.imgur.com/DvpvklR.png").into(viewHolder.feedIcon);
+
             if (removeIcon) viewHolder.feedActionIcon.setRotation(45); // Show delete icon
         }
 

@@ -12,17 +12,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.company.rss.rss.fragments.MultifeedEditFragment;
+import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.User;
+import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.persistence.UserPrefs;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 
+import java.util.ArrayList;
+
 public class MultifeedCreationActivity extends AppCompatActivity implements MultifeedEditFragment.MultifeedEditInterface {
     private final String TAG = getClass().getName();
     private RESTMiddleware api;
-    private User loggedUser;
+    private UserData userData;
+    private UserPrefs prefs;
 
 
     private MultifeedEditFragment multifeedEditFragment;
@@ -32,8 +37,9 @@ public class MultifeedCreationActivity extends AppCompatActivity implements Mult
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multifeed_creation);
 
-        UserPrefs prefs = new UserPrefs(this);
-        loggedUser = prefs.retrieveUser();
+        prefs = new UserPrefs(this);
+
+        loadUserData();
 
         api = new RESTMiddleware(this);
 
@@ -52,6 +58,15 @@ public class MultifeedCreationActivity extends AppCompatActivity implements Mult
         ft.commit();
 
 
+    }
+
+    private void loadUserData(){
+        if(userData == null) {
+            //Get a UserData instance
+            userData = UserData.getInstance();
+            userData.loadPersistedData(this);
+            userData.processUserData();
+        }
     }
 
     @Override
@@ -81,17 +96,29 @@ public class MultifeedCreationActivity extends AppCompatActivity implements Mult
     private void createNewMultifeed() {
         // The user clicked on the save icon
         // get the multifeed from the fragment
-        Multifeed multifeed = multifeedEditFragment.getMultifeed();
+        final Multifeed multifeed = multifeedEditFragment.getMultifeed();
 
         // Save the multifeed and finish
         final Intent returnIntent = new Intent();
 
         if(validMultifeed(multifeed)){
+
             Log.d(ArticleActivity.logTag + ":" + TAG, "Saving newly created multifeed, info: " + multifeed.toString());
-            api.addUserMultifeed(multifeed.getTitle(), loggedUser.getId(), multifeed.getColor(), new SQLOperationCallback() {
+
+            // Call the API and add the user
+            api.addUserMultifeed(multifeed.getTitle(), userData.getUser().getId(), multifeed.getColor(), new SQLOperationCallback() {
                 @Override
                 public void onLoad(SQLOperation sqlOperation) {
-                    Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed saved successfully" + sqlOperation.toString());
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed saved successfully via API " + sqlOperation.toString());
+
+                    // Get the multifeed ID returned by the API
+                    int multifeedId = sqlOperation.getInsertId();
+                    multifeed.setId(multifeedId);
+                    // Set an empty list of feed
+                    multifeed.setFeeds(new ArrayList<Feed>());
+
+                    // Save the multifeed locally
+                    prefs.storeMultifeed(multifeed);
 
                     // return with success code
                     setResult(RESULT_OK, returnIntent);

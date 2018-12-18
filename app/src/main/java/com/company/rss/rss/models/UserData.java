@@ -341,4 +341,5 @@ public class UserData {
         result = 31 * result + (collectionMap != null ? collectionMap.hashCode() : 0);
         return result;
     }
+
 }

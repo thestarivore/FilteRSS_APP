@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
@@ -61,6 +62,7 @@ import java.util.List;
 public class ArticlesListActivity extends AppCompatActivity implements  ArticlesListFragment.OnListFragmentInteractionListener,
                                                                         ArticlesSlideFragment.OnFragmentInteractionListener {
     private static final String TAG = "LoadingActivity";
+    private static final int REQUEST_CODE_MANAGER = 1;
 
     // TODO: refactor this
     private DrawerLayout drawerLayout;
@@ -163,6 +165,7 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
         pager.setPageMargin(0);
 
     }
+
 
     /**
      * Initialize the Activity's Toolbar(ActionBar)
@@ -379,8 +382,7 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.itemSearchArticleList:
-                Intent intent = new Intent(this, FeedsSearchActivity.class);
-                startActivity(intent);
+                startFeedsSearchActivity();
                 return (true);
         }
         return super.onOptionsItemSelected(item);
@@ -389,15 +391,16 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
     /*
     Handles the interactions with the list, click
      */
+
     @Override
     public void onListFragmentInteractionClick(Article article) {
         Log.v(ArticleActivity.logTag, article.toString());
         startArticleActivity(article);
     }
-
     /*
     Handles the interactions with the list, swipe
      */
+
     @Override
     public void onListFragmentInteractionSwipe(Article article) {
         Log.v(ArticleActivity.logTag, article.toString());
@@ -408,16 +411,15 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
             Toast.makeText(this, R.string.unswipe_to_remove, Toast.LENGTH_LONG).show();
         }
     }
-
     /*
     Handles the interactions with the top slider
      */
+
     @Override
     public void onFragmentInteraction(Article article) {
         Log.v(ArticleActivity.logTag, article.toString());
         startArticleActivity(article);
     }
-
 
     private void startArticleActivity(Article article) {
         Intent intent = new Intent(this, ArticleActivity.class);
@@ -427,18 +429,52 @@ public class ArticlesListActivity extends AppCompatActivity implements  Articles
 
     private void startMultifeedManagerActivity() {
         Intent intent = new Intent(this, MultifeedManagerActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_CODE_MANAGER);
     }
 
     private void startCollectionManagerActivity() {
         Intent intent = new Intent(this, CollectionManagerActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_CODE_MANAGER);
+    }
+
+    private void startFeedsSearchActivity() {
+        Intent intent = new Intent(this, FeedsSearchActivity.class);
+        startActivityForResult(intent, REQUEST_CODE_MANAGER);
     }
 
     private void restartActivity(){
         Intent intent = getIntent();
         finish();
         startActivity(intent);
+    }
+
+
+    /**
+     * When returning from an activity that performs changes on the data we need to refresh
+     * the drawer with the new data
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Returning with " + REQUEST_CODE_MANAGER);
+
+        if (requestCode == REQUEST_CODE_MANAGER  && resultCode  == RESULT_OK) {
+            // Refresh the user's data saved locally
+
+            userData.loadPersistedData(context);
+            userData.processUserData();
+
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Refreshing User's Multifeed... " + userData.getMultifeedList());
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Refreshing User's Collection... " + userData.getCollectionList());
+
+            initMultifeedListOnDrawer();
+            initCollectionListOnDrawer();
+
+        }
     }
 
     /**
