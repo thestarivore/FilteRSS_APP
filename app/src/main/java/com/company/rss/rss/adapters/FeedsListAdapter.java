@@ -70,7 +70,6 @@ public class FeedsListAdapter extends ArrayAdapter<Feed> implements Filterable {
             viewHolder.feedCategory.setText(feed.getCategory());
             if(!feed.getIconURL().isEmpty())
                 Picasso.get().load(feed.getVisualURL()).into(viewHolder.feedIcon);
-
             if (removeIcon) viewHolder.feedActionIcon.setRotation(45); // Show delete icon
         }
 

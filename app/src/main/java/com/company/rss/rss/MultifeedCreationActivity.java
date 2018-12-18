@@ -111,15 +111,6 @@ public class MultifeedCreationActivity extends AppCompatActivity implements Mult
                 public void onLoad(SQLOperation sqlOperation) {
                     Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed saved successfully via API " + sqlOperation.toString());
 
-                    // Get the multifeed ID returned by the API
-                    int multifeedId = sqlOperation.getInsertId();
-                    multifeed.setId(multifeedId);
-                    // Set an empty list of feed
-                    multifeed.setFeeds(new ArrayList<Feed>());
-
-                    // Save the multifeed locally
-                    prefs.storeMultifeed(multifeed);
-
                     // return with success code
                     setResult(RESULT_OK, returnIntent);
                     finish();

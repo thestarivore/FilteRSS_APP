@@ -68,5 +68,7 @@
     <string name="error_adding_feed">Error adding feed</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="loading">Loading...</string>
+    <string name="updating_user_information">Updating user\'s information...</string>
+    <string name="user_information_updated">User\'s information updated</string>
 
 </resources>

@@ -244,10 +244,20 @@ public class FeedsSearchActivity extends AppCompatActivity {
 
         // Refresh the list of multifeed saved locally
         Log.d(ArticleActivity.logTag + ":" + TAG, "Refreshing User's Multifeed...");
-        userData.loadPersistedData(this);
-        userData.processUserData();
 
-        multifeeds = userData.getMultifeedList();
+        api.getUserMultifeeds(userData.getUser().getEmail(), new MultifeedCallback() {
+            @Override
+            public void onLoad(List<Multifeed> multifeedsReply) {
+                // Refresh the list of multifeed saved locally
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Refreshing User's Multifeed done");
+                multifeeds = multifeedsReply;
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Refreshing User's Multifeed FAILED");
+            }
+        });
 
     }
 

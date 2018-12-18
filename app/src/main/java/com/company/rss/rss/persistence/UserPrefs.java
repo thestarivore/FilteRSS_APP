@@ -143,9 +143,6 @@ public class UserPrefs{
         Gson gson = new Gson();
         String mf_json = gson.toJson(multifeeds);
 
-        Log.d(ArticleActivity.logTag + ":" + "STORING", mf_json);
-
-
         // store in SharedPreferences
         editor.putString(MULTIFEED_LIST_OBJECT, mf_json);
         editor.commit();
@@ -236,7 +233,6 @@ public class UserPrefs{
     public List<Multifeed> retrieveMultifeeds(){
         Gson gson = new Gson();
         String multifeedsJson = settings.getString(MULTIFEED_LIST_OBJECT, "");
-        Log.d(ArticleActivity.logTag + ":" + "RETRIEVING", multifeedsJson);
 
         Type type = new TypeToken<List<Multifeed>>(){}.getType();
         return gson.fromJson(multifeedsJson, type);

@@ -79,9 +79,7 @@ public class LoadingActivity extends AppCompatActivity {
         loadingTextView.setText(loginSentences[random.nextInt(loginSentences.length-1)]);
 
         Intent intent = getIntent();
-        User loggedUser;
-        loggedUser = (User) intent.getSerializableExtra("logged-user");
-
+        User loggedUser = (User) intent.getSerializableExtra("logged-user");
 
         //Start an AsyncTask to gather all the User's information before stepping into the main Activity
         new LoadUserData(new AsyncResponse() {

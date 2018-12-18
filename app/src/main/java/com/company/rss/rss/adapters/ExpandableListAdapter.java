@@ -1,6 +1,7 @@
 package com.company.rss.rss.adapters;
 
 import android.content.Context;
+import android.database.DataSetObserver;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -97,6 +98,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         textView.setText(headerTitle);
 
         return convertView;
+    }
+
+    @Override
+    public void registerDataSetObserver(DataSetObserver observer) {
+        super.registerDataSetObserver(observer);
     }
 
     @Override
