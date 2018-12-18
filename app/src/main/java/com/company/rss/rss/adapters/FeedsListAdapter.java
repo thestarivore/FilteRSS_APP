@@ -68,7 +68,8 @@ public class FeedsListAdapter extends ArrayAdapter<Feed> implements Filterable {
         if (feed != null) {
             viewHolder.feedName.setText(feed.getTitle());
             viewHolder.feedCategory.setText(feed.getCategory());
-            Picasso.get().load("http://i.imgur.com/DvpvklR.png").into(viewHolder.feedIcon);
+            if(!feed.getIconURL().isEmpty())
+                Picasso.get().load(feed.getVisualURL()).into(viewHolder.feedIcon);
 
             if (removeIcon) viewHolder.feedActionIcon.setRotation(45); // Show delete icon
         }
