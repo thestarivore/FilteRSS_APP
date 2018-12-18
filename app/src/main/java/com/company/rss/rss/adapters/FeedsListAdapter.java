@@ -29,7 +29,6 @@ public class FeedsListAdapter extends ArrayAdapter<Feed> implements Filterable {
 
 
     static class ViewHolderFeed {
-
         TextView feedName;
         TextView feedCategory;
         ImageView feedIcon;

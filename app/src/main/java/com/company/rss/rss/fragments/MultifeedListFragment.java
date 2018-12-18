@@ -20,6 +20,9 @@ import com.company.rss.rss.models.Multifeed;
 
 import java.util.ArrayList;
 
+/**
+ * The fragment responsible of showing the list of multifeeds
+ */
 public class MultifeedListFragment extends Fragment {
     private ArrayList<Multifeed> multifeeds;
     private OnMultifeedListListener listener;

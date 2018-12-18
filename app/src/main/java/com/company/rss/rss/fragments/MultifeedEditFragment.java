@@ -26,6 +26,9 @@ import java.util.List;
 
 import top.defaults.colorpicker.ColorPickerPopup;
 
+/**
+ * The fragment responsible of showing the multifeed and the list of feeds associated with it
+ */
 public class MultifeedEditFragment extends Fragment {
     private static final String TAG = "MEFragment";
     private View view;
@@ -129,6 +132,7 @@ public class MultifeedEditFragment extends Fragment {
 
         return view;
     }
+
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {

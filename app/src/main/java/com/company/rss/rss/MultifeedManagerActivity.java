@@ -15,17 +15,20 @@ import android.widget.FrameLayout;
 
 import com.company.rss.rss.fragments.MultifeedEditFragment;
 import com.company.rss.rss.fragments.MultifeedListFragment;
+import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.UserData;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class MultifeedManagerActivity extends AppCompatActivity implements MultifeedEditFragment.MultifeedEditInterface, MultifeedListFragment.OnMultifeedListListener {
     private boolean isTwoPane = false;
     private boolean editView = false;
-    private ArrayList<Multifeed> multifeeds;
     private ActionBar actionbar;
     private UserData userData;
+    private ArrayList<Multifeed> multifeeds;
 
 
     @Override
@@ -46,7 +49,13 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
 
         determinePaneLayout();
 
-        multifeeds = (ArrayList<Multifeed>) userData.getMultifeedList();
+        Map<Multifeed, List<Feed>> multifeedsMap = userData.getMultifeedMap();
+        multifeeds = new ArrayList<Multifeed>();
+
+        for (Multifeed multifeed : multifeedsMap.keySet()) {
+            multifeed.setFeeds(multifeedsMap.get(multifeed));
+            multifeeds.add(multifeed);
+        }
 
         showListFragment();
     }
@@ -77,6 +86,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
 
     @Override
     public void onMultifeedSelected(int position) {
+
         if (isTwoPane) { // single activity with multifeed and detail
             // Replace frame layout with correct edit fragment
             MultifeedEditFragment multifeedEditFragment = MultifeedEditFragment.newInstance(multifeeds.get(position));
@@ -115,6 +125,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
     public void onSaveMultifeed(Multifeed multifeed) {
         // TODO: call the API and update the multifeed
         Log.v(ArticleActivity.logTag, "Saving multifeed to API: " + multifeed.toString());
+
     }
 
     @Override
