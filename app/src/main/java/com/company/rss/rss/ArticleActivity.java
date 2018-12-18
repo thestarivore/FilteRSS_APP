@@ -38,6 +38,7 @@ import android.widget.TextView;
 import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Collection;
+import com.squareup.picasso.Picasso;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -97,8 +98,8 @@ public class ArticleActivity extends AppCompatActivity implements
 
         // SETTERS
         ImageView articleImageView = (ImageView) findViewById(R.id.imageViewArticleImage);
-        new DownloadImageTask(articleImageView)
-                .execute(article.getImgLink());
+        Picasso.get().load(article.getImgLink()).into(articleImageView);
+
         // Set the image to full size of the viewport
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();

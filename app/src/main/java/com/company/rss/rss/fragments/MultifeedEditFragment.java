@@ -26,6 +26,9 @@ import java.util.List;
 
 import top.defaults.colorpicker.ColorPickerPopup;
 
+/**
+ * The fragment responsible of showing the multifeed and the list of feeds associated with it
+ */
 public class MultifeedEditFragment extends Fragment {
     private static final String TAG = "MEFragment";
     private View view;
@@ -82,8 +85,6 @@ public class MultifeedEditFragment extends Fragment {
             importance.setProgress(multifeed.getImportance());
 
             // multifeed's feeds list
-
-            // TODO: retrieve multifeed's feeds from the API
             final List<Feed> feeds = multifeed.getFeeds();
 
             final ListView listview = view.findViewById(R.id.listViewEditMultifeed);
@@ -103,16 +104,14 @@ public class MultifeedEditFragment extends Fragment {
                             .setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Log.d(ArticleActivity.logTag, "Removing feed " + position + " feed: " + feeds.get(position));
-                                    feeds.remove(position);
-                                    adapter.notifyDataSetChanged();
-                                    saveMultifeedInterface.onSaveMultifeed(multifeed);
+                                    Log.d(ArticleActivity.logTag + ":" + TAG, "Removing feed " + position + " feed: " + feeds.get(position));
+                                    saveMultifeedInterface.onDeleteFeed(multifeed, feed, feeds, position, adapter);
                                 }
                             })
                             .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Log.d(ArticleActivity.logTag, "Dialog closed");
+                                    Log.d(ArticleActivity.logTag + ":" + TAG, "Dialog closed");
                                 }
                             })
                             .show();
@@ -129,6 +128,7 @@ public class MultifeedEditFragment extends Fragment {
 
         return view;
     }
+
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -210,7 +210,8 @@ public class MultifeedEditFragment extends Fragment {
     }
 
     public interface MultifeedEditInterface {
-        public void onSaveMultifeed(Multifeed multifeed);
+        void onSaveMultifeed(Multifeed multifeed);
+        void onDeleteFeed(Multifeed multifeed, Feed feed, List<Feed> feeds, int position, FeedsListAdapter adapter);
     }
 
 

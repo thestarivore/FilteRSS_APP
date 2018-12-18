@@ -20,7 +20,11 @@ import com.company.rss.rss.models.Multifeed;
 
 import java.util.ArrayList;
 
+/**
+ * The fragment responsible of showing the list of multifeeds
+ */
 public class MultifeedListFragment extends Fragment {
+    private final String TAG = getClass().getName();
     private ArrayList<Multifeed> multifeeds;
     private OnMultifeedListListener listener;
     private MultifeedListAdapter adapter;
@@ -82,16 +86,16 @@ public class MultifeedListFragment extends Fragment {
                         .setPositiveButton(R.string.remove, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Log.d(ArticleActivity.logTag, "Removing multifeed " + position + " multifeed: " + parent.getItemAtPosition(position));
-                                adapter.notifyDataSetChanged();
+                                Log.d(ArticleActivity.logTag + ":" + TAG, "Removing multifeed " + position + " multifeed: " + parent.getItemAtPosition(position));
                                 multifeeds.remove(position);
+                                adapter.notifyDataSetChanged();
                                 // TODO: call the API and remove the multifeed
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Log.d(ArticleActivity.logTag, "Dialog closed");
+                                Log.d(ArticleActivity.logTag + ":" + TAG, "Dialog closed");
                             }
                         })
                         .show();

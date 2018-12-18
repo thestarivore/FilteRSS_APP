@@ -11,17 +11,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.company.rss.rss.adapters.FeedsListAdapter;
 import com.company.rss.rss.fragments.MultifeedEditFragment;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.SQLOperation;
-import com.company.rss.rss.models.User;
 import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.persistence.UserPrefs;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class MultifeedCreationActivity extends AppCompatActivity implements MultifeedEditFragment.MultifeedEditInterface {
     private final String TAG = getClass().getName();
@@ -72,6 +72,11 @@ public class MultifeedCreationActivity extends AppCompatActivity implements Mult
     @Override
     public void onSaveMultifeed(Multifeed multifeed) {
         // Do nothing because the user clicked on the back button
+    }
+
+    @Override
+    public void onDeleteFeed(Multifeed multifeed, Feed feed, List<Feed> feeds, int position, FeedsListAdapter adapter) {
+        // Do nothing because the list of feed is empty (we are creating a new multifeed)
     }
 
     @Override
