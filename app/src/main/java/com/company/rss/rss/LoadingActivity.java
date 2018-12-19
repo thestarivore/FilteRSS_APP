@@ -2,6 +2,7 @@ package com.company.rss.rss;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
@@ -89,17 +90,34 @@ public class LoadingActivity extends AppCompatActivity {
         //Start an AsyncTask to gather all the User's information before stepping into the main Activity
         new LoadUserData(new AsyncResponse() {
             @Override
-            public void processFinish(Object output) {
-                //All the data has been gathered so we can open the main activity
-                Log.d(ArticleActivity.logTag + ":" + TAG, "User's data loaded...");
-                startArticlesListActivity();
-
+            public void processFinish(Integer output) {
+                if(output == LoadUserData.DATA_LOADING_TERMINTAED) {
+                    //All the data has been gathered so we can open the main activity
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "User's data loaded...");
+                    startArticlesListActivity();
+                }
+                else if (output == LoadUserData.AUTHENTICATION_FAILED){
+                    startLoginActivityOnAuthFailed();
+                    Snackbar.make(findViewById(android.R.id.content), R.string.authentication_failed, Snackbar.LENGTH_LONG).show();
+                }
             }
         }, this, loggedUser).execute();
     }
 
+    /**
+     * Start ArticlesListActivity
+     */
     private void startArticlesListActivity() {
         Intent intent = new Intent(this, ArticlesListActivity.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Start LoginActivity after an authentication failed
+     */
+    private void startLoginActivityOnAuthFailed() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.putExtra("authFailed", true);
         startActivity(intent);
     }
 

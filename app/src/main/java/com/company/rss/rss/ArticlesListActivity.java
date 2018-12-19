@@ -506,7 +506,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
             // Refresh the user's multifeed saved locally
             new LoadUserMultifeeds(new AsyncResponse() {
                 @Override
-                public void processFinish(Object output) {
+                public void processFinish(Integer output) {
                     Log.d(ArticleActivity.logTag + ":" + TAG, "User's Multifeeds refreshed... ");
 
                     userData.loadPersistedData(context);
@@ -530,7 +530,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
             // Refresh the user's collection saved locally
             new LoadUserCollections(new AsyncResponse() {
                 @Override
-                public void processFinish(Object output) {
+                public void processFinish(Integer output) {
                     Log.d(ArticleActivity.logTag + ":" + TAG, "User's Collections refreshed... ");
 
                     userData.loadPersistedData(context);

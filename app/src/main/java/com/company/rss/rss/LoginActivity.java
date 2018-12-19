@@ -36,6 +36,13 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         context = this;
 
+        //Verifies if this Activity was opened after a failed authentication
+        Intent intent = getIntent();
+        boolean authFailed = intent.getBooleanExtra("authFailed", false);
+        if(authFailed==true) {
+            Snackbar.make(findViewById(android.R.id.content), R.string.authentication_failed, Snackbar.LENGTH_LONG).show();
+        }
+
         loginButton = findViewById(R.id.loginButton);
         TextView signUpTextView = findViewById(R.id.signUpTextView);
         emailText = findViewById(R.id.loginMailEditText);
@@ -68,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
 
         //Get the User Logged in
         loggedUser = prefs.retrieveUser();
-        //Skip login if User already persisted
+        //Skip Login Activity if User already persisted
         if(loggedUser != null) {
             onLoginSuccess();
         }

@@ -40,6 +40,7 @@
     <string name="create_account">No account yet? Create one</string>
     <string name="login">Login</string>
     <string name="authenticating">Authenticating...</string>
+    <string name="authentication_failed">Authentication Failed!</string>
     <string name="title_activity_signup">SignupActivity</string>
     <string name="register">Register</string>
     <string name="already_member">Already a member? Login</string>

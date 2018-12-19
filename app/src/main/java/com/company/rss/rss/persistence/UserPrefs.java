@@ -271,4 +271,17 @@ public class UserPrefs{
         return gson.fromJson(articlesJson, type);
     }
 
+    /***************************************************
+     *                    REMOVE
+     **************************************************/
+    /**
+     * Remove a User from the Shared Preferences
+     * @return User read
+     */
+    public void removeUser(){
+        // Remove from SharedPreferences
+        editor.remove(USER_OBJECT);
+        editor.commit();
+    }
+
 }

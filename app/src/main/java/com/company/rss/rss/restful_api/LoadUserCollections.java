@@ -6,17 +6,11 @@ import android.util.Log;
 
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Collection;
-import com.company.rss.rss.models.Feed;
-import com.company.rss.rss.models.FeedGrouping;
-import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.SavedArticle;
 import com.company.rss.rss.models.User;
 import com.company.rss.rss.persistence.UserPrefs;
 import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.CollectionCallback;
-import com.company.rss.rss.restful_api.callbacks.FeedCallback;
-import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
-import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
 
@@ -25,7 +19,7 @@ import java.util.List;
 /**
  * Retrieve User's Data from the API: Feeds, FeedGroups, Multifeeds, Collections and persist them
  */
-public class LoadUserCollections extends AsyncTask<Void, Void, Object> {
+public class LoadUserCollections extends AsyncTask<Void, Void, Integer> {
     private static final String TAG = "LoadUserData";
 
     //Call back interface
@@ -66,7 +60,7 @@ public class LoadUserCollections extends AsyncTask<Void, Void, Object> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Integer doInBackground(Void... params) {
         //Get a SharedPreferences instance
         final UserPrefs prefs = new UserPrefs(parent);
 
@@ -147,7 +141,7 @@ public class LoadUserCollections extends AsyncTask<Void, Void, Object> {
     }
 
     @Override
-    protected void onPostExecute(Object result) {
+    protected void onPostExecute(Integer result) {
         super.onPostExecute(result);
         delegate.processFinish(result);
     }
