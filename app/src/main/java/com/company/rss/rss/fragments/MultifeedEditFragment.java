@@ -181,14 +181,12 @@ public class MultifeedEditFragment extends Fragment {
     public void onStop() {
         super.onStop();
         // save data and pass updated multifeed to parent activity
-
         Log.d(ArticleActivity.logTag + ":" + TAG, "Fragment paused...");
 
         // Get the multifeed data from the view and update the multifeed
         setMultifeedData();
 
         // pass the new multifeed to the parent
-
         // TODO: invoke onSaveMultifeed only if the multifeed has been updated with new data
         Log.d(ArticleActivity.logTag + ":" + TAG, "Calling parent method for saving" + multifeed.toString());
 
@@ -209,6 +207,11 @@ public class MultifeedEditFragment extends Fragment {
         return multifeed;
     }
 
+
+    /**
+     * onSaveMultifeed: called when the multifeed is edited
+     * onDeleteFeed: called when a feed of a multifeed is deleted
+     */
     public interface MultifeedEditInterface {
         void onSaveMultifeed(Multifeed multifeed);
         void onDeleteFeed(Multifeed multifeed, Feed feed, List<Feed> feeds, int position, FeedsListAdapter adapter);

@@ -69,7 +69,11 @@
     <string name="updating_user_information">Updating user\'s information...</string>
     <string name="user_information_updated">User\'s information updated</string>
     <string name="feed_deleted_successfully">Feed deleted successfully</string>
+    <string name="multifeed_deleted_successfully">Multifeed deleted successfully</string>
+    <string name="multifeed_updated_successfully">Multifeed updated successfully</string>
     <string name="feed_deletion_error">An error with the elimination of the feed occurred</string>
+    <string name="multifeed_deletion_error">An error with the elimination of the multifeed occurred</string>
+    <string name="multifeed_update_error">An error with the update of the multifeed occurred</string>
     <string name="open_article">Open Article</string>
 
 </resources>

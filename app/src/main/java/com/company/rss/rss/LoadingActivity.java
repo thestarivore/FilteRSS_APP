@@ -3,6 +3,7 @@ package com.company.rss.rss;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.company.rss.rss.models.User;
@@ -12,6 +13,7 @@ import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
 import java.util.Random;
 
 public class LoadingActivity extends AppCompatActivity {
+    private final String TAG = getClass().getName();
     private String[] loginSentences = {
             "Reticulating splines...",
             "Generating witty dialog...",
@@ -74,6 +76,8 @@ public class LoadingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
 
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Started...");
+
         Random random = new Random();
         TextView loadingTextView = findViewById(R.id.loadingTextView);
         loadingTextView.setText(loginSentences[random.nextInt(loginSentences.length-1)]);
@@ -81,11 +85,13 @@ public class LoadingActivity extends AppCompatActivity {
         Intent intent = getIntent();
         User loggedUser = (User) intent.getSerializableExtra("logged-user");
 
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Starting user's data loading...");
         //Start an AsyncTask to gather all the User's information before stepping into the main Activity
         new LoadUserData(new AsyncResponse() {
             @Override
             public void processFinish(Object output) {
                 //All the data has been gathered so we can open the main activity
+                Log.d(ArticleActivity.logTag + ":" + TAG, "User's data loaded...");
                 startArticlesListActivity();
 
             }

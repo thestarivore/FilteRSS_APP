@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.company.rss.rss.adapters.FeedsListAdapter;
+import com.company.rss.rss.adapters.MultifeedListAdapter;
 import com.company.rss.rss.fragments.MultifeedEditFragment;
 import com.company.rss.rss.fragments.MultifeedListFragment;
 import com.company.rss.rss.models.Feed;
@@ -26,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MultifeedManagerActivity extends AppCompatActivity implements MultifeedEditFragment.MultifeedEditInterface, MultifeedListFragment.OnMultifeedListListener {
+public class MultifeedManagerActivity extends AppCompatActivity implements MultifeedEditFragment.MultifeedEditInterface, MultifeedListFragment.MultifeedListInterface {
     private final String TAG = getClass().getName();
     private RESTMiddleware api;
     private boolean isTwoPane = false;
@@ -139,15 +140,57 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
      * @param multifeed the updated multifeed
      */
     @Override
-    public void onSaveMultifeed(Multifeed multifeed) {
+    public void onSaveMultifeed(final Multifeed multifeed) {
         // TODO: call the API and update the multifeed
         Log.d(ArticleActivity.logTag + ":" + TAG, "Saving multifeed to API: " + multifeed.toString());
+        api.updateUserMultifeed(multifeed.getId(), multifeed.getTitle(), multifeed.getColor(), new SQLOperationCallback() {
+            @Override
+            public void onLoad(SQLOperation sqlOperation) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed " + multifeed.getTitle() + " updated");
+                Snackbar.make(findViewById(android.R.id.content), R.string.multifeed_updated_successfully, Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure() {
+                Log.e(ArticleActivity.logTag + ":" + TAG, "Multifeed " + multifeed.getTitle() + "NOT updated");
+                Snackbar.make(findViewById(android.R.id.content), R.string.multifeed_update_error, Snackbar.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    /**
+     * The function is called when a multifeed is deleted. When the API returns a successful
+     * response the multifeed is remove from the list
+     * @param multifeed the removed multifeed
+     * @param multifeeds the list of multifeeds that need to be updated
+     * @param position the position of the multifeed to remove
+     * @param adapter the adapter set on the list of multifeed
+     */
+    @Override
+    public void onDeleteMultifeed(final Multifeed multifeed, final ArrayList<Multifeed> multifeeds, final int position, final MultifeedListAdapter adapter) {
+        api.deleteUserMultifeed(multifeed.getId(), new SQLOperationCallback() {
+            @Override
+            public void onLoad(SQLOperation sqlOperation) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed " + multifeed.getTitle() + " deleted");
+                multifeeds.remove(position);
+                adapter.notifyDataSetChanged();
+                Snackbar.make(findViewById(android.R.id.content), R.string.multifeed_deleted_successfully, Snackbar.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure() {
+                Log.e(ArticleActivity.logTag + ":" + TAG, "Multifeed " + multifeed.getTitle() + "NOT delete");
+                Snackbar.make(findViewById(android.R.id.content), R.string.multifeed_deletion_error, Snackbar.LENGTH_LONG).show();
+            }
+        });
+
 
     }
 
 
     /**
-     * The function is called when a feed is delete from a multifeed. When the API returns a successful
+     * The function is called when a feed is deleted from a multifeed. When the API returns a successful
      * response the feed is remove from the list
      * @param multifeed the multifeed from which the feed is removed
      * @param feed the removed feed
@@ -160,7 +203,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         api.deleteUserFeed(feed.getId(), multifeed.getId(), new SQLOperationCallback() {
             @Override
             public void onLoad(SQLOperation sqlOperation) {
-                Log.d(ArticleActivity.logTag + ":" + TAG, "Feed " + feed.getTitle() + " delete from Multifeed " + multifeed.getTitle());
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Feed " + feed.getTitle() + " deleted from Multifeed " + multifeed.getTitle());
                 feeds.remove(position);
                 adapter.updateFeeds(feeds);
                 Snackbar.make(findViewById(android.R.id.content), R.string.feed_deleted_successfully, Snackbar.LENGTH_LONG).show();
@@ -168,7 +211,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
 
             @Override
             public void onFailure() {
-                Log.d(ArticleActivity.logTag + ":" + TAG, "Feed " + feed.getTitle() + "NOT delete from Multifeed " + multifeed.getTitle());
+                Log.e(ArticleActivity.logTag + ":" + TAG, "Feed " + feed.getTitle() + "NOT delete from Multifeed " + multifeed.getTitle());
                 Snackbar.make(findViewById(android.R.id.content), R.string.feed_deletion_error, Snackbar.LENGTH_LONG).show();
             }
         });

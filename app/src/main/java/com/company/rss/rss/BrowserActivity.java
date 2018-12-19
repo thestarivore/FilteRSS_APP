@@ -6,13 +6,14 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 public class BrowserActivity extends AppCompatActivity {
-
+    private final String TAG = getClass().getName();
     public static final String URL = "url";
 
     @Override
@@ -29,6 +30,7 @@ public class BrowserActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String url = intent.getStringExtra(URL);
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Opening in browser " + url);
         if (url == null || url.isEmpty()) finish();
 
 

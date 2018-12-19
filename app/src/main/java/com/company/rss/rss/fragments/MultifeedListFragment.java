@@ -13,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.company.rss.rss.ArticleActivity;
-import com.company.rss.rss.MultifeedManagerActivity;
 import com.company.rss.rss.R;
 import com.company.rss.rss.adapters.MultifeedListAdapter;
 import com.company.rss.rss.models.Multifeed;
@@ -26,7 +25,7 @@ import java.util.ArrayList;
 public class MultifeedListFragment extends Fragment {
     private final String TAG = getClass().getName();
     private ArrayList<Multifeed> multifeeds;
-    private OnMultifeedListListener listener;
+    private MultifeedListInterface multifeedListInterface;
     private MultifeedListAdapter adapter;
 
     @Override
@@ -45,11 +44,11 @@ public class MultifeedListFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnMultifeedListListener) {
-            listener = (OnMultifeedListListener) context;
+        if (context instanceof MultifeedListInterface) {
+            multifeedListInterface = (MultifeedListInterface) context;
         } else {
             throw new ClassCastException(context.toString()
-                    + " must implement ItemsListFragment.OnMultifeedListListener");
+                    + " must implement ItemsListFragment.MultifeedListInterface");
         }
     }
 
@@ -70,7 +69,7 @@ public class MultifeedListFragment extends Fragment {
                 final Multifeed multifeed = (Multifeed) parent.getItemAtPosition(position);
                 Log.v(ArticleActivity.logTag, "Multifeed " + id + " clicked" + multifeed.toString());
 
-                listener.onMultifeedSelected(position);
+                multifeedListInterface.onMultifeedSelected(position);
             }
 
         });
@@ -87,9 +86,7 @@ public class MultifeedListFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.d(ArticleActivity.logTag + ":" + TAG, "Removing multifeed " + position + " multifeed: " + parent.getItemAtPosition(position));
-                                multifeeds.remove(position);
-                                adapter.notifyDataSetChanged();
-                                // TODO: call the API and remove the multifeed
+                                multifeedListInterface.onDeleteMultifeed(multifeed, multifeeds, position, adapter);
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -111,7 +108,7 @@ public class MultifeedListFragment extends Fragment {
                 // Retrieve item based on position
                 Item i = adapterItems.getItem(position);
                 // Fire selected event for item
-                listener.onMultifeedSelected(i);
+                multifeedListInterface.onMultifeedSelected(i);
             }
         });*/
         return view;
@@ -131,9 +128,13 @@ public class MultifeedListFragment extends Fragment {
      * }
      */
 
-
-    public interface OnMultifeedListListener {
-        public void onMultifeedSelected(int position);
+    /**
+     * onMultifeedSelected: called when the multifeed is selected
+     * onDeleteMultifeed: called when the multifeed is deleted
+     */
+    public interface MultifeedListInterface {
+        void onMultifeedSelected(int position);
+        void onDeleteMultifeed(Multifeed multifeed, ArrayList<Multifeed> multifeeds, int position, MultifeedListAdapter adapter);
     }
 
 
