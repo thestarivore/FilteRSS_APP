@@ -403,8 +403,10 @@ public class ArticleActivity extends AppCompatActivity implements
             } else {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "TTS: init with locale " + Locale.getDefault());
                 // Init completed show play button
-                ttsPlayItem.setEnabled(true);
-                ttsPlayItem.getIcon().setAlpha(255);
+                if(ttsPlayItem != null) {               //TODO: Qui a volte diventava null. Indagare..
+                    ttsPlayItem.setEnabled(true);
+                    ttsPlayItem.getIcon().setAlpha(255);
+                }
             }
 
         } else {

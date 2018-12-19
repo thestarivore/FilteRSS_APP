@@ -103,8 +103,8 @@ public class LoadUserData extends AsyncTask<Void, Void, Integer> {
                     Log.d(ArticleActivity.logTag + ":" + TAG, "Authentication Failed!");
                     //Get a SharedPreferences instance
                     //And Remove the User (since is wrong)
-                    UserPrefs prefs = new UserPrefs( parent);
-                    prefs.removeUser();
+                    //UserPrefs prefs = new UserPrefs( parent);
+                    //prefs.removeUser();
                     authFaild = true;
                 }
             }

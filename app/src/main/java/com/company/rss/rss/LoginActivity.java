@@ -38,8 +38,8 @@ public class LoginActivity extends AppCompatActivity {
 
         //Verifies if this Activity was opened after a failed authentication
         Intent intent = getIntent();
-        boolean authFailed = intent.getBooleanExtra("authFailed", false);
-        if(authFailed==true) {
+        boolean persistedAuthFailed = intent.getBooleanExtra("authFailed", false);
+        if(persistedAuthFailed==true) {
             Snackbar.make(findViewById(android.R.id.content), R.string.authentication_failed, Snackbar.LENGTH_LONG).show();
         }
 
@@ -76,11 +76,10 @@ public class LoginActivity extends AppCompatActivity {
         //Get the User Logged in
         loggedUser = prefs.retrieveUser();
         //Skip Login Activity if User already persisted
-        if(loggedUser != null) {
+        if(loggedUser != null && persistedAuthFailed == false) {
             onLoginSuccess();
         }
     }
-
 
 
     /**
@@ -111,24 +110,23 @@ public class LoginActivity extends AppCompatActivity {
             public void onLoad(List<User> users) {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "\nUser authentication " + users.size());
 
+                //Get logged user
+                if(users.isEmpty() == false) {
+                    loggedUser = users.get(0);
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "\nUser: " + loggedUser.getId() +  ", " + loggedUser.getName() + ", "
+                            + loggedUser.getSurname() + ", " + loggedUser.getEmail() + ", " + loggedUser.getPassword());
 
-                for(User user: users){
-                    Log.d(ArticleActivity.logTag + ":" + TAG, "\nUser authentication");
-                    Log.d(ArticleActivity.logTag + ":" + TAG, "\nUser: " + user.getId() +  ", " + user.getName() + ", " + user.getSurname() + ", " + user.getEmail() + ", " + user.getPassword());
+                    //Get a SharedPreferences instance
+                    UserPrefs prefs = new UserPrefs( context);
 
-                    //Get logged user
-                    if(users.isEmpty() == false) {
-                        loggedUser = users.get(0);
-
-                        //Get a SharedPreferences instance
-                        UserPrefs prefs = new UserPrefs( context);
-
-                        //Persist the User Logged in
-                        prefs.storeUser(loggedUser);
-                    }
-                    progressDialog.dismiss();
+                    //Persist the User Logged in
+                    prefs.storeUser(loggedUser);
                     onLoginSuccess();
                 }
+                else{
+                    onLoginFailed();
+                }
+                progressDialog.dismiss();
             }
 
             @Override
