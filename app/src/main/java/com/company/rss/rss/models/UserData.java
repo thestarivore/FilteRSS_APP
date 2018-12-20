@@ -187,6 +187,21 @@ public class UserData {
     }
 
     /**
+     * Get a Icon URLs List of the feeds stored in the map with the desired key
+     * @param multifeedKey Multifeed Key in the Multifeed Map
+     * @return List<String> object
+     */
+    public List<String> getMapFeedIconLinkListByKey(Multifeed multifeedKey){
+        List<String> feedIconURLList = new ArrayList<>();
+
+        //For each Feed in the FeedList with the key "multifeedKey"
+        for (Feed feed: multifeedMap.get(multifeedKey)){
+            feedIconURLList.add(feed.getVisualURL());
+        }
+        return feedIconURLList;
+    }
+
+    /**
      * Get a Titles List of the article stored in the map with the desired key
      * @param collectionKey Collection Key in the Collection Map
      * @return List<String> object

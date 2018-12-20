@@ -84,11 +84,13 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private ExpandableListView expListViewMultifeeds;
     private List<String> multifeedListHeaders;
     private HashMap<String, List<String>> multifeedListChild;
+    private HashMap<String, List<String>> multifeedListFeedIcon;
     //Collections List
     private ExpandableListAdapter collectionListAdapter;
     private ExpandableListView expListViewCollections;
     private List<String> collectionListHeaders;
     private HashMap<String, List<String>> collectionListChild;
+    private HashMap<String, List<String>> collectionListFeedIcon;
     //Other
     private TextView textViewMultifeedList;
     private TextView textViewCollectionsList;
@@ -106,10 +108,12 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_articles_list);
         context = this;
-        multifeedListHeaders = new ArrayList<String>();
-        multifeedListChild = new HashMap<String, List<String>>();
-        collectionListHeaders = new ArrayList<String>();
-        collectionListChild = new HashMap<String, List<String>>();
+        multifeedListHeaders    = new ArrayList<String>();
+        multifeedListChild      = new HashMap<String, List<String>>();
+        multifeedListFeedIcon   = new HashMap<String, List<String>>();
+        collectionListHeaders   = new ArrayList<String>();
+        collectionListChild     = new HashMap<String, List<String>>();
+        collectionListFeedIcon  = new HashMap<String, List<String>>();
 
 
         //Instantiate the Middleware for the RESTful API's
@@ -294,7 +298,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private void initMultifeedListOnDrawer() {
         expListViewMultifeeds = (ExpandableListView) findViewById(R.id.exp_list_view_multifeeds);
         prepareMultifeedsListData();
-        multifeedListAdapter = new ExpandableListAdapter(this, multifeedListHeaders, multifeedListChild);
+        multifeedListAdapter = new ExpandableListAdapter(this, multifeedListHeaders, multifeedListChild, multifeedListFeedIcon);
         expListViewMultifeeds.setAdapter(multifeedListAdapter);
         //Expand all the groups
         for (int i = 0; i < multifeedListAdapter.getGroupCount(); i++) {
@@ -351,7 +355,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private void initCollectionListOnDrawer() {
         expListViewCollections = (ExpandableListView) findViewById(R.id.exp_list_view_collections);
         prepareCollectionsListData();
-        collectionListAdapter = new ExpandableListAdapter(this, collectionListHeaders, collectionListChild);
+        collectionListAdapter = new ExpandableListAdapter(this, collectionListHeaders, collectionListChild, collectionListFeedIcon);
         expListViewCollections.setAdapter(collectionListAdapter);
         //Item LongClick
         expListViewCollections.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -418,6 +422,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
             multifeedListHeaders.add(multifeed.getTitle());
             //Add the associated feed list
             multifeedListChild.put(multifeed.getTitle(), userData.getMapFeedTitlesListByKey(multifeed));
+            //Add the associated feed icons list
+            multifeedListFeedIcon.put(multifeed.getTitle(), userData.getMapFeedIconLinkListByKey(multifeed));
         }
     }
 
