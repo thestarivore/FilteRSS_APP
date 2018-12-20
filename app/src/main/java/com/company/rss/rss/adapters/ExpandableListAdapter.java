@@ -7,9 +7,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.company.rss.rss.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,18 +20,27 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> groups;
     private HashMap<String, List<String>> items;
+    private HashMap<String, List<String>> icons;
+    private TextView numberOfArticles;
 
     public ExpandableListAdapter(Context context, List<String> groups,
-                                 HashMap<String, List<String>> items) {
-        this.context = context;
-        this.groups = groups;
-        this.items = items;
+                                    HashMap<String, List<String>> items,
+                                    HashMap<String, List<String>> icons) {
+        this.context    = context;
+        this.groups     = groups;
+        this.items      = items;
+        this.icons      = icons;
     }
 
     @Override
-    public Object getChild(int groupPosition, int childPosititon) {
+    public Object getChild(int groupPosition, int childPosition) {
         return this.items.get(this.groups.get(groupPosition))
-                .get(childPosititon);
+                .get(childPosition);
+    }
+
+    public Object getChildIcon(int groupPosition, int childPosition) {
+        return this.icons.get(this.groups.get(groupPosition))
+                .get(childPosition);
     }
 
     @Override
@@ -49,8 +60,18 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             convertView = inflater.inflate(R.layout.expandable_list_view_item, null);
         }
 
+        //Text view containing the Name of the Child (feed)
         TextView textView = (TextView) convertView.findViewById(R.id.exp_menu_group_item);
         textView.setText(childText);
+
+        //Text view containing the number of articles left for each child (feed)
+        numberOfArticles = (TextView) convertView.findViewById(R.id.exp_menu_group_item_count);
+
+        //Child's Icon
+        ImageView feedIcon  = (ImageView) convertView.findViewById(R.id.exp_menu_group_item_icon);
+        String iconLink = (String) getChildIcon(groupPosition, childPosition);
+        if(!iconLink.isEmpty())
+            Picasso.get().load(iconLink).into(feedIcon);
 
         return convertView;
     }
