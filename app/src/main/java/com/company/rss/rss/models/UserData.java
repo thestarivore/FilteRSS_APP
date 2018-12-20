@@ -41,6 +41,8 @@ public class UserData {
     private int multifeedPosition;
     private int feedPosition;
     private int collectionPosition;
+    private UserPrefs prefs;
+    private Context context;
 
     /**
      * Get Singleton's instance
@@ -75,7 +77,8 @@ public class UserData {
      */
     public void loadPersistedData(Context context){
         //Get a SharedPreferences instance
-        UserPrefs prefs = new UserPrefs(context);
+        this.context = context;
+        prefs = new UserPrefs(context);
 
         //Get the User data
         user  = prefs.retrieveUser();
@@ -342,4 +345,11 @@ public class UserData {
         return result;
     }
 
+    /**
+     * Delete all the persisted data
+     */
+    public void deleteAll() {
+        prefs = new UserPrefs(context);
+        prefs.removeUser();
+    }
 }

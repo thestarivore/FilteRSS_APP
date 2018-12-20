@@ -40,6 +40,10 @@ import android.widget.TextView;
 import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Collection;
+import com.company.rss.rss.models.User;
+import com.company.rss.rss.persistence.UserPrefs;
+import com.company.rss.rss.restful_api.RESTMiddleware;
+import com.company.rss.rss.restful_api.callbacks.CollectionCallback;
 import com.squareup.picasso.Picasso;
 
 import java.io.FileNotFoundException;
@@ -60,7 +64,10 @@ public class ArticleActivity extends AppCompatActivity implements
 
     public final static String logTag = "RSSLOG";
     private final String TAG = getClass().getName();
+    private RESTMiddleware api;
+    private User loggedUser;
     private TextToSpeech tts;
+    private List<Collection> collections;
 
     private boolean fabVisible;
     private Article article;
@@ -84,6 +91,13 @@ public class ArticleActivity extends AppCompatActivity implements
         actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
 
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
+
+        api = new RESTMiddleware(this);
+
+        //Get a SharedPreferences instance
+        UserPrefs prefs = new UserPrefs(this);
+        //Get the User
+        loggedUser = prefs.retrieveUser();
 
         // Init tts
         tts = new TextToSpeech(this, this);
@@ -135,15 +149,20 @@ public class ArticleActivity extends AppCompatActivity implements
         String articleReadTime = readingTime + "M";
         articleReadTimeTextView.setText(articleReadTime);
 
-        Button buttonOpenArticle = findViewById(R.id.buttonArticleUrlOpen);
-        buttonOpenArticle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openWebPage(articleLink);
-            }
-        });
 
         // EVENTS LISTENER
+
+        // Click on open article button
+        if(articleLink != null){
+            Button buttonOpenArticle = findViewById(R.id.buttonArticleUrlOpen);
+            buttonOpenArticle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openWebPage(articleLink);
+                }
+            });
+        }
+
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabFeedbackButtonArticle);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -217,43 +236,61 @@ public class ArticleActivity extends AppCompatActivity implements
         Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback " + i + " for " + article.toString());
     }
 
+    /**
+     * Show the dialog to save the article in a existing collection and for creating a new collection
+     */
     private void showDialogCollectionsList() {
-        // TODO: get user's collections
-        final List<Collection> collections = Collection.generateMockupCollections(5);
+        api.getUserCollections(loggedUser.getEmail(), new CollectionCallback() {
+            @Override
+            public void onLoad(List<Collection> collectionsReply) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "User's collections retrieved");
+                collections = collectionsReply;
 
-        new android.app.AlertDialog.Builder(ArticleActivity.this)
-                .setTitle(R.string.dialog_add_article_to_collection)
-                .setSingleChoiceItems(Collection.toStrings(collections), -1,
-                        new DialogInterface.OnClickListener() {
+                new android.app.AlertDialog.Builder(ArticleActivity.this)
+                        .setTitle(R.string.dialog_add_article_to_collection)
+                        .setSingleChoiceItems(Collection.toStrings(collections), -1,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int selectedIndex) {
+                                        Log.d(ArticleActivity.logTag, "Collection " + selectedIndex + " clicked, info: " + collections.get(selectedIndex).toString());
+
+                                        boolean added = addArticleToCollection(article, collections.get(selectedIndex));
+
+                                        if (added) {
+                                            Snackbar.make(findViewById(android.R.id.content), R.string.article_added_to_collection, Snackbar.LENGTH_LONG).show();
+                                            dialog.dismiss();
+                                        } else {
+                                            Snackbar.make(findViewById(android.R.id.content), R.string.error_adding_article, Snackbar.LENGTH_LONG).show();
+                                        }
+
+                                    }
+                                })
+                        .setPositiveButton(R.string.dialog_add_article_positive_button, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int selectedIndex) {
-                                Log.d(ArticleActivity.logTag, "Collection " + selectedIndex + " clicked, info: " + collections.get(selectedIndex).toString());
-
-                                boolean added = addArticleToCollection(article, collections.get(selectedIndex));
-
-                                if (added) {
-                                    Snackbar.make(getCurrentFocus(), R.string.article_added_to_collection, Snackbar.LENGTH_LONG).show();
-                                    dialog.dismiss();
-                                } else {
-                                    Snackbar.make(getCurrentFocus(), R.string.error_adding_article, Snackbar.LENGTH_LONG).show();
-                                }
-
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.d(ArticleActivity.logTag, "Creating new collection");
+                                createNewCollection(new Collection());
                             }
                         })
-                .setPositiveButton(R.string.dialog_add_article_positive_button, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Log.d(ArticleActivity.logTag, "Creating new collection");
-                        createNewCollection(new Collection());
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Log.d(ArticleActivity.logTag, "Dialog closed");
-                    }
-                })
-                .show();
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.d(ArticleActivity.logTag, "Dialog closed");
+                            }
+                        })
+                        .show();
+            }
+
+            @Override
+            public void onFailure() {
+                Log.e(ArticleActivity.logTag + ":" + TAG, "User's collections NOT retrieved");
+                Snackbar.make(findViewById(android.R.id.content), R.string.error_connection, Snackbar.LENGTH_LONG).show();
+
+            }
+        });
+
+
+
     }
 
     private void createNewCollection(final Collection collection) {

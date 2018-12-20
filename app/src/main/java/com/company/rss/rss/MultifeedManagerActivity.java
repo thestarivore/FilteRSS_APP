@@ -204,8 +204,9 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
             @Override
             public void onLoad(SQLOperation sqlOperation) {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "Feed " + feed.getTitle() + " deleted from Multifeed " + multifeed.getTitle());
-                feeds.remove(position);
-                adapter.updateFeeds(feeds);
+                feeds.remove(position);     // remove the feed from the feeds list
+                multifeed.setFeeds(feeds);  // to have a consistent number of feeds
+                adapter.updateFeeds(feeds); // update the adapter
                 Snackbar.make(findViewById(android.R.id.content), R.string.feed_deleted_successfully, Snackbar.LENGTH_LONG).show();
             }
 

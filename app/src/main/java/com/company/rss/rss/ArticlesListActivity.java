@@ -1,7 +1,9 @@
 package com.company.rss.rss;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -125,6 +128,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         initAllMultifeedTextClick();
         //Collectio TextView
         initCollectionsTextClick();
+        // init the logout button
+        initLogoutButton();
 
         // Drawer
         drawerLayout = findViewById(R.id.drawer_layout_articles_list);
@@ -179,6 +184,37 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
     }
 
+    /**
+     * The logout button initializer
+     */
+    private void initLogoutButton() {
+        Button logoutAccount = findViewById(R.id.buttonAccountLogout);
+        logoutAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // show a confirmation dialog
+                new AlertDialog.Builder(ArticlesListActivity.this)
+                        .setTitle(R.string.dialog_are_you_sure)
+                        // The positive delete the user local account
+                        .setPositiveButton(R.string.logout, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.d(ArticleActivity.logTag + ":" + TAG, "User logout confirmed...");
+                                userData.deleteAll();
+                                finish();
+                                startLoginActivity();
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.d(ArticleActivity.logTag + ":" + TAG, "Dialog closed");
+                            }
+                        })
+                        .show();
+            }
+        });
+    }
 
     /**
      * Initialize the Activity's Toolbar(ActionBar)
@@ -473,6 +509,12 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         intent.putExtra(EXTRA_ARTICLE, article);
         startActivityForResult(intent, REQUEST_CODE_COLLECTION_EDIT);
     }
+
+    private void startLoginActivity() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+    }
+
 
     private void restartActivity() {
         Intent intent = getIntent();

@@ -26,6 +26,7 @@ public class SignupActivity extends AppCompatActivity {
     private EditText emailEditText;
     private EditText passwordEditText;
     private Context context;
+    private int registeredId;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,13 +80,15 @@ public class SignupActivity extends AppCompatActivity {
         api.registerNewUser(name, "", email, password, new SQLOperationCallback() {
             @Override
             public void onLoad(SQLOperation sqlOperation) {
-                User registredUser = new User(sqlOperation.getInsertId(), name, "", email, password);
+                registeredId = sqlOperation.getInsertId();
+
+                User registeredUser = new User(sqlOperation.getInsertId(), name, "", email, password);
 
                 //Get a SharedPreferences instance
                 UserPrefs prefs = new UserPrefs( context);
 
                 //Persist the Registred User
-                prefs.storeUser(registredUser);
+                prefs.storeUser(registeredUser);
 
                 onSignupSuccess();
                 progressDialog.dismiss();
@@ -102,11 +105,26 @@ public class SignupActivity extends AppCompatActivity {
 
 
     public void onSignupSuccess() {
-        Log.d(ArticleActivity.logTag + ":" + TAG, "Sign up success");
-        signUpButton.setEnabled(true);
-        //setResult(RESULT_OK, null);
-        startArticlesListActivity();
-        finish();
+        if(registeredId != 0) {
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Sign up success");
+            signUpButton.setEnabled(true);
+
+            api.addUserCollection((String) getText(R.string.read_it_later), registeredId, 0, new SQLOperationCallback() {
+                @Override
+                public void onLoad(SQLOperation sqlOperation) {
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "Read it later default collection created");
+                }
+
+                @Override
+                public void onFailure() {
+                    Log.e(ArticleActivity.logTag + ":" + TAG, "Read it later default collection NOT created");
+                }
+            });
+
+            //setResult(RESULT_OK, null);
+            startArticlesListActivity();
+            finish();
+        }
     }
 
     public void onSignupFailed() {

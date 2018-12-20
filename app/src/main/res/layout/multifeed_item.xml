@@ -28,6 +28,18 @@
             android:layout_marginRight="16dp"
             android:text="Feed Name" />
 
+        <TextView
+            android:id="@+id/textViewMultifeedCount"
+            style="@style/material_type_scale_caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rectangular_border"
+            android:paddingStart="8dp"
+            android:paddingLeft="8dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="8dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="4dp" />
     </LinearLayout>
 
 </LinearLayout>

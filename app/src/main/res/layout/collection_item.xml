@@ -8,8 +8,8 @@
 
     <View
         android:id="@+id/viewCollectionColor"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:background="@drawable/rounded_button" />
 
 

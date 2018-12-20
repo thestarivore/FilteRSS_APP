@@ -76,5 +76,9 @@
     <string name="multifeed_deletion_error">An error with the elimination of the multifeed occurred</string>
     <string name="multifeed_update_error">An error with the update of the multifeed occurred</string>
     <string name="open_article">Open Article</string>
+    <string name="error_connection">An error occured with the connection</string>
+    <string name="read_it_later">Read it later</string>
+    <string name="logout">Logout</string>
+    <string name="dialog_are_you_sure">Are you sure?</string>
 
 </resources>
