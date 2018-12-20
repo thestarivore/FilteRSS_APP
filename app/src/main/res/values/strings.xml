@@ -50,6 +50,7 @@
     <string name="password_not_valid">Between 4 and 10 alphanumeric characters</string>
     <string name="signup_failed">Sign up failed</string>
     <string name="name_not_valid">At least 3 characters</string>
+    <string name="name_not_empty">Collection name can not be empty</string>
     <string name="dialog_add_article_to_collection">Add article to collection</string>
     <string name="article_added_to_collection">Article added to collection</string>
     <string name="error_adding_article">Error adding the article to the collection</string>
@@ -67,8 +68,8 @@
     <string name="error_adding_feed">Error adding feed</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="loading">Loading...</string>
-    <string name="updating_user_information">Updating user\'s information...</string>
-    <string name="user_information_updated">User\'s information updated</string>
+    <string name="updating_user_information">Synch your data...</string>
+    <string name="user_information_updated">Synch completed</string>
     <string name="feed_deleted_successfully">Feed deleted successfully</string>
     <string name="multifeed_deleted_successfully">Multifeed deleted successfully</string>
     <string name="multifeed_updated_successfully">Multifeed updated successfully</string>
@@ -80,5 +81,10 @@
     <string name="read_it_later">Read it later</string>
     <string name="logout">Logout</string>
     <string name="dialog_are_you_sure">Are you sure?</string>
+    <string name="collection_created">Collection created successfully</string>
+    <string name="collection_removed_successfully">Collection removed successfully</string>
+    <string name="collection_remove_error">An error with the removing of the collection occurred</string>
+    <string name="collection_updated_successfully">Collection updated successfully</string>
+    <string name="collection_update_error">An error with the collection update occurred</string>
 
 </resources>

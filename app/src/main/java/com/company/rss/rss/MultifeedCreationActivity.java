@@ -70,7 +70,7 @@ public class MultifeedCreationActivity extends AppCompatActivity implements Mult
     }
 
     @Override
-    public void onSaveMultifeed(Multifeed multifeed) {
+    public void onUpdateMultifeed(Multifeed multifeed) {
         // Do nothing because the user clicked on the back button
     }
 

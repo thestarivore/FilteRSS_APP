@@ -34,7 +34,7 @@ public class MultifeedEditFragment extends Fragment {
     private View view;
     private MultifeedEditInterface saveMultifeedInterface;
     private Multifeed multifeed;
-    private static boolean multifeedCreation; // if true the fragment is used to create a new feed, to edit it otherwise
+    private static boolean multifeedCreationMode; // if true the fragment is used to create a new feed, to edit it otherwise
 
     private EditText name;
     private View color;
@@ -47,7 +47,7 @@ public class MultifeedEditFragment extends Fragment {
         // or to create a new one (multifeed == null)
         if (multifeed == null) {
             Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed creation mode");
-            multifeedCreation = true;
+            multifeedCreationMode = true;
         } else {
             Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed edit mode");
 
@@ -69,7 +69,7 @@ public class MultifeedEditFragment extends Fragment {
         importance = view.findViewById(R.id.seekBarMultifeedEdit);
 
         // if fragment called for creation do not populate the view leaving it blank
-        if (!multifeedCreation) {
+        if (!multifeedCreationMode) {
             Log.d(ArticleActivity.logTag + ":" + TAG, "Populating view...");
 
             // MULTIFEED DATA
@@ -187,10 +187,10 @@ public class MultifeedEditFragment extends Fragment {
         setMultifeedData();
 
         // pass the new multifeed to the parent
-        // TODO: invoke onSaveMultifeed only if the multifeed has been updated with new data
+        // TODO: invoke onUpdateMultifeed only if the multifeed has been updated with new data
         Log.d(ArticleActivity.logTag + ":" + TAG, "Calling parent method for saving" + multifeed.toString());
 
-        saveMultifeedInterface.onSaveMultifeed(multifeed);
+        saveMultifeedInterface.onUpdateMultifeed(multifeed);
     }
 
     private void setMultifeedData() {
@@ -209,11 +209,11 @@ public class MultifeedEditFragment extends Fragment {
 
 
     /**
-     * onSaveMultifeed: called when the multifeed is edited
+     * onUpdateMultifeed: called when the multifeed is updated
      * onDeleteFeed: called when a feed of a multifeed is deleted
      */
     public interface MultifeedEditInterface {
-        void onSaveMultifeed(Multifeed multifeed);
+        void onUpdateMultifeed(Multifeed multifeed);
         void onDeleteFeed(Multifeed multifeed, Feed feed, List<Feed> feeds, int position, FeedsListAdapter adapter);
     }
 

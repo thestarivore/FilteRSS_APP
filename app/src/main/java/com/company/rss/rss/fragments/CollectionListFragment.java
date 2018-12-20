@@ -1,6 +1,7 @@
 package com.company.rss.rss.fragments;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -19,12 +20,18 @@ import com.company.rss.rss.adapters.CollectionListAdapter;
 import com.company.rss.rss.models.Collection;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import top.defaults.colorpicker.ColorPickerPopup;
 
 public class CollectionListFragment extends Fragment {
+    private final String TAG = getClass().getName();
+
     private ArrayList<Collection> collections;
     private CollectionListAdapter adapter;
+
+    private CollectionEditInterface collectionEditInterface;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,7 +49,6 @@ public class CollectionListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_collection_list, container, false);
 
         collections = (ArrayList<Collection>) getArguments().getSerializable("collections");
@@ -63,7 +69,7 @@ public class CollectionListFragment extends Fragment {
 
         listview.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(final AdapterView<?> parent, View view, final int position, long id) {
+            public boolean onItemLongClick(final AdapterView<?> parent, final View view, final int position, long id) {
                 final Collection collection = (Collection) parent.getItemAtPosition(position);
                 Log.v(ArticleActivity.logTag, "Collection " + id + " long clicked " + collection.toString());
 
@@ -73,9 +79,8 @@ public class CollectionListFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.d(ArticleActivity.logTag, "Removing collection " + position + " collection: " + parent.getItemAtPosition(position));
-                                adapter.notifyDataSetChanged();
-                                collections.remove(position);
-                                // TODO: call the API and remove the collection
+
+                                collectionEditInterface.onDeleteCollection(collection, collections, position, adapter);
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -146,8 +151,9 @@ public class CollectionListFragment extends Fragment {
                     public void onCancel(DialogInterface dialog) {
                         String name = collectionTitle.getText().toString();
                         collection.setTitle(name);
-                        Log.v(ArticleActivity.logTag, "Saving collection: " + collection.toString());
-                        adapter.notifyDataSetChanged();
+
+                        collectionEditInterface.onUpdateCollection(collection, adapter);
+
                     }
                 }
         );
@@ -172,5 +178,25 @@ public class CollectionListFragment extends Fragment {
         editCollectionDialog.show();
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof CollectionEditInterface) {
+            collectionEditInterface = (CollectionEditInterface) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement CollectionEditInterface");
+        }
+    }
+
+
+    /**
+     * onUpdateCollection: called when the collection is updated
+     * onDeleteCollection: called when a collection is deleted
+     */
+    public interface CollectionEditInterface {
+        void onUpdateCollection(Collection collection, CollectionListAdapter adapter);
+        void onDeleteCollection(Collection collection, List<Collection> collections, int position, CollectionListAdapter adapter);
+    }
 
 }

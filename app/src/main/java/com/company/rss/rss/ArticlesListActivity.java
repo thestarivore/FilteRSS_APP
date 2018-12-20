@@ -539,11 +539,10 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         Log.d(ArticleActivity.logTag + ":" + TAG, "Returning with " + REQUEST_CODE_MULTIFEED_EDIT);
 
         if (requestCode == REQUEST_CODE_MULTIFEED_EDIT && resultCode == RESULT_OK) {
-            // A multifeed may be edited or created so refresh the local data
+            // A multifeed was edited or created so refresh the local data
 
             Log.d(ArticleActivity.logTag + ":" + TAG, "Refreshing User's Multifeeds... ");
             Snackbar.make(findViewById(android.R.id.content), R.string.updating_user_information, Snackbar.LENGTH_LONG).show();
-
 
             // Refresh the user's multifeed saved locally
             new LoadUserMultifeeds(new AsyncResponse() {
@@ -563,11 +562,10 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
             }, this, userData.getUser()).execute();
 
         } else if (requestCode == REQUEST_CODE_COLLECTION_EDIT && resultCode == RESULT_OK) {
-            // A collection may be edited or created so refresh the local data
+            // A collection was edited or created so refresh the local data
 
             Log.d(ArticleActivity.logTag + ":" + TAG, "Refreshing User's Collections... ");
             Snackbar.make(findViewById(android.R.id.content), R.string.updating_user_information, Snackbar.LENGTH_LONG).show();
-
 
             // Refresh the user's collection saved locally
             new LoadUserCollections(new AsyncResponse() {

@@ -41,8 +41,6 @@ public class FeedsSearchActivity extends AppCompatActivity {
     private final String TAG = getClass().getName();
     private RESTMiddleware api;
     private UserData userData;
-    private Context context;
-
 
     private static final int REQUEST_CREATE_MULTIFEED = 0;
 
@@ -53,6 +51,7 @@ public class FeedsSearchActivity extends AppCompatActivity {
     private List<Multifeed> multifeeds;
     private List<Feed> feeds;
     private ListView feedsListview;
+    private boolean multifeedsChange;
 
     // TODO: view https://developer.android.com/training/improving-layouts/smooth-scrolling#java
 
@@ -60,9 +59,9 @@ public class FeedsSearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feeds_search);
-        context = this;
 
         api = new RESTMiddleware(this);
+        multifeedsChange = false;
 
         loadUserData();
 
@@ -281,6 +280,8 @@ public class FeedsSearchActivity extends AppCompatActivity {
 
                 Snackbar.make(findViewById(android.R.id.content), feed.getTitle() + " " +
                         getText(R.string.saved_in) + " " + multifeed.getTitle(), Snackbar.LENGTH_LONG).show();
+
+                multifeedsChange = true;
             }
 
             @Override
@@ -302,6 +303,21 @@ public class FeedsSearchActivity extends AppCompatActivity {
         Log.d(ArticleActivity.logTag + ":" + TAG, "Starting multifeed creation...");
         Intent intent = new Intent(this, MultifeedCreationActivity.class);
         startActivityForResult(intent, REQUEST_CREATE_MULTIFEED);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CREATE_MULTIFEED) {
+            if (resultCode == RESULT_OK) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Returned from MultifeedCreationActivity with RESULT_OK");
+                Snackbar.make(findViewById(android.R.id.content), R.string.multifeed_saved, Snackbar.LENGTH_LONG).show();
+                multifeedsChange = true;
+            } else {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Returned from MultifeedCreationActivity without RESULT_OK");
+                Snackbar.make(findViewById(android.R.id.content), R.string.multifeed_not_saved, Snackbar.LENGTH_LONG).show();
+
+            }
+        }
     }
 
     @Override
@@ -371,29 +387,18 @@ public class FeedsSearchActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CREATE_MULTIFEED) {
-            if (resultCode == RESULT_OK) {
-                Log.d(ArticleActivity.logTag + ":" + TAG, "Returned from MultifeedCreationActivity with RESULT_OK");
-                Snackbar.make(findViewById(android.R.id.content), R.string.multifeed_saved, Snackbar.LENGTH_LONG).show();
-            } else {
-                Log.d(ArticleActivity.logTag + ":" + TAG, "Returned from MultifeedCreationActivity without RESULT_OK");
-                Snackbar.make(findViewById(android.R.id.content), R.string.multifeed_not_saved, Snackbar.LENGTH_LONG).show();
-
-            }
-        }
-    }
-
 
     /**
-     * Return to the activity RESULT_OK, to notify that new data is present
+     * Used to notify the ArticleListActivity that collections have been changed
      */
     @Override
     public void onBackPressed() {
-        Log.d(ArticleActivity.logTag + ":" + TAG, "Back pressed...");
-        Intent intent = getIntent();
-        setResult(RESULT_OK, intent);
-        finish();
+        if(multifeedsChange){
+            Intent intent = getIntent();
+            setResult(RESULT_OK, intent);
+            finish();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

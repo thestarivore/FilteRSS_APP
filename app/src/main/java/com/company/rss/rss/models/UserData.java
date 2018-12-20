@@ -105,6 +105,8 @@ public class UserData {
      *  associated.
      */
     public void processMultifeedMap(){
+        multifeedMap.clear();
+
         //For every multifeed we must map the list of feeds
         for(Multifeed multifeed: multifeedList){
             List<Feed>  mfeedList = new ArrayList<>();      //Feed List to map to the multifeed
@@ -128,6 +130,8 @@ public class UserData {
      *  associated.
      */
     public void processCollectionMap(){
+        collectionMap.clear();
+
         //For every collection we must map the list of articles
         for(Collection collection: collectionList){
             List<Article>  articleList = new ArrayList<>();      //Article List to map to the collection

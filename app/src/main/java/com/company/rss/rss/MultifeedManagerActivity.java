@@ -35,6 +35,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
     private ActionBar actionbar;
     private UserData userData;
     private ArrayList<Multifeed> multifeeds;
+    private boolean multifeedsChange;
 
 
     @Override
@@ -45,6 +46,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         loadUserData();
 
         api = new RESTMiddleware(this);
+        multifeedsChange = false;
 
         Toolbar toolbar = findViewById(R.id.multifeed_manager_toolbar);
         setSupportActionBar(toolbar);
@@ -59,6 +61,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
 
         Map<Multifeed, List<Feed>> multifeedsMap = userData.getMultifeedMap();
         multifeeds = new ArrayList<Multifeed>();
+        multifeeds.clear();
 
         for (Multifeed multifeed : multifeedsMap.keySet()) {
             multifeed.setFeeds(multifeedsMap.get(multifeed));
@@ -111,6 +114,8 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
             editView = true;
             actionbar.setTitle(multifeeds.get(position).getTitle());
             actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed passed" + multifeeds.get(position));
+
             MultifeedEditFragment multifeedEditFragment = MultifeedEditFragment.newInstance(multifeeds.get(position));
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.multifeedListFrameLayout, multifeedEditFragment);
@@ -118,29 +123,13 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        Log.d(ArticleActivity.logTag + ":" + TAG, "Back pressed...");
-        if(editView){
-            showListFragment();
-            editView = false;
-            actionbar.setTitle(R.string.multifeeds);
-            actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
-        } else {
-            // Return RESULT_OK to notify that data changed
-            Intent intent = getIntent();
-            setResult(RESULT_OK, intent);
-            finish();
-        }
-    }
-
 
     /**
-     * The function is called by the MultifeedEditFragment when the multifeed is modified
+     * The function is called by the MultifeedEditFragment when the multifeed is updated
      * @param multifeed the updated multifeed
      */
     @Override
-    public void onSaveMultifeed(final Multifeed multifeed) {
+    public void onUpdateMultifeed(final Multifeed multifeed) {
         // TODO: call the API and update the multifeed
         Log.d(ArticleActivity.logTag + ":" + TAG, "Saving multifeed to API: " + multifeed.toString());
         api.updateUserMultifeed(multifeed.getId(), multifeed.getTitle(), multifeed.getColor(), new SQLOperationCallback() {
@@ -148,6 +137,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
             public void onLoad(SQLOperation sqlOperation) {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed " + multifeed.getTitle() + " updated");
                 Snackbar.make(findViewById(android.R.id.content), R.string.multifeed_updated_successfully, Snackbar.LENGTH_LONG).show();
+                multifeedsChange = true;
             }
 
             @Override
@@ -161,7 +151,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
 
     /**
      * The function is called when a multifeed is deleted. When the API returns a successful
-     * response the multifeed is remove from the list
+     * response the multifeed is removed from the list
      * @param multifeed the removed multifeed
      * @param multifeeds the list of multifeeds that need to be updated
      * @param position the position of the multifeed to remove
@@ -176,6 +166,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
                 multifeeds.remove(position);
                 adapter.notifyDataSetChanged();
                 Snackbar.make(findViewById(android.R.id.content), R.string.multifeed_deleted_successfully, Snackbar.LENGTH_LONG).show();
+                multifeedsChange = true;
             }
 
             @Override
@@ -191,7 +182,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
 
     /**
      * The function is called when a feed is deleted from a multifeed. When the API returns a successful
-     * response the feed is remove from the list
+     * response the feed is removed from the list
      * @param multifeed the multifeed from which the feed is removed
      * @param feed the removed feed
      * @param feeds the list of feeds that need to be updated
@@ -208,6 +199,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
                 multifeed.setFeeds(feeds);  // to have a consistent number of feeds
                 adapter.updateFeeds(feeds); // update the adapter
                 Snackbar.make(findViewById(android.R.id.content), R.string.feed_deleted_successfully, Snackbar.LENGTH_LONG).show();
+                multifeedsChange = true;
             }
 
             @Override
@@ -236,6 +228,26 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
                 }*/
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Back pressed...");
+        if(editView){
+            showListFragment();
+            editView = false;
+            actionbar.setTitle(R.string.multifeeds);
+            actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+        } else {
+            if(multifeedsChange){
+                // Return RESULT_OK to notify that data changed
+                Intent intent = getIntent();
+                setResult(RESULT_OK, intent);
+                finish();
+            } else {
+                super.onBackPressed();
+            }
+        }
     }
 
 }

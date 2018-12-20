@@ -46,9 +46,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="@string/collection_name"
-            android:inputType="text"
+            android:inputType="textCapWords"
             android:lines="1"
-            android:maxLines="1"
-            android:text="Collection Name" />
+            android:maxLines="1" />
     </LinearLayout>
 </LinearLayout>

@@ -109,7 +109,8 @@ public class SignupActivity extends AppCompatActivity {
             Log.d(ArticleActivity.logTag + ":" + TAG, "Sign up success");
             signUpButton.setEnabled(true);
 
-            api.addUserCollection((String) getText(R.string.read_it_later), registeredId, 0, new SQLOperationCallback() {
+            // create a "Read it later" default collection with red color
+            api.addUserCollection((String) getText(R.string.read_it_later), registeredId, -65531, new SQLOperationCallback() {
                 @Override
                 public void onLoad(SQLOperation sqlOperation) {
                     Log.d(ArticleActivity.logTag + ":" + TAG, "Read it later default collection created");

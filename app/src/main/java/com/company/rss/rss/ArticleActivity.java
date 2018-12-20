@@ -10,12 +10,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LevelListDrawable;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
@@ -37,13 +34,14 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Collection;
+import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.User;
 import com.company.rss.rss.persistence.UserPrefs;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.CollectionCallback;
+import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 import com.squareup.picasso.Picasso;
 
 import java.io.FileNotFoundException;
@@ -56,8 +54,6 @@ import java.util.List;
 import java.util.Locale;
 
 import top.defaults.colorpicker.ColorPickerPopup;
-
-import static android.text.Layout.JUSTIFICATION_MODE_INTER_WORD;
 
 public class ArticleActivity extends AppCompatActivity implements
         TextToSpeech.OnInitListener, Html.ImageGetter {
@@ -77,6 +73,7 @@ public class ArticleActivity extends AppCompatActivity implements
     private MenuItem ttsPlayItem;
 
     private TextView articleBodyTextView;
+    private boolean collectionsChange;
 
 
     @Override
@@ -93,6 +90,7 @@ public class ArticleActivity extends AppCompatActivity implements
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
 
         api = new RESTMiddleware(this);
+        collectionsChange = false;
 
         //Get a SharedPreferences instance
         UserPrefs prefs = new UserPrefs(this);
@@ -130,11 +128,10 @@ public class ArticleActivity extends AppCompatActivity implements
 
         //Set Article Body View
         articleBodyTextView = (TextView) findViewById(R.id.textViewArticleBody);
-        if(articleBody != null) {
+        if (articleBody != null) {
             Spanned spannedBody = Html.fromHtml(articleBody, this, null);
             articleBodyTextView.setText(spannedBody);
-        }
-        else{
+        } else {
             articleBodyTextView.setText("");
         }
         /*if (articleBody != null)
@@ -153,7 +150,7 @@ public class ArticleActivity extends AppCompatActivity implements
         // EVENTS LISTENER
 
         // Click on open article button
-        if(articleLink != null){
+        if (articleLink != null) {
             Button buttonOpenArticle = findViewById(R.id.buttonArticleUrlOpen);
             buttonOpenArticle.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -252,30 +249,22 @@ public class ArticleActivity extends AppCompatActivity implements
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int selectedIndex) {
-                                        Log.d(ArticleActivity.logTag, "Collection " + selectedIndex + " clicked, info: " + collections.get(selectedIndex).toString());
-
-                                        boolean added = addArticleToCollection(article, collections.get(selectedIndex));
-
-                                        if (added) {
-                                            Snackbar.make(findViewById(android.R.id.content), R.string.article_added_to_collection, Snackbar.LENGTH_LONG).show();
-                                            dialog.dismiss();
-                                        } else {
-                                            Snackbar.make(findViewById(android.R.id.content), R.string.error_adding_article, Snackbar.LENGTH_LONG).show();
-                                        }
-
+                                        Log.d(ArticleActivity.logTag + ":" + TAG, "Collection " + selectedIndex + " clicked, info: " + collections.get(selectedIndex).toString());
+                                        addArticleToCollection(article, collections.get(selectedIndex));
+                                        dialog.dismiss();
                                     }
                                 })
                         .setPositiveButton(R.string.dialog_add_article_positive_button, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Log.d(ArticleActivity.logTag, "Creating new collection");
+                                Log.d(ArticleActivity.logTag + ":" + TAG, "Creating new collection");
                                 createNewCollection(new Collection());
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Log.d(ArticleActivity.logTag, "Dialog closed");
+                                Log.d(ArticleActivity.logTag + ":" + TAG, "Dialog closed");
                             }
                         })
                         .show();
@@ -290,18 +279,24 @@ public class ArticleActivity extends AppCompatActivity implements
         });
 
 
-
     }
 
+
+    /**
+     * Manages the creation of a new collection
+     *
+     * @param collection the collection that is going to be created. It is used to pass data between
+     *                   the dialog and the color picker dialog
+     */
     private void createNewCollection(final Collection collection) {
         final android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(ArticleActivity.this);
 
         View dialogView = LayoutInflater.from(ArticleActivity.this).inflate(R.layout.dialog_collection_edit, null);
 
-        final TextView collectionTitle = dialogView.findViewById(R.id.editTextCollectionEditTitle);
+        final TextView collectionTitleTextView = dialogView.findViewById(R.id.editTextCollectionEditTitle);
         final View collectionColor = dialogView.findViewById(R.id.viewCollectionEditColor);
 
-        collectionTitle.setText(collection.getTitle());
+        collectionTitleTextView.setText(collection.getTitle());
         GradientDrawable background = (GradientDrawable) collectionColor.getBackground();
         background.setColor(collection.getColor() == 0 ? Color.BLACK : collection.getColor());
 
@@ -312,25 +307,58 @@ public class ArticleActivity extends AppCompatActivity implements
             }
         });
 
-        builder.setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String title = collectionTitle.getText().toString();
+        builder.setPositiveButton(R.string.save, null);
 
-                // TODO: call the API and create the collection
-                collection.setTitle(title);
-
-                Log.d(ArticleActivity.logTag + ":" + TAG, "Saving collection: " + collection.toString());
-            }
-        });
 
         builder.setView(dialogView);
         final android.app.AlertDialog editCollectionDialog = builder.create();
 
+        editCollectionDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+
+                Button button = editCollectionDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
+                        collection.setTitle(collectionTitleTextView.getText().toString());
+
+                        // Validate the collection name
+                        if (collection.getTitle() == null || collection.getTitle().isEmpty()) {
+                            collectionTitleTextView.setError(getText(R.string.name_not_empty));
+                        } else {
+                            Log.d(ArticleActivity.logTag + ":" + TAG, "Saving collection: " + collection.toString());
+                            api.addUserCollection(collection.getTitle(), loggedUser.getId(), collection.getColor(), new SQLOperationCallback() {
+                                @Override
+                                public void onLoad(SQLOperation sqlOperation) {
+                                    Log.d(ArticleActivity.logTag + ":" + TAG, "Collection " + collection.toString() + " saved...");
+                                    Snackbar.make(findViewById(android.R.id.content), R.string.collection_created, Snackbar.LENGTH_LONG).show();
+                                    collectionsChange = true;
+                                }
+
+                                @Override
+                                public void onFailure() {
+                                    Log.e(ArticleActivity.logTag + ":" + TAG, "Collection " + collection.toString() + "NOT saved...");
+                                    Snackbar.make(findViewById(android.R.id.content), R.string.error_connection, Snackbar.LENGTH_LONG).show();
+
+                                }
+                            });
+                            //Dismiss once everything is OK.
+                            editCollectionDialog.dismiss();
+                        }
+
+                    }
+                });
+            }
+        });
+
+
         collectionColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                editCollectionDialog.dismiss();
+                editCollectionDialog.dismiss(); // dismiss the edit dialog
                 new ColorPickerPopup.Builder(ArticleActivity.this)
                         .initialColor(collection.getColor())
                         .enableBrightness(false)
@@ -343,8 +371,9 @@ public class ArticleActivity extends AppCompatActivity implements
                         .show(new ColorPickerPopup.ColorPickerObserver() {
                             @Override
                             public void onColorPicked(int color) {
+                                collection.setTitle(collectionTitleTextView.getText().toString());
                                 collection.setColor(color);
-                                createNewCollection(collection);
+                                createNewCollection(collection); // restart the edit of the collection with the edited values
                             }
 
                             @Override
@@ -358,21 +387,47 @@ public class ArticleActivity extends AppCompatActivity implements
         editCollectionDialog.show();
     }
 
-    private boolean addArticleToCollection(Article article, Collection collection) {
-        // TODO: call the API and add the article to the collection
+    /**
+     * Add the selected article to the selected collection
+     * @param article the article to add to the collection
+     * @param collection where to add the article
+     */
+    private void addArticleToCollection(final Article article, final Collection collection) {
+        api.addUserSavedArticle(article.getHashId(), collection.getId(), new SQLOperationCallback() {
+            @Override
+            public void onLoad(SQLOperation sqlOperation) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Saving article " + article.getTitle() + " to collection " + collection.getTitle() + "DONE");
+                Snackbar.make(findViewById(android.R.id.content), R.string.article_added_to_collection, Snackbar.LENGTH_LONG).show();
+                collectionsChange = true;
+            }
 
-        // Article added
-        Boolean articleAdded = true;
-        if (articleAdded)
-            return true;
-        else
-            return false;
+            @Override
+            public void onFailure() {
+                Log.e(ArticleActivity.logTag + ":" + TAG, "Saving article " + article.getTitle() + " to collection " + collection.getTitle() + "ERROR");
+                Snackbar.make(findViewById(android.R.id.content), R.string.error_adding_article, Snackbar.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     public void openWebPage(String url) {
         Intent intent = new Intent(this, BrowserActivity.class);
         intent.putExtra(BrowserActivity.URL, url);
         startActivity(intent);
+    }
+
+    /**
+     * Used to notify the ArticleListActivity that collections have been changed
+     */
+    @Override
+    public void onBackPressed() {
+        if(collectionsChange){
+            Intent intent = getIntent();
+            setResult(RESULT_OK, intent);
+            finish();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -440,7 +495,7 @@ public class ArticleActivity extends AppCompatActivity implements
             } else {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "TTS: init with locale " + Locale.getDefault());
                 // Init completed show play button
-                if(ttsPlayItem != null) {               //TODO: Qui a volte diventava null. Indagare..
+                if (ttsPlayItem != null) {               //TODO: Qui a volte diventava null. Indagare..
                     ttsPlayItem.setEnabled(true);
                     ttsPlayItem.getIcon().setAlpha(255);
                 }
@@ -527,6 +582,8 @@ public class ArticleActivity extends AppCompatActivity implements
 
         return d;
     }
+
+
 
     /**
      * AsyncTask that loads the images in the Article's TextBody
