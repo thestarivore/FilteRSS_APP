@@ -20,6 +20,7 @@ import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
+import com.company.rss.rss.restful_api.callbacks.SQLOperationListCallback;
 import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 import com.company.rss.rss.restful_api.interfaces.AuthenticationRESTInterface;
@@ -793,6 +794,43 @@ public class RESTService {
             public void onFailure(Call<SQLOperation> call, Throwable t) {
                 callback.onFailure();
             }
+        });
+    }
+
+    /**
+     * Add an Article and a SavedArticle(Association with a collection). The OnResponse will return with
+     * two SQLperation results stored in a list (the first one is related to the Article inserption, while
+     * the second SQLOperation refers to the SavedArticle insertion). Article insertion does not fail on duplicate
+     * hash_id (if already present on the DB, then only the Saved article will be inserted)
+     * @param title
+     * @param description
+     * @param comment
+     * @param link
+     * @param img_link
+     * @param pub_date
+     * @param userId
+     * @param feedId
+     * @param collectionId
+     * @param callback      SQLOperationListCallback callback interface
+     */
+    public void addUserArticleAssociatedToCollection(String title, String description, String comment, String link, String img_link,
+                                    String pub_date, int userId, int feedId, int collectionId, final SQLOperationListCallback callback){
+        final List<SQLOperation> sqlOperationList = new ArrayList<>();
+
+        userRESTInterface.addUserArticleAssociatedToCollection(title, description, comment, link, img_link, pub_date, userId, feedId, collectionId)
+                .enqueue(new retrofit2.Callback<List<SQLOperation>>() {
+                    @Override
+                    public void onResponse(Call<List<SQLOperation>> call, Response<List<SQLOperation>> response) {
+                        for (SQLOperation sqlOperation :response.body()){
+                            sqlOperationList.add(sqlOperation);
+                        }
+                        callback.onLoad(sqlOperationList);
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<SQLOperation>> call, Throwable t) {
+                        callback.onFailure();
+                    }
         });
     }
 

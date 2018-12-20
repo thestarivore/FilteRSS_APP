@@ -125,6 +125,19 @@ public interface UserRESTInterface {
                                                   @Field("collection") int collection);
 
     @FormUrlEncoded
+    @PUT("/v1/user/articles/saved")
+    public Call<List<SQLOperation>> addUserArticleAssociatedToCollection(
+                                            @Field("title") String title,
+                                            @Field("description") String description,
+                                            @Field("comment") String comment,
+                                            @Field("link") String link,
+                                            @Field("img_link") String img_link,
+                                            @Field("pub_date") String pub_date,
+                                            @Field("user") int userId,
+                                            @Field("feed") int feedHashId,
+                                            @Field("collectionId") int collectionId);
+
+    @FormUrlEncoded
     @HTTP(method = "DELETE", path = "/v1/user/articles/saved", hasBody = true)
     public Call<SQLOperation> deleteUserSavedArticle(@Field("article") long article,
                                                      @Field("collection") int collection);
