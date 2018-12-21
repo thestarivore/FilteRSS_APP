@@ -25,6 +25,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -102,6 +104,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private List<Feed> feedList = new ArrayList<>();
     private Context context;
     private UserData userData;
+    private ProgressBar progressBar;
+    private LinearLayout contentLinearLayout;
 
 
     @Override
@@ -186,6 +190,13 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         pager.setClipToPadding(false);
         pager.setPadding(0, 0, 60, 0);
         pager.setPageMargin(0);
+
+
+        // Set the progress bar visible and hide other
+        progressBar = findViewById(R.id.progressBarArticlesList);
+        progressBar.setVisibility(View.VISIBLE);
+        contentLinearLayout = findViewById(R.id.articleListLinearLayout);
+        contentLinearLayout.setVisibility(View.INVISIBLE);
 
     }
 
@@ -401,6 +412,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
     }
 
+
     /**
      * Load the UserData object persisted in the SharedMemory
      */
@@ -484,6 +496,34 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         if (alreadyPresent) {
             Toast.makeText(this, R.string.unswipe_to_remove, Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void onListFragmentArticlesReady() {
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Articles are ready to be displayed...");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(progressBar == null || contentLinearLayout == null) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        // show the list
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "Showing articles list");
+                        progressBar.setVisibility(View.GONE);
+                        contentLinearLayout.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+        }).start();
+
+
     }
 
     /**

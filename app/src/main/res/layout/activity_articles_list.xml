@@ -9,8 +9,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="#e4e4e4">
+        android:background="#e4e4e4"
+        android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/articles_list_toolbar"
@@ -27,28 +27,44 @@
             android:layout_height="match_parent"
             android:fillViewport="true">
 
-            <LinearLayout
-                android:id="@+id/articleListLinearLayout"
+            <FrameLayout
+                android:id="@+id/articleListContainerFrameLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:descendantFocusability="blocksDescendants"
                 android:orientation="vertical">
 
-                <com.company.rss.rss.helpers.MyViewPager
-                    android:id="@+id/pagerArticles"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <fragment
-                    android:id="@+id/articles_list_fragment"
-                    android:name="com.company.rss.rss.fragments.ArticlesListFragment"
+                <ProgressBar
+                    android:id="@+id/progressBarArticlesList"
+                    style="?android:attr/progressBarStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginRight="16dp" />
+                    android:layout_gravity="center" />
 
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/articleListLinearLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:descendantFocusability="blocksDescendants"
+                    android:orientation="vertical"
+                    android:visibility="invisible">
+
+                    <com.company.rss.rss.helpers.MyViewPager
+                        android:id="@+id/pagerArticles"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                    <fragment
+                        android:id="@+id/articles_list_fragment"
+                        android:name="com.company.rss.rss.fragments.ArticlesListFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginRight="16dp" />
+
+                </LinearLayout>
+            </FrameLayout>
 
         </android.support.v4.widget.NestedScrollView>
     </LinearLayout>

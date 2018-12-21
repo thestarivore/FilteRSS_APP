@@ -2,15 +2,19 @@ package com.company.rss.rss.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
+import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.ArticleListSwipeController;
 import com.company.rss.rss.ArticlesListActivity;
 import com.company.rss.rss.R;
@@ -34,13 +38,15 @@ import java.util.List;
  * interface.
  */
 public class ArticlesListFragment extends Fragment implements ArticleListSwipeController.RecyclerItemTouchHelperListener {
-
+    private final String TAG = getClass().getName();
     private RecyclerView recyclerView = null;
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     List<Article> articles;// = Article.generateMockupArticles(25);
     private UserData userData;
+    private int feedCounter;
+
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -62,6 +68,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
@@ -118,61 +125,105 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
      * Callback launched (on Fragment Attach) from the activity to inform the fragment that the UserData has been loaded
      */
     public void onUserDataLoaded() {
-        List<Feed> feedList = new ArrayList<>();
+        final List<Feed> feedList = new ArrayList<>();
         List<Article> articleList = new ArrayList<>();
 
         //Get the Transferred UserData
         this.userData = UserData.getInstance();
 
         //Prepare the articles list
-        this.articles =  new ArrayList<>();
+        this.articles = new ArrayList<>();
 
         //Get the list of feeds to show in the RecyclerView
         //All Multifeeds Feeds Articles
-        if(userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
+        if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
             feedList.addAll(userData.getFeedList());
         }
         //Multifeed Articles
-        else if(userData.getVisualizationMode() == UserData.MODE_MULTIFEED_ARTICLES) {
+        else if (userData.getVisualizationMode() == UserData.MODE_MULTIFEED_ARTICLES) {
             Multifeed multifeed = userData.getMultifeedList().get(userData.getMultifeedPosition());
             feedList.addAll(userData.getMultifeedMap().get(multifeed));
         }
         //Feed Articles
-        else if(userData.getVisualizationMode() == UserData.MODE_FEED_ARTICLES) {
+        else if (userData.getVisualizationMode() == UserData.MODE_FEED_ARTICLES) {
             Multifeed multifeed = userData.getMultifeedList().get(userData.getMultifeedPosition());
             feedList.add(userData.getMultifeedMap().get(multifeed).get(userData.getFeedPosition()));
         }
         //Collection Articles
-        else if(userData.getVisualizationMode() == UserData.MODE_COLLECTION_ARTICLES) {
+        else if (userData.getVisualizationMode() == UserData.MODE_COLLECTION_ARTICLES) {
             Collection collection = userData.getCollectionList().get(userData.getCollectionPosition());
             articleList.addAll(userData.getCollectionMap().get(collection));
         }
 
         //MODE_ALL_MULTIFEEDS_FEEDS || MODE_MULTIFEED_ARTICLES || MODE_FEED_ARTICLES
-        if(userData.getVisualizationMode() != UserData.MODE_COLLECTION_ARTICLES){
+        if (userData.getVisualizationMode() != UserData.MODE_COLLECTION_ARTICLES) {
+            feedCounter = 0;
             //Start Downloading the Articles, even if the UI hasn't loaded yet
-            for (final Feed feed: feedList){
+            for (final Feed feed : feedList) {
                 new LoadRSSFeed(new AsyncRSSFeedResponse() {
                     @Override
                     public void processFinish(Object output, RSSFeed rssFeed) {
-                        for (Article article: rssFeed.getItemList()){
+                        for (Article article : rssFeed.getItemList()) {
                             article.setFeed(String.valueOf(feed));
                             articles.add(article);
                         }
 
                         //Wait for onCreateView to set RecyclerView's Adapter
-                        while(recyclerView == null || recyclerView.getAdapter() == null);
+                        while (recyclerView == null || recyclerView.getAdapter() == null) ;
 
                         //Notify a change in the RecyclerView's Article List
                         recyclerView.getAdapter().notifyDataSetChanged();
+
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "LoadRSSFeed finished: " + (feedCounter+1) + "/" + feedList.size());
+
+                        feedCounter++;
                     }
                 }, getContext(), feed).execute();
             }
+
+            // Wait until at least one LoadRSSFeed has finished then call onListFragmentArticlesReady
+            // to notify that we have something to show
+            final Thread waitAllFeedsLoaded = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (feedCounter < 1){ // wait until we have something to shoe
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if(mListener != null){
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "All LoadRSSFeed finished");
+
+                        mListener.onListFragmentArticlesReady();
+                    }
+
+                }
+            });
+            waitAllFeedsLoaded.start();
+
+            // call on list fragmentArticlesReady always after a delay of 10 seconds
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    waitAllFeedsLoaded.interrupt();
+                    if(feedCounter < feedList.size()){
+                        if(mListener != null){
+                            Log.d(ArticleActivity.logTag + ":" + TAG, "TIMEOUT LoadRSSFeed, loading not completed");
+                            mListener.onListFragmentArticlesReady();
+                        }
+                    }
+                }
+            }, 10000);
         }
         //MODE_COLLECTION_ARTICLES
-        else{
+        else {
             articles.addAll(articleList);
+            mListener.onListFragmentArticlesReady();
         }
+
     }
 
     /**
@@ -188,8 +239,11 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         void onListFragmentInteractionClick(Article article);
+
         void onListFragmentInteractionSwipe(Article article);
+
+        void onListFragmentArticlesReady();
     }
 
-    
+
 }
