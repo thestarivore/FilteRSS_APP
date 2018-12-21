@@ -151,11 +151,12 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         //MODE_ALL_MULTIFEEDS_FEEDS || MODE_MULTIFEED_ARTICLES || MODE_FEED_ARTICLES
         if(userData.getVisualizationMode() != UserData.MODE_COLLECTION_ARTICLES){
             //Start Downloading the Articles, even if the UI hasn't loaded yet
-            for (Feed feed: feedList){
+            for (final Feed feed: feedList){
                 new LoadRSSFeed(new AsyncRSSFeedResponse() {
                     @Override
                     public void processFinish(Object output, RSSFeed rssFeed) {
                         for (Article article: rssFeed.getItemList()){
+                            article.setFeed(String.valueOf(feed));
                             articles.add(article);
                         }
 

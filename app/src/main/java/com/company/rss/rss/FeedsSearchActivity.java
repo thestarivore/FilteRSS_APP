@@ -188,6 +188,8 @@ public class FeedsSearchActivity extends AppCompatActivity {
         feedsListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+                // TODO: fix bug: selected feed is not the correct one when filtering
+
                 final Feed feed = (Feed) parent.getItemAtPosition(position);
                 Log.d(ArticleActivity.logTag + ":" + TAG, "Feed " + id + " clicked. Info: " + feed.toString());
 
