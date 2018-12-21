@@ -131,7 +131,7 @@ public interface UserRESTInterface {
                                             @Field("comment") String comment,
                                             @Field("link") String link,
                                             @Field("img_link") String img_link,
-                                            @Field("pub_date") Date pub_date,
+                                            @Field("pub_date") String pub_date,
                                             @Field("user") int userId,
                                             @Field("feed") int feedHashId,
                                             @Field("collectionId") int collectionId);

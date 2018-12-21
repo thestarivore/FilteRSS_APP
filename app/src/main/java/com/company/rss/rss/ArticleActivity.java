@@ -411,14 +411,15 @@ public class ArticleActivity extends AppCompatActivity implements
      * @param collection where to add the article
      */
     private void addArticleToCollection(final Article article, final Collection collection) {
-        Log.d(ArticleActivity.logTag + ":" + TAG, "Saving article " + article.toString() +  " to collection " + collection.getTitle());
+
+        //Problem with types
         api.addUserArticleAssociatedToCollection(
                 article.getTitle(),
                 article.getDescription(),
                 article.getComment(),
                 article.getLink(),
                 article.getImgLink(),
-                article.getPubDate(),
+                article.getPubDateString(),
                 loggedUser.getId(),
                 article.getFeed(),
                 collection.getId(),
@@ -483,6 +484,12 @@ public class ArticleActivity extends AppCompatActivity implements
             case R.id.itemShareArticle:
                 //add the function to perform here
                 return (true);
+            /*case R.id.about:
+                //add the function to perform here
+                return (true);
+            case R.id.exit:
+                //add the function to perform here
+                return (true);*/
         }
         return (super.onOptionsItemSelected(item));
     }

@@ -6,6 +6,8 @@ import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,7 +45,7 @@ public class Article implements Serializable {
 
     @SerializedName("user")
     @Expose
-    private String user;
+    private int user;
 
     @SerializedName("feed")
     @Expose
@@ -68,7 +70,7 @@ public class Article implements Serializable {
         this.thumbnail = thumbnail;
     }
 
-    public Article(long hashId, String title, String description, String comment, String link, String imgLink, Date pubDate, String user, int feed, String thumbnail) {
+    public Article(long hashId, String title, String description, String comment, String link, String imgLink, Date pubDate, int user, int feed, String thumbnail) {
         this.hashId = hashId;
         this.title = title;
         this.description = description;
@@ -133,15 +135,29 @@ public class Article implements Serializable {
         return pubDate;
     }
 
+    /**
+     * Return the publication date in String
+     * @return String containig the publication date
+     */
+    public String getPubDateString() {
+        if (pubDate != null) {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            String strDate = dateFormat.format(pubDate);
+            return strDate;
+        }
+        else
+            return "";
+    }
+
     public void setPubDate(Date pubDate) {
         this.pubDate = pubDate;
     }
 
-    public String getUser() {
+    public int getUser() {
         return user;
     }
 
-    public void setUser(String user) {
+    public void setUser(int user) {
         this.user = user;
     }
 
@@ -200,6 +216,8 @@ public class Article implements Serializable {
         Article article = (Article) o;
 
         if (hashId != article.hashId) return false;
+        if (user != article.user) return false;
+        if (feed != article.feed) return false;
         if (!title.equals(article.title)) return false;
         if (description != null ? !description.equals(article.description) : article.description != null)
             return false;
@@ -209,8 +227,11 @@ public class Article implements Serializable {
         if (imgLink != null ? !imgLink.equals(article.imgLink) : article.imgLink != null)
             return false;
         if (!pubDate.equals(article.pubDate)) return false;
-        if (!user.equals(article.user)) return false;
-        return feed == (article.feed);
+        if (thumbnail != null ? !thumbnail.equals(article.thumbnail) : article.thumbnail != null)
+            return false;
+        if (excerpt != null ? !excerpt.equals(article.excerpt) : article.excerpt != null)
+            return false;
+        return author != null ? author.equals(article.author) : article.author == null;
     }
 
     @Override
@@ -222,8 +243,11 @@ public class Article implements Serializable {
         result = 31 * result + link.hashCode();
         result = 31 * result + (imgLink != null ? imgLink.hashCode() : 0);
         result = 31 * result + pubDate.hashCode();
-        result = 31 * result + user.hashCode();
+        result = 31 * result + user;
         result = 31 * result + feed;
+        result = 31 * result + (thumbnail != null ? thumbnail.hashCode() : 0);
+        result = 31 * result + (excerpt != null ? excerpt.hashCode() : 0);
+        result = 31 * result + (author != null ? author.hashCode() : 0);
         return result;
     }
 

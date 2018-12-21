@@ -28,6 +28,8 @@ import com.company.rss.rss.restful_api.interfaces.CategoryRESTInterface;
 import com.company.rss.rss.restful_api.interfaces.FeedsRESTInterface;
 import com.company.rss.rss.restful_api.interfaces.UserRESTInterface;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,8 +50,8 @@ public class RESTService {
 
     private RESTService(Context context){
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.1.109:3000/")                                         //In local Nicholas
-                //.baseUrl("http://192.168.1.22:3000/")                                         //In local Eddy
+                //.baseUrl("http://192.168.1.109:3000/")                                         //In local Nicholas
+                .baseUrl("http://192.168.0.33:3000/")                                         //In local Eddy
                 //.baseUrl("http://ec2-35-180-230-227.eu-west-3.compute.amazonaws.com:3000")      //On Amazon AWS
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -815,7 +817,7 @@ public class RESTService {
      * @param callback      SQLOperationListCallback callback interface
      */
     public void addUserArticleAssociatedToCollection(String title, String description, String comment, String link, String img_link,
-                                                     Date pub_date, int userId, int feedId, int collectionId, final SQLOperationListCallback callback){
+                                                     String pub_date, int userId, int feedId, int collectionId, final SQLOperationListCallback callback){
         final List<SQLOperation> sqlOperationList = new ArrayList<>();
 
         userRESTInterface.addUserArticleAssociatedToCollection(title, description, comment, link, img_link, pub_date, userId, feedId, collectionId)
