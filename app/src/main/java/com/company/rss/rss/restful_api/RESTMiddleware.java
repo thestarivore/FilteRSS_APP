@@ -15,6 +15,8 @@ import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 import com.company.rss.rss.service.RESTService;
 
+import java.util.Date;
+
 
 public class RESTMiddleware {
     private Context context;
@@ -356,7 +358,7 @@ public class RESTMiddleware {
      * @param callback      SQLOperationListCallback callback interface
      */
     public void addUserArticleAssociatedToCollection(String title, String description, String comment, String link, String img_link,
-                                                     String pub_date, int userId, int feedId, int collectionId, SQLOperationListCallback callback){
+                                                     Date pub_date, int userId, int feedId, int collectionId, SQLOperationListCallback callback){
         RESTService.getInstance(context).addUserArticleAssociatedToCollection(title, description, comment, link, img_link,
                                                                                 pub_date, userId, feedId, collectionId, callback);
     }

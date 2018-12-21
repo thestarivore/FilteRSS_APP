@@ -16,7 +16,7 @@
         app:titleTextColor="@android:color/white" />
 
     <WebView
-        android:id="@+id/webView1"
+        android:id="@+id/webViewBrowser"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>

@@ -1,7 +1,5 @@
 package com.company.rss.rss.restful_api.interfaces;
 
-
-
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
@@ -11,6 +9,7 @@ import com.company.rss.rss.models.ReadArticle;
 import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.SavedArticle;
 
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -132,7 +131,7 @@ public interface UserRESTInterface {
                                             @Field("comment") String comment,
                                             @Field("link") String link,
                                             @Field("img_link") String img_link,
-                                            @Field("pub_date") String pub_date,
+                                            @Field("pub_date") Date pub_date,
                                             @Field("user") int userId,
                                             @Field("feed") int feedHashId,
                                             @Field("collectionId") int collectionId);

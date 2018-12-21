@@ -29,6 +29,7 @@ import com.company.rss.rss.restful_api.interfaces.FeedsRESTInterface;
 import com.company.rss.rss.restful_api.interfaces.UserRESTInterface;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -814,7 +815,7 @@ public class RESTService {
      * @param callback      SQLOperationListCallback callback interface
      */
     public void addUserArticleAssociatedToCollection(String title, String description, String comment, String link, String img_link,
-                                    String pub_date, int userId, int feedId, int collectionId, final SQLOperationListCallback callback){
+                                                     Date pub_date, int userId, int feedId, int collectionId, final SQLOperationListCallback callback){
         final List<SQLOperation> sqlOperationList = new ArrayList<>();
 
         userRESTInterface.addUserArticleAssociatedToCollection(title, description, comment, link, img_link, pub_date, userId, feedId, collectionId)

@@ -47,7 +47,7 @@ public class Article implements Serializable {
 
     @SerializedName("feed")
     @Expose
-    private String feed;
+    private int feed;
 
     //TODO: aggiunto perche usato nella mockapp, ma non c'era nel ER_Model originale, valutare se serve
     private String thumbnail;
@@ -68,7 +68,7 @@ public class Article implements Serializable {
         this.thumbnail = thumbnail;
     }
 
-    public Article(long hashId, String title, String description, String comment, String link, String imgLink, Date pubDate, String user, String feed, String thumbnail) {
+    public Article(long hashId, String title, String description, String comment, String link, String imgLink, Date pubDate, String user, int feed, String thumbnail) {
         this.hashId = hashId;
         this.title = title;
         this.description = description;
@@ -145,11 +145,11 @@ public class Article implements Serializable {
         this.user = user;
     }
 
-    public String getFeed() {
+    public int getFeed() {
         return feed;
     }
 
-    public void setFeed(String feed) {
+    public void setFeed(int feed) {
         this.feed = feed;
     }
 
@@ -210,7 +210,7 @@ public class Article implements Serializable {
             return false;
         if (!pubDate.equals(article.pubDate)) return false;
         if (!user.equals(article.user)) return false;
-        return feed.equals(article.feed);
+        return feed == (article.feed);
     }
 
     @Override
@@ -223,7 +223,7 @@ public class Article implements Serializable {
         result = 31 * result + (imgLink != null ? imgLink.hashCode() : 0);
         result = 31 * result + pubDate.hashCode();
         result = 31 * result + user.hashCode();
-        result = 31 * result + feed.hashCode();
+        result = 31 * result + feed;
         return result;
     }
 

@@ -1,4 +1,4 @@
-package com.company.rss.rss;
+package com.company.rss.rss.controllers;
 
 import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;

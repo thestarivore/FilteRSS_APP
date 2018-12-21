@@ -11,6 +11,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ScrollView;
+
+import com.company.rss.rss.controllers.OnSwipeTouchListener;
 
 public class BrowserActivity extends AppCompatActivity {
     private final String TAG = getClass().getName();
@@ -27,17 +30,17 @@ public class BrowserActivity extends AppCompatActivity {
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
 
-
         Intent intent = getIntent();
         String url = intent.getStringExtra(URL);
         Log.d(ArticleActivity.logTag + ":" + TAG, "Opening in browser " + url);
         if (url == null || url.isEmpty()) finish();
 
 
-        WebView webView = findViewById(R.id.webView1);
+        WebView webView = findViewById(R.id.webViewBrowser);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new WebViewClient());
         webView.loadUrl(url);
+
 
     }
 
@@ -54,10 +57,13 @@ public class BrowserActivity extends AppCompatActivity {
                 finish();
                 return true;
             case R.id.itemSaveArticleBrowser:
+                //showDialogCollectionsList();
                 return (true);
             case R.id.itemShareArticleBrowser:
                 return (true);
         }
         return (super.onOptionsItemSelected(item));
     }
+
+
 }

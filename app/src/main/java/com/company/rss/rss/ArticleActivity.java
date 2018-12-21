@@ -30,10 +30,12 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.company.rss.rss.controllers.OnSwipeTouchListener;
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.SQLOperation;
@@ -149,6 +151,16 @@ public class ArticleActivity extends AppCompatActivity implements
 
 
         // EVENTS LISTENER
+        // Swipe right to go back
+        ScrollView scrollViewArticle = findViewById(R.id.scrollViewArticle);
+        scrollViewArticle.setOnTouchListener(new OnSwipeTouchListener(ArticleActivity.this) {
+            @Override
+            public void onSwipeRight() {
+                onBackPressed();
+            }
+
+        });
+
 
         // Click on open article button
         if (articleLink != null) {
@@ -212,7 +224,12 @@ public class ArticleActivity extends AppCompatActivity implements
                 positionProgressBar.setProgress((int) percentageScrolled);
 
                 if (!fabVisible && percentageScrolled >= 70) {
-                    fab.setVisibility(View.VISIBLE);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            fab.setVisibility(View.VISIBLE);
+                        }
+                    });
                     fabVisible = true;
 
                     sendArticlesRead(article);
@@ -237,7 +254,7 @@ public class ArticleActivity extends AppCompatActivity implements
     /**
      * Show the dialog to save the article in a existing collection and for creating a new collection
      */
-    private void showDialogCollectionsList() {
+    public void showDialogCollectionsList() {
         api.getUserCollections(loggedUser.getEmail(), new CollectionCallback() {
             @Override
             public void onLoad(List<Collection> collectionsReply) {
@@ -394,8 +411,7 @@ public class ArticleActivity extends AppCompatActivity implements
      * @param collection where to add the article
      */
     private void addArticleToCollection(final Article article, final Collection collection) {
-        /*
-        //Problem with types
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Saving article " + article.toString() +  " to collection " + collection.getTitle());
         api.addUserArticleAssociatedToCollection(
                 article.getTitle(),
                 article.getDescription(),
@@ -409,18 +425,18 @@ public class ArticleActivity extends AppCompatActivity implements
                 new SQLOperationListCallback() {
                     @Override
                     public void onLoad(List<SQLOperation> sqlOperationList) {
-                        Log.d(ArticleActivity.logTag + ":" + TAG, "Saving article " + article.getTitle() + " to collection " + collection.getTitle() + "DONE");
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "Article " + article.getTitle() + " to collection " + collection.getTitle() + " saved");
                         Snackbar.make(findViewById(android.R.id.content), R.string.article_added_to_collection, Snackbar.LENGTH_LONG).show();
                         collectionsChange = true;
                     }
 
                     @Override
                     public void onFailure() {
-                        Log.e(ArticleActivity.logTag + ":" + TAG, "Saving article " + article.getTitle() + " to collection " + collection.getTitle() + "ERROR");
+                        Log.e(ArticleActivity.logTag + ":" + TAG, "Article " + article.getTitle() + " to collection " + collection.getTitle() + " NOT saved");
                         Snackbar.make(findViewById(android.R.id.content), R.string.error_adding_article, Snackbar.LENGTH_LONG).show();
                     }
                 }
-        );*/
+        );
     }
 
     public void openWebPage(String url) {
@@ -465,12 +481,6 @@ public class ArticleActivity extends AppCompatActivity implements
                 showDialogCollectionsList();
                 return (true);
             case R.id.itemShareArticle:
-                //add the function to perform here
-                return (true);
-            case R.id.about:
-                //add the function to perform here
-                return (true);
-            case R.id.exit:
                 //add the function to perform here
                 return (true);
         }

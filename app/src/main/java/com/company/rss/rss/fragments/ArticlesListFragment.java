@@ -12,11 +12,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 
 import com.company.rss.rss.ArticleActivity;
-import com.company.rss.rss.ArticleListSwipeController;
-import com.company.rss.rss.ArticlesListActivity;
+import com.company.rss.rss.controllers.ArticleListSwipeController;
 import com.company.rss.rss.R;
 import com.company.rss.rss.adapters.ArticleRecyclerViewAdapter;
 import com.company.rss.rss.models.Article;
@@ -164,7 +162,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                     @Override
                     public void processFinish(Object output, RSSFeed rssFeed) {
                         for (Article article : rssFeed.getItemList()) {
-                            article.setFeed(String.valueOf(feed));
+                            article.setFeed(feed.getId());
                             articles.add(article);
                         }
 
