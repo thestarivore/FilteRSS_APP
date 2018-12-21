@@ -90,13 +90,18 @@ public class FeedsListAdapter extends ArrayAdapter<Feed> implements Filterable {
     }
 
     @Override
+    public Feed getItem(int location) {
+        return feeds.get(location);
+    }
+
+    @Override
     public Filter getFilter() {
         if (filter == null)
             filter = new FeedFilter();
         return filter;
     }
-
     class FeedFilter extends Filter {
+
 
 
         List<Feed> filteredResult = new ArrayList<>();
@@ -135,12 +140,12 @@ public class FeedsListAdapter extends ArrayAdapter<Feed> implements Filterable {
 
             return results;
         }
-
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             feeds = (ArrayList<Feed>) results.values;
             notifyDataSetChanged();
         }
+
     }
 }
 

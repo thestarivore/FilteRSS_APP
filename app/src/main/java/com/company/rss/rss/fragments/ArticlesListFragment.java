@@ -186,7 +186,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             final Thread waitAllFeedsLoaded = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while (feedCounter < 1){ // wait until we have something to shoe
+                    while (feedCounter < 1){ // wait until we have something to show
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
