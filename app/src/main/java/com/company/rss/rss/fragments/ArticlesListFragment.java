@@ -27,7 +27,9 @@ import com.company.rss.rss.restful_api.interfaces.AsyncRSSFeedResponse;
 import com.company.rss.rss.rss_parser.LoadRSSFeed;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A fragment representing a list of Items.
@@ -123,8 +125,10 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
      * Callback launched (on Fragment Attach) from the activity to inform the fragment that the UserData has been loaded
      */
     public void onUserDataLoaded() {
-        final List<Feed> feedList = new ArrayList<>();
-        List<Article> articleList = new ArrayList<>();
+        final List<Feed>        feedList                = new ArrayList<>();
+        List<Article>           articleList             = new ArrayList<>();
+        final Map<String,Integer>    feedArticlesNumberMap   = new HashMap<>();
+        final int numberOfFeeds;
 
         //Get the Transferred UserData
         this.userData = UserData.getInstance();
@@ -153,6 +157,9 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             articleList.addAll(userData.getCollectionMap().get(collection));
         }
 
+        //Total number of feeds
+        numberOfFeeds = feedList.size();
+
         //MODE_ALL_MULTIFEEDS_FEEDS || MODE_MULTIFEED_ARTICLES || MODE_FEED_ARTICLES
         if (userData.getVisualizationMode() != UserData.MODE_COLLECTION_ARTICLES) {
             feedCounter = 0;
@@ -165,6 +172,9 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                             article.setFeed(feed.getId());
                             articles.add(article);
                         }
+
+                        //Save the number of articles for each feed, mapped in a HashMap
+                        feedArticlesNumberMap.put(feed.getTitle(),articles.size());
 
                         //Wait for onCreateView to set RecyclerView's Adapter
                         while (recyclerView == null || recyclerView.getAdapter() == null) ;
@@ -193,10 +203,15 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                     }
                     if(mListener != null){
                         Log.d(ArticleActivity.logTag + ":" + TAG, "All LoadRSSFeed finished");
-
                         mListener.onListFragmentArticlesReady();
                     }
 
+                    //Wait for all articles to load, then notify the activity with a callback, and pass the
+                    //map of the number of articles for each feed
+                    while (feedCounter < numberOfFeeds);
+                    if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
+                        mListener.onListFragmentAllArticlesReady(feedArticlesNumberMap);
+                    }
                 }
             });
             waitAllFeedsLoaded.start();
@@ -241,6 +256,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         void onListFragmentInteractionSwipe(Article article);
 
         void onListFragmentArticlesReady();
+
+        void onListFragmentAllArticlesReady(Map<String, Integer> feedArticlesNumberMap);
     }
 
 

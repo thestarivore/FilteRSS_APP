@@ -8,8 +8,8 @@
 
     <TextView
         android:id="@+id/exp_menu_group_item_count"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="25dp"
+        android:layout_height="21dp"
         android:layout_alignParentTop="true"
         android:layout_gravity="right|center"
         android:background="@drawable/bg_grey"

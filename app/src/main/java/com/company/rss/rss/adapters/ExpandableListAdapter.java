@@ -3,6 +3,7 @@ package com.company.rss.rss.adapters;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,17 +12,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.company.rss.rss.R;
+import com.company.rss.rss.models.Feed;
+import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> groups;
     private HashMap<String, List<String>> items;
     private HashMap<String, List<String>> icons;
-    private TextView numberOfArticles;
+    private int numberOfItems;
+    private HashMap<String,Integer>  feedArticlesNumber;
 
     public ExpandableListAdapter(Context context, List<String> groups,
                                     HashMap<String, List<String>> items,
@@ -30,6 +37,16 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         this.groups     = groups;
         this.items      = items;
         this.icons      = icons;
+        this.feedArticlesNumber = null;
+
+        //Get the number of elements in the items HashMap
+        this.numberOfItems = 0;
+        Iterator it = items.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry)it.next();
+            List<String> feedTitles = (List<String>) pair.getValue();
+            this.numberOfItems += feedTitles.size();
+        }
     }
 
     @Override
@@ -64,8 +81,16 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         TextView textView = (TextView) convertView.findViewById(R.id.exp_menu_group_item);
         textView.setText(childText);
 
-        //Text view containing the number of articles left for each child (feed)
-        numberOfArticles = (TextView) convertView.findViewById(R.id.exp_menu_group_item_count);
+
+        //Set The Number of Articles(TextView) associated to each Feed child
+        TextView countTextView = (TextView) convertView.findViewById(R.id.exp_menu_group_item_count);
+        String feedTitle = (String) getChild(groupPosition, childPosition);
+        int numberOfArticles = 0;       //Default: Not known yet
+        //If updated, pick the real number of articles, else use the default momentary (it will be called again once the number is updated)
+        if(feedArticlesNumber != null) {
+            numberOfArticles = feedArticlesNumber.get(feedTitle);        //Get the number of articles for the feed with the title=feedTitle
+        }
+        countTextView.setText(String.valueOf(numberOfArticles));
 
         //Child's Icon
         ImageView feedIcon  = (ImageView) convertView.findViewById(R.id.exp_menu_group_item_icon);
@@ -136,4 +161,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         return true;
     }
 
+
+    /**
+     * Sets the number(TextView) of articles for each feed, data mapped in a HashMap passed as argument
+     * @param feedArticlesNumberMap HashMap of the feed,number of articles association
+     */
+    public void updateFeedArticlesNumbers(Map<String,Integer> feedArticlesNumberMap) {
+        feedArticlesNumber = (HashMap<String, Integer>) feedArticlesNumberMap;
+    }
 }

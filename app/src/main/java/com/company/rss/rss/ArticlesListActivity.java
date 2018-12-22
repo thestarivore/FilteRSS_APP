@@ -57,16 +57,17 @@ import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
-import com.company.rss.rss.restful_api.callbacks.SQLOperationListCallback;
 import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncRSSFeedResponse;
 import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
 import com.company.rss.rss.rss_parser.LoadRSSFeed;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class ArticlesListActivity extends AppCompatActivity implements ArticlesListFragment.OnListFragmentInteractionListener,
@@ -106,6 +107,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private UserData userData;
     private ProgressBar progressBar;
     private LinearLayout contentLinearLayout;
+    private Map<String, Integer> feedArticlesNumberMap;
 
 
     @Override
@@ -119,7 +121,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         collectionListHeaders   = new ArrayList<String>();
         collectionListChild     = new HashMap<String, List<String>>();
         collectionListFeedIcon  = new HashMap<String, List<String>>();
-
 
         //Instantiate the Middleware for the RESTful API's
         api = new RESTMiddleware(this);
@@ -522,8 +523,18 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 });
             }
         }).start();
+    }
 
+    @Override
+    public void onListFragmentAllArticlesReady(Map<String, Integer> feedArticlesNumberMap) {
+        multifeedListAdapter.updateFeedArticlesNumbers(feedArticlesNumberMap);
+        this.feedArticlesNumberMap = feedArticlesNumberMap;
+        runOnUiThread(new Runnable(){
+            public void run() {
+                multifeedListAdapter.notifyDataSetChanged();
+            }
 
+        });
     }
 
     /**
@@ -562,13 +573,27 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         startActivity(intent);
     }
 
-
+    /**
+     * Restart this Activity and also pass some data within the intent, so that it doesn't get lost
+     */
     private void restartActivity() {
-        Intent intent = getIntent();
+        Intent intent = new Intent(ArticlesListActivity.this, ArticlesListActivity.class);
+        //Sent the Map of the NumberOfArticles per Feed, so that it doesn't get lost
+        intent.putExtra("feedArticlesNumberMap", (Serializable) feedArticlesNumberMap);
         finish();
         startActivity(intent);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Get intent passed data
+        Intent intent = getIntent();
+        feedArticlesNumberMap = (HashMap<String, Integer>) intent.getSerializableExtra("feedArticlesNumberMap");
+        multifeedListAdapter.updateFeedArticlesNumbers(feedArticlesNumberMap);
+        multifeedListAdapter.notifyDataSetChanged();
+
+    }
 
     /**
      * When returning from an activity that performs changes on the data we need to refresh
