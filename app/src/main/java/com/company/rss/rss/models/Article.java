@@ -52,25 +52,22 @@ public class Article implements Serializable {
     private int feed;
 
     //TODO: aggiunto perche usato nella mockapp, ma non c'era nel ER_Model originale, valutare se serve
-    private String thumbnail;
-    //TODO: aggiunto perche usato nella mockapp, ma non c'era nel ER_Model originale, valutare se serve
     private String excerpt;
     private String author;      //TODO: Valutare se aggiungere sul DB
 
     public Article() {
     }
 
-    public Article(long hashId, String title, String description, String link, Date pubDate, String imgLink, String thumbnail) {
+    public Article(long hashId, String title, String description, String link, Date pubDate, String imgLink) {
         this.hashId = hashId;
         this.title = title;
         this.description = description;
         this.link = link;
         this.imgLink = imgLink;
         this.pubDate = pubDate;
-        this.thumbnail = thumbnail;
     }
 
-    public Article(long hashId, String title, String description, String comment, String link, String imgLink, Date pubDate, int user, int feed, String thumbnail) {
+    public Article(long hashId, String title, String description, String comment, String link, String imgLink, Date pubDate, int user, int feed) {
         this.hashId = hashId;
         this.title = title;
         this.description = description;
@@ -80,7 +77,6 @@ public class Article implements Serializable {
         this.pubDate = pubDate;
         this.user = user;
         this.feed = feed;
-        this.thumbnail = thumbnail;
     }
 
     public long getHashId() {
@@ -169,14 +165,6 @@ public class Article implements Serializable {
         this.feed = feed;
     }
 
-    public String getThumbnail() {
-        return thumbnail;
-    }
-
-    public void setThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
     public String getExcerpt() {
         return excerpt;
     }
@@ -223,11 +211,10 @@ public class Article implements Serializable {
             return false;
         if (comment != null ? !comment.equals(article.comment) : article.comment != null)
             return false;
-        if (!link.equals(article.link)) return false;
+        if (link != null ? !link.equals(article.link) : article.link != null) return false;
         if (imgLink != null ? !imgLink.equals(article.imgLink) : article.imgLink != null)
             return false;
-        if (!pubDate.equals(article.pubDate)) return false;
-        if (thumbnail != null ? !thumbnail.equals(article.thumbnail) : article.thumbnail != null)
+        if (pubDate != null ? !pubDate.equals(article.pubDate) : article.pubDate != null)
             return false;
         if (excerpt != null ? !excerpt.equals(article.excerpt) : article.excerpt != null)
             return false;
@@ -240,12 +227,11 @@ public class Article implements Serializable {
         result = 31 * result + title.hashCode();
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (comment != null ? comment.hashCode() : 0);
-        result = 31 * result + link.hashCode();
+        result = 31 * result + (link != null ? link.hashCode() : 0);
         result = 31 * result + (imgLink != null ? imgLink.hashCode() : 0);
-        result = 31 * result + pubDate.hashCode();
+        result = 31 * result + (pubDate != null ? pubDate.hashCode() : 0);
         result = 31 * result + user;
         result = 31 * result + feed;
-        result = 31 * result + (thumbnail != null ? thumbnail.hashCode() : 0);
         result = 31 * result + (excerpt != null ? excerpt.hashCode() : 0);
         result = 31 * result + (author != null ? author.hashCode() : 0);
         return result;
@@ -254,7 +240,7 @@ public class Article implements Serializable {
     private static Article createMockArticle() {
         Random random = new Random();
         int imageId = random.nextInt(1085);
-        return new Article(random.nextInt(), makeTitle(), makeBody(), makeSource(), new Date(), makeImage(imageId), makeThumbnail(imageId));
+        return new Article(random.nextInt(), makeTitle(), makeBody(), makeSource(), new Date(), makeImage(imageId));
     }
 
     private static String makeSource() {

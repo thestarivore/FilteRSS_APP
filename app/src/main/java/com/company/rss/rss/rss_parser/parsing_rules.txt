@@ -1,0 +1,554 @@
+START+END XML TAGs:
+
+-ITEM:
+    "item", "entry"
+
+    
+-TITLE:
+    "title"
+-DESCRIPTION:
+    "description", "content:encoded", "content", "summary"(if no other)
+-PUB_DATE:
+    "pubDate", "published", "dc:date", "a10:updated"
+-AUTHOR:
+    "author", "dc:creator", "itunes:author"
+-ARTICLE_LINK:
+    "link"
+-THUMBNAIL_IMAGE_LINK:
+    "thumbnail", "thumb"
+-COMMENTS_LINK:
+    "comments", "wfw:commentRss"(rss-comments, use if no normal link for comments)
+
+
+SINGLE XML TAG:
+
+-TITLE:
+-DESCRIPTION:
+-PUB_DATE:
+-AUTHOR:
+-ARTICLE_LINK:
+-THUMBNAIL_IMAGE_LINK:
+    "media:thumbnail"(url=), "media:content"(url=), "enclosure"(ignore for now, not always is the thumbnail)
+-COMMENTS_LINK:
+
+
+LINKS:
+https://www.theverge.com/rss/full.xml                   ok
+http://www.psfk.com/feed                                ok
+http://feeds.mashable.com/Mashable                      ok
+http://feeds.wired.com/wired/index                      ok
+http://feeds.gawker.com/gizmodo/full                    DOES_NOT_RESPOND
+http://www.androidcentral.com/feed                      ok
+http://feeds2.feedburner.com/businessinsider            ok
+http://feeds.feedburner.com/tedtalks_video              ok
+http://makezine.com/feed/                               ok
+http://googleblog.blogspot.com/atom.xml                 ok
+http://www.macrumors.com/macrumors.xml                  ok
+http://rss.slashdot.org/Slashdot/slashdot               ok
+http://sethgodin.typepad.com/seths_blog/atom.xml        HTML_AL_POSTO_DI_XML(si trova il link xml volendo)
+http://www.androidworld.it/feed/                        ok
+http://feeds2.feedburner.com/Geekissimo                 ok
+http://www.iphoneitalia.com/feed                        ok
+http://www.macitynet.it/macity/rss.xml                  ok
+http://www.downloadblog.it/rss2.xml                     ok
+http://www.ilsoftware.it/rss.asp                        ok
+http://feeds.feedburner.com/motoricerca                 ok
+http://blog.tagliaerbe.com/feed                         ok
+http://www.tomshw.it/rss_news.xml                       PAGE_NOT_FOUND
+http://feeds.feedburner.com/hd-blog                     ok
+http://rss.marketingprofs.com/marketingprofs/daily      ok  
+http://feeds.marketingland.com/mktingland               ok
+http://guykawasaki.com/feed/                            ok
+http://www.quicksprout.com/feed/                        ok
+http://feeds.feedburner.com/OnlineMarketingSEOBlog      ok
+http://econsultancy.com/us/blog.atom                    REDIRECTED_TO_A_HTML_PAGE
+http://feeds.mashable.com/Mashable/SocialMedia          ok
+http://feeds.feedburner.com/KISSmetrics                 ok
+http://feeds.clickz.com/clickz                          PAGE_NOT_FOUND
+http://feeds.copyblogger.com/Copyblogger                HTML_AL_POSTO_DI_XML(si trova il link xml volendo)
+http://www.socialmediaexaminer.com/feed/                ok
+http://feeds.searchengineland.com/searchengineland      ok
+http://feeds.feedburner.com/Adfreak                     ok
+http://www.fubiz.net/en/feed/                           ok
+http://feeds.feedburner.com/FreshInspirationForYourHome ok
+http://www.younghouselove.com/feed/                     ok
+http://feeds.feedburner.com/dezeen                      ok
+http://feeds.feedburner.com/core77/blog                 ok
+http://www.yankodesign.com/feed/                        ok
+http://feeds.feedburner.com/design-milk                 ok
+http://feeds.feedburner.com/abduzeedo?format=xml        ok
+http://www.fastcodesign.com/rss.xml                     ok
+http://www.home-designing.com/feed                      ok
+http://www.betterlivingthroughdesign.com/atom.xml       ok
+http://www.trendir.com/atom.xml                         ok
+http://feeds.feedburner.com/JustCreativeDesignBlog      ok
+http://www.sfgirlbybay.com/feed/                        ok
+http://www.notcot.com/atom.xml                          ok
+http://www.yatzer.com/feed/index.php                    ok
+http://theultralinx.com/category/art-design/feed        PAGE_NOT_FOUND
+http://www.smashingmagazine.com/feed/                   ok
+http://theimpossiblecool.tumblr.com/rss                 ok
+http://www.boston.com/bigpicture/index.xml              ok
+http://feeds.feedburner.com/stuckincustoms/EmRA         ok
+http://www.nationalgeographic.com/rss/photography/photo-of-the-day      PAGE_NOT_FOUND
+http://feeds.feedburner.com/OneBigPhoto                         ok
+http://feeds.feedburner.com/Light-Stalking                      ok
+http://www.yellowkorner.com/all_items.rss                       REDIRECTED_TO_A_HTML_PAGE
+http://feeds.feedburner.com/DigitalPhotographySchool            ok
+http://feeds.feedburner.com/thesartorialist                     ok
+http://feeds.feedburner.com/colossal                            ok
+http://feeds.feedburner.com/Diyphotographynet                   ok
+http://www.dpreview.com/feeds/news.xml
+http://strobist.blogspot.com/feeds/posts/default
+http://feeds.feedburner.com/PetaPixel
+http://feeds.feedburner.com/LightroomKillerTips
+http://feeds.feedburner.com/canonrumors/rss
+http://feeds.feedburner.com/freetech4teachers/cGEY
+http://feeds.feedburner.com/dangerouslyirrelevant
+http://ilearntechnology.com/?feed=rss2
+http://gdata.youtube.com/feeds/base/users/TEDEducation/uploads?alt=rss&v=2&orderby=published&client=ytapi-youtube-profile
+http://theinnovativeeducator.blogspot.com/feeds/posts/default
+http://thefischbowl.blogspot.com/feeds/posts/default
+http://feeds.feedburner.com/OpenCulture
+http://www.npr.org/rss/rss.php?id=1013
+http://feeds.feedburner.com/tedblog
+http://mindshift.kqed.org/feed/
+http://feeds.feedburner.com/StudyHacks
+http://www.nytimes.com/services/xml/rss/nyt/Education.xml
+http://www.educatorstechnology.com/feeds/posts/default
+http://feeds.feedburner.com/hackeducation
+http://coolcatteacher.blogspot.com/feeds/posts/default
+http://feeds.feedburner.com/RapidElearningBlog
+http://www.insidehighered.com/rss/feed/ihe
+http://www.edweek.org/ew/rss1.xml
+http://www.teachthought.com/feed/
+http://www.frizzifrizzi.it/feed/
+http://www.fashionblog.it/rss2.xml
+http://bentrovatoblog.com/feed/
+http://www.trendandthecity.it/feed/
+http://www.verycool.it/feed/
+http://coolechicstylefashion.blogspot.com/feeds/posts/default
+http://www.gqitalia.it/feed
+http://www.vanityfair.it/feed
+http://blog.cliomakeup.com/feed/
+http://www.luxgallery.it/rss2/ 	 
+http://atcasa.corriere.it/rss/Tendenze.xml
+http://www.stylosophy.it/s/tendenze/rss2/
+http://www.menchic.it/feed
+http://news.google.com/news?hl=it&gl=it&q=tendenze&um=1&ie=UTF-8&output=rss
+http://www.ireneccloset.com/feed
+http://d.repubblica.it/rss/all/rss2.0.xml
+http://oltreuomo.com/feed/
+http://www.lapinella.com/feed/
+http://www.grazia.it/feed
+http://www.style.it/cm/rss/style_rss.asp
+http://news.nationalgeographic.com/index.rss
+http://www.sciencemag.org/rss/current.xml
+http://feeds.gawker.com/io9/full
+http://newsrss.bbc.co.uk/rss/newsonline_world_edition/science/nature/rss.xml
+http://feeds.feedburner.com/InformationIsBeautiful
+http://www.nature.com/nature/current_issue/rss
+http://feeds.feedburner.com/FlowingData
+http://www.space.com/syn/space.xml
+http://www.sciencedaily.com/newsfeed.xml
+http://www.nytimes.com/services/xml/rss/nyt/Science.xml
+http://www.futurity.org/feed/
+http://www.technologyreview.com/rss/rss.aspx
+http://www.physorg.com/rss-feed/
+http://feeds.feedburner.com/MinimalistBaker
+http://feeds.feedburner.com/Bakerella
+http://feeds.feedburner.com/CookieAndKate
+http://mynameisyeh.com/mynameisyeh?format=rss
+http://www.howsweeteats.com/feed/
+http://www.ourbestbites.com/feeds/posts/default
+http://bakingbites.com/feed/
+http://thevanillabeanblog.com/feed
+http://bakeat350.blogspot.com/feeds/posts/default
+http://feeds.feedburner.com/browneyedbaker/feed
+http://feeds.feedburner.com/thepastryaffair/
+http://www.mybakingaddiction.com/feed/
+http://www.bakersroyale.com/feed/atom/
+http://www.sprinklebakes.com/feeds/posts/default
+http://www.kingarthurflour.com/blog/feed/
+http://feeds.feedburner.com/TopWithCinnamon
+http://feeds.feedburner.com/SallysBakingAddiction
+http://www.twopeasandtheirpod.com/feed/
+http://feeds.feedburner.com/PickyPalate
+http://www.davidlebovitz.com/archives/index.rdf
+http://feeds.feedburner.com/smittenkitchen
+http://www.skinnytaste.com/feeds/posts/default
+http://feeds.101cookbooks.com/101cookbooks
+http://feeds.seriouseats.com/seriouseatsfeaturesvideos
+http://thepioneerwoman.com/cooking/feed/
+http://feeds.feedburner.com/food52-TheAandMBlog
+http://ohsheglows.com/feed
+http://www.loveandoliveoil.com/feed
+http://www.shutterbean.com/feed/
+http://blog.williams-sonoma.com/feed/
+http://feeds.feedburner.com/elise/simplyrecipes
+http://feeds.feedburner.com/apartmenttherapy/thekitchn
+http://feeds2.feedburner.com/SproutedKitchen
+http://www.greenkitchenstories.com/feed/
+http://www.marksdailyapple.com/feed/
+http://www.loveandlemons.com/feed/
+http://www.autoblog.com/rss.xml
+http://feeds.gawker.com/jalopnik/vip
+http://www.thetruthaboutcars.com/?feed=rss2
+http://feeds.feedburner.com/Speedhunters
+http://paultan.org/feed/
+http://www.motortrend.com/widgetrss/motortrend-stories.xml
+http://newsrss.bbc.co.uk/rss/sportonline_world_edition/motorsport/formula_one/rss.xml
+http://www.autosport.com/rss/f1news.xml
+http://www.bikeexif.com/feed
+http://carscoop.blogspot.com/feeds/posts/default
+http://feeds.feedburner.com/BmwBlog
+http://www.autocar.co.uk/rss/latestnews/
+http://bringatrailer.com/feed/
+http://www.autobloggreen.com/rss.xml
+http://feeds.feedburner.com/MotorAuthority2
+http://feeds.feedburner.com/carbodydesign-news
+http://www.autoexpress.co.uk/rss/news/
+http://feeds.feedburner.com/f1fanatic
+http://feeds.ign.com/ign/games-all
+http://www.polygon.com/rss/index.xml
+http://feeds.gawker.com/kotaku/vip
+http://www.joystiq.com/rss.xml
+http://www.wired.com/gamelife/feed/
+http://feeds.arstechnica.com/arstechnica/gaming/
+http://tagn.wordpress.com/feed/
+http://feeds.feedburner.com/RockPaperShotgun
+http://www.penny-arcade.com/rss.xml
+http://store.steampowered.com/feeds/news.xml
+http://feeds.feedburner.com/PSBlog
+http://www.gamespot.com/rss/game_updates.php
+http://feeds.feedburner.com/MajorNelson
+http://www.destructoid.com/elephant/index.phtml?mode=atom
+http://www.eurogamer.net/rss/eurogamer_frontpage_feed.rss
+http://feeds.feedburner.com/GamasutraFeatureArticles/
+http://toucharcade.com/feed/
+http://www.maximumpc.com/articles/all/feed
+http://gdata.youtube.com/feeds/base/users/GoProCamera/uploads?alt=rss&v=2&orderby=published&client=ytapi-youtube-profile
+http://gdata.youtube.com/feeds/base/users/DiscoveryNetworks/uploads?alt=rss&v=2&orderby=published&client=ytapi-youtube-profile
+http://vimeo.com/channels/1nspirational/videos/rss
+http://devour.com/rss/index.xml
+http://feeds.feedburner.com/cgpgrey/PJyo	 
+http://gdata.youtube.com/feeds/base/users/WSJDigitalNetwork/uploads?alt=rss&v=2&orderby=published&client=ytapi-youtube-profile
+http://gdata.youtube.com/feeds/base/users/AsapSCIENCE/uploads?alt=rss&v=2&orderby=published&client=ytapi-youtube-profile
+http://vimeo.com/channels/documentaryfilm/videos/rss
+http://vimeo.com/channels/everythinganimated/videos/rss
+http://vimeo.com/channels/1341/videos/rss
+http://vimeo.com/groups/musicvideo/videos/rss
+http://vimeo.com/channels/pmg/videos/rss
+http://vimeo.com/channels/nicetype/videos/rss
+http://vimeo.com/channels/aework/videos/rss
+http://gdata.youtube.com/feeds/base/users/geekandsundry/uploads?alt=rss&v=2&orderby=published&client=ytapi-youtube-profile
+http://vimeo.com/channels/shortoftheweek/videos/rss
+http://feeds.feedburner.com/RSAcomment
+http://vimeo.com/channels/hdmusicvideos/videos/rss
+http://news.google.com/news?hl=en&gl=us&q=vimeo&um=1&ie=UTF-8&output=rss
+http://gdata.youtube.com/feeds/base/users/schmoyoho/uploads?alt=rss&v=2&orderby=published&client=ytapi-youtube-profile
+http://feeds.feedburner.com/thepointsguy
+http://feeds.feedburner.com/MattsTravelSite
+http://skift.com/feed/
+http://adventure.com/feed/
+http://www.economist.com/blogs/gulliver/atom.xml
+http://www.johnnyjet.com/feed/
+http://saverocity.com/travel/feed/
+http://rssfeeds.usatoday.com/usatoday-NewsTopStories
+http://chrisguillebeau.com/3x5/feed/
+http://rss.cnn.com/rss/cnn_travel.rss
+http://feeds.feedburner.com/frugaltravelguycom
+http://atlasobscura.com/rss.xml
+http://www.nytimes.com/services/xml/rss/nyt/Travel.xml
+http://www.lonelyplanet.com/blog/feed/atom/
+http://feeds.feedburner.com/MillionMileSecrets
+http://feeds2.feedburner.com/EverythingEverywhere/
+http://boardingarea.com/blogs/onemileatatime/feed/
+http://www.empireonline.com/rss/rss.asp
+http://www.firstshowing.net/feed/?full
+http://www.davidbordwell.net/blog/?feed=atom
+http://mubi.com/notebook/posts.atom
+http://screencrave.com/feed/
+http://www.avclub.com/feed/rss/
+http://trailers.apple.com/trailers/home/rss/newtrailers.rss
+http://feeds.feedburner.com/slashfilm
+http://blog.moviefone.com/rss.xml
+http://www.indiewire.com/index.xml
+http://www.aintitcool.com/node/feed
+http://www.variety.com/rss.asp?categoryid=10
+http://www.guardian.co.uk/rssfeed/0,,16,00.xml
+http://www.deadline.com/feed/
+http://feeds.feedburner.com/nofilmschool/
+http://feeds.feedburner.com/comingsoonnet30
+http://www.artofthetitle.com/feed/
+http://feeds.boingboing.net/boingboing/iBag
+http://feeds.gawker.com/io9/vip
+http://postsecret.blogspot.com/feeds/posts/default
+http://feeds.feedburner.com/flavorwire-rss
+http://www.lettersofnote.com/feeds/posts/default
+http://feeds2.feedburner.com/TheArtOfManliness
+http://feeds.feedburner.com/TheAtlantic
+http://www.newyorker.com/services/rss/feeds/everything.xml
+http://www.vice.com/rss
+http://www.slate.com/rss
+http://www.buzzfeed.com/index.xml
+http://www.coolhunting.com/atom.xml
+http://feeds.gawker.com/jezebel/full
+http://feeds.feedburner.com/weburbanist
+http://feeds.kottke.org/main
+http://www.fashionsquad.com/feed/
+http://www.stylebubble.co.uk/style_bubble/atom.xml
+http://feeds.feedburner.com/fashionistacom
+http://everyday-carry.com/rss
+http://becauseimaddicted.net/feeds/posts/default
+http://www.eatsleepwear.com/feed/
+http://www.bubbyandbean.com/feeds/posts/default
+http://annstreetstudio.com/feed/
+http://damselindior.com/feed/
+http://fashioncopious.typepad.com/fashioncopious/atom.xml
+http://www.all-theprettybirds.com/feed/
+http://uncrate.com/rss/index.xml
+http://hypebeast.com/feed/
+http://joannagoddard.blogspot.com/feeds/posts/default
+http://www.refinery29.com/index.xml
+http://feeds.feedburner.com/highsnobiety/rss
+http://www.businessoffashion.com/feed
+http://feeds.feedburner.com/SearchEngineJournal
+http://www.seobook.com/rss.xml
+http://googlewebmastercentral.blogspot.com/atom.xml
+http://www.seroundtable.com/index.rdf
+http://blog.hootsuite.com/feed/
+http://feeds.feedburner.com/joostdevalk
+http://www.seobythesea.com/?feed=rss2
+http://www.semrush.com/blog/feed/
+http://insidesearch.blogspot.com/atom.xml
+http://searchenginewatch.com/rss
+http://feeds.feedburner.com/WordStreamBlog
+http://xkcd.com/rss.xml
+http://feeds.feedburner.com/DilbertDailyStrip
+http://theoatmeal.com/feed/rss
+http://xkcd.com/atom.xml
+http://www.smbc-comics.com/rss.php
+http://www.phdcomics.com/gradfeed.php
+http://feeds.feedburner.com/failblog
+http://feeds.feedburner.com/Explosm 	 
+http://www.questionablecontent.net/QCRSS.xml
+http://feeds.feedburner.com/oatmealfeed
+http://rsspect.com/rss/qwantz.xml
+http://oglaf.com/feeds/rss/
+http://www.cad-comic.com/rss/rss.xml
+http://feeds.feedburner.com/PoorlyDrawnLines
+http://www.giantitp.com/comics/oots.rss
+http://thisisindexed.com/feed/
+http://dilbert.com/blog/entry.feed/
+http://www.pvponline.com/feed/
+http://venturebeat.com/feed/
+http://feeds.feedburner.com/AtlanticBusinessChannel
+http://www.calculatedriskblog.com/feeds/posts/default
+http://feeds.feedburner.com/entrepreneur/latest
+http://feeds.harvardbusiness.org/harvardbusiness/
+http://www.economist.com/rss/the_world_this_week_rss.xml
+http://rss.time.com/web/time/rss/top/index.xml
+http://www.economist.com/rss/finance_and_economics_rss.xml
+http://freakonomics.blogs.nytimes.com/feed/
+http://online.wsj.com/xml/rss/3_7011.xml
+http://www.getrichslowly.org/blog/feed/
+http://gigaom.com/feed/
+http://www.fourhourworkweek.com/blog/feed/
+http://feeds.feedburner.com/AVc
+http://feeds.feedburner.com/BothSidesOfTheTable
+http://www.startuplessonslearned.com/feeds/posts/default
+http://steveblank.com/feed/
+http://stratechery.com/feed/
+http://feeds.feedburner.com/FeldThoughts
+http://cdixon.org/feed/
+http://ben-evans.com/benedictevans?format=rss
+http://bhorowitz.com/feed/
+http://feeds.feedburner.com/SmallBusinessTrends
+http://feeds.feedburner.com/smartpassiveincome
+http://andrewchen.co/feed/
+http://feeds.feedburner.com/jamesaltucher
+http://feeds.feedburner.com/forentrepreneurs
+http://www.kickstarter.com/blog.atom
+http://thebeautydepartment.com/feed/
+http://www.frmheadtotoe.com/feeds/posts/default
+http://kandeethemakeupartist.blogspot.com/feeds/posts/default
+http://intothegloss.com/feed/
+http://www.makeupandbeautyblog.com/feed/
+http://www.beautysnob.com/atom.xml
+http://www.garancedore.fr/en/feed/
+http://feeds.feedburner.com/bellasugar
+http://feeds.feedburner.com/lisaeldridge
+http://www.temptalia.com/feed
+http://feeds.whowhatwear.com/whowhatwear
+http://feeds.feedburner.com/blogspot/GqCLV
+http://kendieveryday.blogspot.com/feeds/posts/default
+http://www.laurenconrad.com/show.rss
+http://www.hackaday.com/rss.xml
+http://www.apartmenttherapy.com/main/atom.xml
+http://www.wikihow.com/feed.rss
+http://www.designsponge.com/feed/
+http://www.instructables.com/tag/type:instructable/rss.xml
+http://feeds.feedburner.com/CoolTools
+http://feeds.howtogeek.com/HowToGeek
+http://feeds.feedburner.com/Makeuseof
+http://abeautifulmess.com/feed
+http://www.etsy.com/storque/feeds/latest/
+http://ohhappyday.com/feed/
+http://www.wonderhowto.com/rss.xml
+http://www.centsationalgirl.com/feed/
+http://poppytalk.blogspot.com/feeds/posts/default
+http://www.arduino.cc/blog/?feed=rss2
+http://rss.cnn.com/rss/cnn_topstories.rss
+http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml
+http://www.ozy.com/XmlServers/DailyDoseRSS.aspx
+http://www.guardian.co.uk/rssfeed/0,,1,00.xml
+http://feeds.abcnews.com/abcnews/topstories
+http://feeds.foxnews.com/foxnews/scitech
+http://www.npr.org/rss/rss.php?id=1001
+http://feeds.huffingtonpost.com/huffingtonpost/LatestNews
+http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml
+http://feeds.reuters.com/reuters/topNews?irpc=69
+http://www.bostonglobe.com/rss/feedly.xml
+http://news.google.com/?output=rss
+http://bigpicture.typepad.com/comments/atom.xml
+http://www.iwillteachyoutoberich.com/feed/
+http://feeds.feedburner.com/thesimpledollar
+http://globaleconomicanalysis.blogspot.com/feeds/posts/default
+http://baselinescenario.com/feed/
+http://www.marketwatch.com/rss/topstories
+http://topics.nytimes.com/top/opinion/editorialsandoped/oped/columnists/paulkrugman/?rss=1
+http://www.newslookup.com/rss/business/bloomberg.rss
+http://feeds.feedburner.com/MrMoneyMustache
+http://rss.cnn.com/rss/money_topstories.rss
+http://www.marginalrevolution.com/marginalrevolution/index.rdf
+http://www.nytimes.com/services/xml/rss/nyt/Business.xml
+http://www.digitaltrends.com/feed/?key=f00edf6a58d2a8740e624dda919cab37
+http://feeds.kinja.com/lifehacker/vip
+http://www.soldiblog.it/rss2.xml
+http://feeds.feedburner.com/blogspot/HAzvd
+http://feeds.blogo.it/finanzablog/it
+http://aspoitalia.blogspot.com/feeds/posts/default
+http://www.vloganza.tv/feeds/posts/default
+http://www.ilsole24ore.com/rss/primapagina.xml
+http://www.ilsole24ore.com/rss/notizie.xml 	 
+http://www.corriere.it/rss/economia.xml
+http://www.repubblica.it/rss/economia/rss2.0.xml
+http://www.milanofinanza.it/rssreader/rssflusso.asp?tipo=caldissime
+http://www.agenziaentrate.it/ilwwcm/jsp/rssnews/rssNews.jsp
+http://www.ansa.it/main/notizie/awnplus/economia/synd/ansait_awnplus_economia_medsynd_Today_Idx.xml
+http://www.lavoce.info/feed/
+http://feeds.feedburner.com/noisefromamerika
+http://feeds2.feedburner.com/phastidio/lhrg
+http://www.chicago-blog.it/feed/
+http://www.ilsole24ore.com/rss/tecnologie.xml
+http://goofynomics.blogspot.com/feeds/posts/default
+http://www.elblogsalmon.com/index.xml
+https://www.google.com/news?output=rss&topic=b&ned=it&cf=all&num=20
+http://www.cineblog.it/rss2.xml
+http://feeds.feedburner.com/ScreenweekWeblog
+http://giovanecinefilo.kekkoz.com/feed/
+http://www.vivacinema.it/feed/
+http://www.fantascienza.com/magazine/rss/fantascienza_com_home.rss
+http://www.gossipblog.it/rss2.xml
+http://www.gossipitaliano.it/feed/
+http://feeds.feedburner.com/veryinutilpeople/VpyK
+http://www.solospettacolo.it/feed/
+http://attriciemodelle.blogspot.com/feeds/posts/default
+http://www.tmz.com/rss.xml
+http://www.dagospia.com/rss/feeds/articoli.xml
+http://people.com/feed/
+http://www.eonline.com/syndication/feeds/rssfeeds/topstories.xml
+http://www.tgcom.mediaset.it/rss/ultimissime.xml
+http://feeds.feedburner.com/DavideMaggio
+http://www.dlisted.com/rss.xml
+http://feeds.feedburner.com/TheGossipers
+http://www.thehollywoodgossip.com/rss.xml
+http://feeds.feedburner.com/popsugar
+http://egotastic.com/feed/
+http://www.todayandtomorrow.net/feed/
+http://feeds.feedburner.com/cyanatrendland
+http://feeds.feedburner.com/liligoBlogdelviaggiatore
+http://feeds.feedburner.com/viaggiovero
+http://viaggilowcost.blogosfere.it/index.rdf
+http://www.repubblica.it/rss/homepage/rss2.0.xml
+http://www.nationalgeographic.it/rss/all/rss2.0.xml
+http://www.zingarate.com/rss/
+http://www.piratinviaggio.it/feed
+http://www.bookingblog.com/feed/
+http://turismolento.blogspot.com/feeds/posts/default
+http://www.nomadidigitali.it/feed/
+http://feeds.feedburner.com/ViaggiareLowcost
+http://www.ilreporter.com/feed
+http://www.ilturista.info/rss.xml
+http://viaggi.alice.it/news.xml
+http://machedavvero.it/feed/
+http://www.zingarate.com/feed
+http://blogdiviaggi.com/feed/
+http://grandtour.blogosfere.it/index.rdf
+http://www.viaggiare-low-cost.it/feed/
+http://arabafeliceincucina.blogspot.com/feeds/posts/default
+http://dolciagogo.blogspot.com/feeds/posts/default
+http://burro-e-miele.blogspot.com/feeds/posts/default
+http://www.cilieginasullatorta.it/feeds/posts/default
+http://www.nellacucinadiely.it/feeds/posts/default
+http://atavolaconmammazan.blogspot.com/feeds/posts/default
+http://bressanini-lescienze.blogautore.espresso.repubblica.it/feed/
+http://www.dissapore.com/feed/
+http://www.ilfattoalimentare.it/feed
+http://feeds.weblogssl.com/directoalpaladar
+http://www.gustoblog.it/rss2.xml
+http://www.intravino.com/feed/
+http://www.scattidigusto.it/feed/
+http://feeds.feedburner.com/MimiSapore
+http://www.cooker.net/rss/ricette.xml
+http://www.javirecetas.com/feed/
+http://www.untoccodizenzero.it/index.php/feed/
+http://webosfritos.es/feed/
+http://idolcidipinella.blogspot.com/feeds/posts/default
+http://ep01.epimg.net/rss/elcomidista/portada.xml
+http://docmanhattan.blogspot.com/feeds/posts/default
+http://www.focus.it/rss/canale/scienza.aspx
+http://www.lescienze.it/rss/all/rss2.0.xml
+http://oggiscienza.wordpress.com/feed/
+http://www.focus.it/rss/foto.aspx
+http://attivissimo.blogspot.com/atom.xml
+http://www.repubblica.it/rss/scienza_e_tecnologia/rss2.0.xml
+http://www.corriere.it/rss/scienze.xml
+http://feeds.feedburner.com/LegaNerd
+http://www.ansa.it/web/notizie/rubriche/scienza/scienza_rss.xml
+http://medbunker.blogspot.com/feeds/posts/default
+https://www.google.com/news?output=rss&topic=t&ned=it&cf=all&num=20
+http://www.galileonet.it/rss/
+http://www.repubblica.it/rss/scienze/rss2.0.xml
+http://www.gravita-zero.org/feeds/posts/default
+http://www.ecoblog.it/rss2.xml
+http://www.comicsblog.it/rss2.xml
+http://makkox.it/feed/
+http://fumettologicamente.wordpress.com/feed/
+http://www.insertosatirico.com/feeds/posts/default
+http://syndication.splinder.com/maurobiani/rss2.xml
+http://www.zerocalcare.it/feed/
+http://www.fumettologica.it/feed/
+http://www.animeclick.it/ticker/news.xml
+http://feeds.feedburner.com/incomaemeglio
+http://www.mangaforever.net/feed
+http://www.badcomics.it/feed/
+http://www.sio.im/rss
+http://blogcomicstrip.blogspot.com/feeds/posts/default
+http://leortola.wordpress.com/feed/
+http://www.lospaziobianco.it/?feed=rss2
+http://www.comicus.it/index.php?option=com_k2&view=itemlist&layout=category&task=category&id=13&Itemid=89&format=feed
+http://feeds.feedburner.com/nanoda-blog-it
+http://tartarotti.wordpress.com/feed/
+http://www.ninjamarketing.it/feed/
+http://www.webinfermento.it/feed/
+http://www.vincos.it/feed/
+http://www.minimarketing.it/feed
+http://feeds.feedburner.com/tagliaerbe
+http://www.html.it/rss/webnews_news.xml
+http://www.designerblog.it/rss2.xml
+http://www.bloggokin.it/feed
+http://feeds.feedburner.com/Designbuzz
+http://designandstyle.blogosfere.it/index.rdf
+http://www.designwithlove.net/feeds/posts/default

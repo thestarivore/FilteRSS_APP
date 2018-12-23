@@ -216,7 +216,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             });
             waitAllFeedsLoaded.start();
 
-            // call on list fragmentArticlesReady always after a delay of 10 seconds
+            // call on list fragmentArticlesReady always after a delay of 20 seconds
             final Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
@@ -229,7 +229,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         }
                     }
                 }
-            }, 10000);
+            }, 20000);
         }
         //MODE_COLLECTION_ARTICLES
         else {
