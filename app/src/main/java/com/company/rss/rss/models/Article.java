@@ -51,6 +51,9 @@ public class Article implements Serializable {
     @Expose
     private int feed;
 
+    private String feedName;
+    private String iconURL;
+
     //TODO: aggiunto perche usato nella mockapp, ma non c'era nel ER_Model originale, valutare se serve
     private String excerpt;
     private String author;      //TODO: Valutare se aggiungere sul DB
@@ -179,6 +182,22 @@ public class Article implements Serializable {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public void setFeedName(String feedName) {
+        this.feedName = feedName;
+    }
+
+    public String getFeedName() {
+        return feedName;
+    }
+
+    public void setFeedIcon(String iconURL) {
+        this.iconURL = iconURL;
+    }
+
+    public String getFeedIcon() {
+        return iconURL;
     }
 
     @Override

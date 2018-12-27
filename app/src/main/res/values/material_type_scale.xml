@@ -50,7 +50,7 @@
         <item name="android:fontFamily">sans-serif</item>
     </style>
     <style name="material_type_scale_overline">
-        <item name="android:textSize">10sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:fontFamily">sans-serif-black</item>
         <item name="android:textAllCaps">true</item>
     </style>

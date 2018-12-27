@@ -5,7 +5,6 @@ import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.PixelCopy;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -15,7 +14,6 @@ import android.widget.TextView;
 import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.R;
 import com.company.rss.rss.fragments.ArticlesListFragment.OnListFragmentInteractionListener;
-import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
 import com.squareup.picasso.Picasso;
 
@@ -23,7 +21,7 @@ import java.util.List;
 
 
 public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecyclerViewAdapter.ViewHolder> {
-
+    private final String TAG = getClass().getName();
     private final List<Article> mArticles;
     private final OnListFragmentInteractionListener mListener;
 
@@ -44,10 +42,41 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         holder.mItem = mArticles.get(position);
         holder.mTitleView.setText(mArticles.get(position).getTitle());
 
-        holder.mExcerptView.setText(mArticles.get(position).getExcerpt());
-        holder.mSubView.setText(mArticles.get(position).getLink());
+        String description = mArticles.get(position).getDescription();
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Article description " + description);
+        if (description == null || description.isEmpty() || description.length() < 10) {
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Hiding article description...");
+            holder.mExcerptView.setVisibility(View.GONE);
+        } else {
+            holder.mExcerptView.setText(description);
+        }
 
-        Picasso.get().load(mArticles.get(position).getImgLink()).into(holder.mImageView);
+        String pubDate = mArticles.get(position).getPubDateString();
+        if (pubDate == null || pubDate.isEmpty()) {
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Hiding article pub date...");
+            holder.mPubDateView.setVisibility(View.GONE);
+        } else {
+            holder.mPubDateView.setText(pubDate);
+        }
+
+
+        holder.mFeedNameView.setText(mArticles.get(position).getFeedName());
+
+
+        String imgLink = mArticles.get(position).getImgLink();
+        if (imgLink == null || imgLink.isEmpty()) {
+            holder.mImageView.setVisibility(View.GONE);
+        } else {
+            Picasso.get().load(imgLink).into(holder.mImageView);
+        }
+
+        String feedIcon = mArticles.get(position).getFeedIcon();
+        if (feedIcon == null || feedIcon.isEmpty()) {
+            holder.mFeedIcon.setVisibility(View.GONE);
+        } else {
+            Picasso.get().load(feedIcon).into(holder.mFeedIcon);
+        }
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             holder.mImageView.setClipToOutline(true);
@@ -57,8 +86,8 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             @Override
             public void run() {
                 Log.v(ArticleActivity.logTag, String.valueOf(holder.mTitleView.getLineCount()));
-                if(holder.mTitleView.getLineCount() == 1){
-                    Log.v(ArticleActivity.logTag, "Increase excerpt");
+                if (holder.mTitleView.getLineCount() == 1) {
+                    //Log.v(ArticleActivity.logTag, "Increase excerpt");
                     holder.mExcerptView.setMaxLines(3);
                 }
             }
@@ -86,8 +115,10 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         public final View mView;
         public final TextView mTitleView;
         public final TextView mExcerptView;
-        public final TextView mSubView;
+        public final TextView mFeedNameView;
+        public final TextView mPubDateView;
         public final ImageView mImageView;
+        public final ImageView mFeedIcon;
         public LinearLayout viewBackground, viewForeground;
 
         public Article mItem;
@@ -95,10 +126,12 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mTitleView = (TextView) view.findViewById(R.id.textViewTitle);
-            mExcerptView = (TextView) view.findViewById(R.id.textViewExcerpt);
-            mSubView = (TextView) view.findViewById(R.id.textViewSub);
-            mImageView = (ImageView) view.findViewById(R.id.imageViewImage);
+            mTitleView = view.findViewById(R.id.textViewTitle);
+            mExcerptView = view.findViewById(R.id.textViewExcerpt);
+            mFeedNameView = view.findViewById(R.id.textViewFeedName);
+            mImageView = view.findViewById(R.id.imageViewImage);
+            mFeedIcon = view.findViewById(R.id.imageViewFeedIcon);
+            mPubDateView = view.findViewById(R.id.textViewPubDate);
 
             viewBackground = view.findViewById(R.id.articleListSingleBackground);
             viewForeground = view.findViewById(R.id.articleListSingleForeground);
@@ -110,7 +143,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
                     "mView=" + mView +
                     ", mTitleView=" + mTitleView +
                     ", mExcerptView=" + mExcerptView +
-                    ", mSubView=" + mSubView +
+                    ", mFeedNameView=" + mFeedNameView +
                     ", mImageView=" + mImageView +
                     ", mItem=" + mItem +
                     '}';
