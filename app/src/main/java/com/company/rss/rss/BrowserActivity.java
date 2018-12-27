@@ -1,6 +1,7 @@
 package com.company.rss.rss;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,9 +16,12 @@ import android.widget.ScrollView;
 
 import com.company.rss.rss.controllers.OnSwipeTouchListener;
 
+import java.time.LocalDateTime;
+
 public class BrowserActivity extends AppCompatActivity {
     private final String TAG = getClass().getName();
     public static final String URL = "url";
+    private String url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +35,7 @@ public class BrowserActivity extends AppCompatActivity {
         actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
 
         Intent intent = getIntent();
-        String url = intent.getStringExtra(URL);
+        url = intent.getStringExtra(URL);
         Log.d(ArticleActivity.logTag + ":" + TAG, "Opening in browser " + url);
         if (url == null || url.isEmpty()) finish();
 
@@ -56,13 +60,17 @@ public class BrowserActivity extends AppCompatActivity {
             case android.R.id.home:
                 finish();
                 return true;
-            case R.id.itemSaveArticleBrowser:
-                //showDialogCollectionsList();
-                return (true);
-            case R.id.itemShareArticleBrowser:
+            case R.id.itemOpenInBrowser:
+                startBrowser();
                 return (true);
         }
         return (super.onOptionsItemSelected(item));
+    }
+
+    private void startBrowser() {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
     }
 
 

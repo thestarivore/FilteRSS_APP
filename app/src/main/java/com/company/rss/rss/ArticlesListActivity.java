@@ -174,7 +174,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         initToolbar();
 
         // TOP ARTICLES - SLIDER
-        // Set the slider to half the size of the viewport
+        // Set the slider to third the size of the viewport
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);

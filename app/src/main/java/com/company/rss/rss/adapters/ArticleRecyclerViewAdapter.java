@@ -40,15 +40,17 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mArticles.get(position);
+
+        holder.mArticleColorView.setBackgroundColor(mArticles.get(position).getColor());
         holder.mTitleView.setText(mArticles.get(position).getTitle());
 
         String description = mArticles.get(position).getDescription();
         Log.d(ArticleActivity.logTag + ":" + TAG, "Article description " + description);
         if (description == null || description.isEmpty() || description.length() < 10) {
             Log.d(ArticleActivity.logTag + ":" + TAG, "Hiding article description...");
-            holder.mExcerptView.setVisibility(View.GONE);
+            holder.mDescriptionView.setVisibility(View.GONE);
         } else {
-            holder.mExcerptView.setText(description);
+            holder.mDescriptionView.setText(description);
         }
 
         String pubDate = mArticles.get(position).getPubDateString();
@@ -59,9 +61,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             holder.mPubDateView.setText(pubDate);
         }
 
-
         holder.mFeedNameView.setText(mArticles.get(position).getFeedName());
-
 
         String imgLink = mArticles.get(position).getImgLink();
         if (imgLink == null || imgLink.isEmpty()) {
@@ -88,7 +88,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
                 Log.v(ArticleActivity.logTag, String.valueOf(holder.mTitleView.getLineCount()));
                 if (holder.mTitleView.getLineCount() == 1) {
                     //Log.v(ArticleActivity.logTag, "Increase excerpt");
-                    holder.mExcerptView.setMaxLines(3);
+                    holder.mDescriptionView.setMaxLines(3);
                 }
             }
         });
@@ -113,8 +113,9 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
+        public final View mArticleColorView;
         public final TextView mTitleView;
-        public final TextView mExcerptView;
+        public final TextView mDescriptionView;
         public final TextView mFeedNameView;
         public final TextView mPubDateView;
         public final ImageView mImageView;
@@ -126,8 +127,9 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         public ViewHolder(View view) {
             super(view);
             mView = view;
+            mArticleColorView = view.findViewById(R.id.viewArticleColor);
             mTitleView = view.findViewById(R.id.textViewTitle);
-            mExcerptView = view.findViewById(R.id.textViewExcerpt);
+            mDescriptionView = view.findViewById(R.id.textViewExcerpt);
             mFeedNameView = view.findViewById(R.id.textViewFeedName);
             mImageView = view.findViewById(R.id.imageViewImage);
             mFeedIcon = view.findViewById(R.id.imageViewFeedIcon);
@@ -142,7 +144,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             return "ViewHolder{" +
                     "mView=" + mView +
                     ", mTitleView=" + mTitleView +
-                    ", mExcerptView=" + mExcerptView +
+                    ", mDescriptionView=" + mDescriptionView +
                     ", mFeedNameView=" + mFeedNameView +
                     ", mImageView=" + mImageView +
                     ", mItem=" + mItem +

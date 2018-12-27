@@ -53,6 +53,7 @@ public class Article implements Serializable {
 
     private String feedName;
     private String iconURL;
+    private int color;
 
     //TODO: aggiunto perche usato nella mockapp, ma non c'era nel ER_Model originale, valutare se serve
     private String excerpt;
@@ -198,6 +199,14 @@ public class Article implements Serializable {
 
     public String getFeedIcon() {
         return iconURL;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public int getColor() {
+        return color;
     }
 
     @Override

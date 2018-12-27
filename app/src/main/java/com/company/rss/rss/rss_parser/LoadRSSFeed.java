@@ -70,8 +70,6 @@ public class LoadRSSFeed extends AsyncTask<Void, Void, Object> {
         //Print all the Articles
         Log.d(ArticleActivity.logTag + ":" + TAG, "\n### LIST of Articles for: " + RSSFEEDURL + " ###");
         for (Article article : rssFeed.getItemList()) {
-            article.setFeedName(feed.getTitle());
-            article.setFeedIcon(feed.getIconURL());
             //Log.d(ArticleActivity.logTag + ":" + TAG, "\n\n\n---Article: " + article.getTitle() + ", " + article.getLink() + ", " + article.getDescription() + ", " + article.getPubDate());
         }
     }

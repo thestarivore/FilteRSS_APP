@@ -27,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -88,7 +89,7 @@ public class ArticleActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
 
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_left);
 
@@ -107,30 +108,53 @@ public class ArticleActivity extends AppCompatActivity implements
         Intent intent = getIntent();
         article = (Article) intent.getSerializableExtra(ArticlesListActivity.EXTRA_ARTICLE);
 
-        String articleImage = article.getImgLink();
         final String articleLink = article.getLink();
+        String articleFeedName = article.getFeedName();
         articleTitle = article.getTitle();
         articleBody = article.getDescription();
-        int readingTime = article.getReadingTime();
+        //int readingTime = article.getReadingTime();
 
         // SETTERS
-        ImageView articleImageView = (ImageView) findViewById(R.id.imageViewArticleImage);
-        Picasso.get().load(article.getImgLink()).into(articleImageView);
-
-        // Set the image to full size of the viewport
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        articleImageView.getLayoutParams().height = size.y / 2;
-
-        TextView articleSubtitleTextView = (TextView) findViewById(R.id.textViewArticleSubtitle);
-        articleSubtitleTextView.setText(articleLink);
-
-        TextView articleTitleTextView = (TextView) findViewById(R.id.textViewArticleTitle);
+        TextView articleTitleTextView = findViewById(R.id.textViewArticleTitle);
         articleTitleTextView.setText(articleTitle);
 
+        TextView articlePubDateTextView = findViewById(R.id.textViewArticlePubDate);
+        String pubDate = article.getPubDateString();
+        if (pubDate == null || pubDate.isEmpty()) {
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Hiding article pub date...");
+            articlePubDateTextView.setVisibility(View.GONE);
+        } else {
+            articlePubDateTextView.setText(pubDate);
+        }
+
+
+        TextView articleFeedNameTextView = findViewById(R.id.textViewArticleFeedName);
+        articleFeedNameTextView.setText(article.getFeedName());
+
+        ImageView feedIconImageView = findViewById(R.id.imageViewArticleFeedIcon);
+        String feedIcon = article.getFeedIcon();
+        if (feedIcon == null || feedIcon.isEmpty()) {
+            feedIconImageView.setVisibility(View.GONE);
+        } else {
+            Picasso.get().load(feedIcon).into(feedIconImageView);
+        }
+
+
+        ImageView articleImageView = findViewById(R.id.imageViewArticleImage);
+        String articleImgLink = article.getImgLink();
+        if (articleImgLink == null || articleImgLink.isEmpty()) {
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Hiding article image...");
+        } else {
+            Picasso.get().load(articleImgLink).into(articleImageView);
+
+            // Set the image to third size of the viewport
+            Display display = getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            articleImageView.getLayoutParams().height = size.y / 3;
+        }
         //Set Article Body View
-        articleBodyTextView = (TextView) findViewById(R.id.textViewArticleBody);
+        articleBodyTextView = findViewById(R.id.textViewArticleBody);
         if (articleBody != null) {
             Spanned spannedBody = Html.fromHtml(articleBody, this, null);
             articleBodyTextView.setText(spannedBody);
@@ -145,9 +169,9 @@ public class ArticleActivity extends AppCompatActivity implements
             articleBodyTextView.setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
         }*/
 
-        TextView articleReadTimeTextView = (TextView) findViewById(R.id.textViewReadTime);
-        String articleReadTime = readingTime + "M";
-        articleReadTimeTextView.setText(articleReadTime);
+        //TextView articleReadTimeTextView = (TextView) findViewById(R.id.textViewReadTime);
+        //String articleReadTime = readingTime + "M";
+        //articleReadTimeTextView.setText(articleReadTime);
 
 
         // EVENTS LISTENER
@@ -446,6 +470,14 @@ public class ArticleActivity extends AppCompatActivity implements
         startActivity(intent);
     }
 
+    private void shareArticle() {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("text/plain");
+        i.putExtra(Intent.EXTRA_SUBJECT, article.getTitle());
+        i.putExtra(Intent.EXTRA_TEXT, article.getLink());
+        startActivity(Intent.createChooser(i, getText(R.string.share_article)));
+    }
+
     /**
      * Used to notify the ArticleListActivity that collections have been changed
      */
@@ -475,6 +507,9 @@ public class ArticleActivity extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
             case R.id.itemReadArticle:
                 speakOut();
                 return (true);
@@ -482,22 +517,10 @@ public class ArticleActivity extends AppCompatActivity implements
                 showDialogCollectionsList();
                 return (true);
             case R.id.itemShareArticle:
-                //add the function to perform here
+                shareArticle();
                 return (true);
-            /*case R.id.about:
-                //add the function to perform here
-                return (true);
-            case R.id.exit:
-                //add the function to perform here
-                return (true);*/
         }
         return (super.onOptionsItemSelected(item));
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right);
     }
 
     /*
@@ -534,6 +557,12 @@ public class ArticleActivity extends AppCompatActivity implements
         } else {
             Log.e(ArticleActivity.logTag + ":" + TAG, "TTS: init failed");
         }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right);
     }
 
     @Override

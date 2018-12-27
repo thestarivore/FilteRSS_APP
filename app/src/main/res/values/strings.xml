@@ -86,5 +86,6 @@
     <string name="collection_remove_error">An error with the removing of the collection occurred</string>
     <string name="collection_updated_successfully">Collection updated successfully</string>
     <string name="collection_update_error">An error with the collection update occurred</string>
+    <string name="share_article">Share Article</string>
 
 </resources>
