@@ -67,10 +67,10 @@ public class LoadRSSFeed extends AsyncTask<Void, Void, Object> {
         super.onPostExecute(result);
         delegate.processFinish(result, rssFeed);
 
-        //Print all the Articles
-        Log.d(ArticleActivity.logTag + ":" + TAG, "\n### LIST of Articles for: " + RSSFEEDURL + " ###");
-        for (Article article : rssFeed.getItemList()) {
-            //Log.d(ArticleActivity.logTag + ":" + TAG, "\n\n\n---Article: " + article.getTitle() + ", " + article.getLink() + ", " + article.getDescription() + ", " + article.getPubDate());
-        }
+//        //Print all the Articles
+//        Log.d(ArticleActivity.logTag + ":" + TAG, "\n### LIST of Articles for: " + RSSFEEDURL + " ###");
+//        for (Article article : rssFeed.getItemList()) {
+//            //Log.d(ArticleActivity.logTag + ":" + TAG, "\n\n\n---Article: " + article.getTitle() + ", " + article.getLink() + ", " + article.getDescription() + ", " + article.getPubDate());
+//        }
     }
 }

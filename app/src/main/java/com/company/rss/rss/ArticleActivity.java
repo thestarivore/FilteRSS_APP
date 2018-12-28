@@ -210,7 +210,6 @@ public class ArticleActivity extends AppCompatActivity implements
                     @Override
                     public void onClick(View v) {
                         sendArticlesFeedback(article, 1);
-                        Snackbar.make(view, R.string.thank_you_feedback_submit, Snackbar.LENGTH_LONG).show();
                         feedbackDialog.dismiss();
                     }
                 });
@@ -270,9 +269,23 @@ public class ArticleActivity extends AppCompatActivity implements
 
     }
 
-    private void sendArticlesFeedback(Article article, int i) {
-        // TODO: call the API and send the feedback
-        Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback " + i + " for " + article.toString());
+    private void sendArticlesFeedback(final Article article, final int vote) {
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback " + vote + " for " + article.toString());
+        api.addUserReadArticle(loggedUser.getId(), article.getHashId(), vote, new SQLOperationCallback() {
+            @Override
+            public void onLoad(SQLOperation sqlOperation) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback " + vote + " for " + article.getHashId() + " DONE");
+                Snackbar.make(findViewById(android.R.id.content), R.string.thank_you_feedback_submit, Snackbar.LENGTH_LONG).show();
+
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback " + vote + " for " + article.getHashId() + " ERROR");
+                Snackbar.make(findViewById(android.R.id.content), R.string.error_connection, Snackbar.LENGTH_LONG).show();
+
+            }
+        });
     }
 
     /**

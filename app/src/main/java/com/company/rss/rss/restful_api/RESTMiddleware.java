@@ -406,4 +406,5 @@ public class RESTMiddleware {
     public void deleteUserReadArticle(int user, long article, SQLOperationCallback callback){
         RESTService.getInstance(context).deleteUserReadArticle(user, article, callback);
     }
+
 }
