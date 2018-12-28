@@ -15,8 +15,6 @@ import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 import com.company.rss.rss.service.RESTService;
 
-import java.util.Date;
-
 
 public class RESTMiddleware {
     private Context context;
@@ -387,14 +385,35 @@ public class RESTMiddleware {
     }
 
     /**
-     * Add an ReadArticle to the User
+     * Add an Article's Opened to the User
+     * @param user
+     * @param article
+     * @param callback Callback for API response management
+     */
+    public void addUserOpenedArticle(int user, long article, SQLOperationCallback callback){
+        RESTService.getInstance(context).addUserOpenedArticle(user, article, callback);
+    }
+
+    /**
+     * Add an Article's Read to the User
+     * @param user
+     * @param article
+     * @param i
+     * @param callback Callback for API response management
+     */
+    public void addUserReadArticle(int user, long article, int i, SQLOperationCallback callback){
+        RESTService.getInstance(context).addUserReadArticle(user, article, callback);
+    }
+
+    /**
+     * Add an Article's Feedback to the User
      * @param user
      * @param article
      * @param vote
      * @param callback Callback for API response management
      */
-    public void addUserReadArticle(int user, long article, int vote, SQLOperationCallback callback){
-        RESTService.getInstance(context).addUserReadArticle(user, article, vote, callback);
+    public void addUserFeedbackArticle(int user, long article, int vote, SQLOperationCallback callback){
+        RESTService.getInstance(context).addUserFeedbackArticle(user, article, vote, callback);
     }
 
     /**

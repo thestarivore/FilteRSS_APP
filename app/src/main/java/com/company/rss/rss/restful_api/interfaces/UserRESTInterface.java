@@ -147,10 +147,20 @@ public interface UserRESTInterface {
     public Call<List<ReadArticle>> getUserReadArticles(@Query("user") int user);
 
     @FormUrlEncoded
+    @PUT("/v1/user/articles/opened")
+    public Call<SQLOperation> addUserOpenedArticle(@Field("user") int user,
+                                                   @Field("article") long article);
+
+    @FormUrlEncoded
     @PUT("/v1/user/articles/read")
     public Call<SQLOperation> addUserReadArticle(@Field("user") int user,
-                                                 @Field("article") long article,
-                                                 @Field("vote") int vote);
+                                                 @Field("article") long article);
+
+    @FormUrlEncoded
+    @PUT("/v1/user/articles/feedback")
+    public Call<SQLOperation> addUserFeedbackArticle(@Field("user") int user,
+                                                    @Field("article") long article,
+                                                    @Field("vote") int vote);
 
     @FormUrlEncoded
     @HTTP(method = "DELETE", path = "/v1/user/articles/read", hasBody = true)
