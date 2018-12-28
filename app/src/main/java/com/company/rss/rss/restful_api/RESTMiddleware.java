@@ -15,6 +15,8 @@ import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 import com.company.rss.rss.service.RESTService;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
@@ -359,8 +361,18 @@ public class RESTMiddleware {
      */
     public void addUserArticleAssociatedToCollection(String title, String description, String comment, String link, String img_link,
                                                      String pub_date, int userId, int feedId, int collectionId, SQLOperationListCallback callback){
+        String pubDate;
+        //Control that the date is valid, otherwise choose the current one
+        if(pub_date.isEmpty()) {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = new Date();
+            pubDate = dateFormat.format(date);
+        }
+        else{
+            pubDate = pub_date;
+        }
         RESTService.getInstance(context).addUserArticleAssociatedToCollection(title, description, comment, link, img_link,
-                                                                                pub_date, userId, feedId, collectionId, callback);
+                                                                                pubDate, userId, feedId, collectionId, callback);
     }
 
     /**

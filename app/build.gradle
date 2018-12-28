@@ -37,4 +37,5 @@ dependencies {
     implementation 'commons-validator:commons-validator:1.6'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.joestelmach:natty:0.13'
 }

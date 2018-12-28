@@ -2,6 +2,9 @@ package com.company.rss.rss.rss_parser;
 
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.RSSFeed;
+import com.joestelmach.natty.DateGroup;
+import com.joestelmach.natty.ParseLocation;
+import com.joestelmach.natty.Parser;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -16,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -72,14 +76,6 @@ public class DOMParser {
         add("media:content");
         //add("enclosure");
     }};
-
-    //Date parser patters list
-    private List<SimpleDateFormat> knownPatterns = new ArrayList<SimpleDateFormat>(); {
-        knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX"));
-        knownPatterns.add(new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z"));
-        knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX"));
-        knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
-    };
 
     // Create a new RSS feed
     private RSSFeed feed = new RSSFeed();
@@ -167,7 +163,7 @@ public class DOMParser {
                         // Set the PublicationDate ("pubDate", "published", "dc:date", "a10:updated")
                         else if (pubDateList.contains(nodeName)) {
                             if (article.getPubDate() == null)
-                                article.setPubDate(parseDateFromString(nodeName));
+                                article.setPubDate(parseDateFromString(nodeString));
                         }
                         // Set the Author ("author", "dc:creator", "itunes:author")
                         else if (authorList.contains(nodeName)) {
@@ -215,19 +211,16 @@ public class DOMParser {
 
 
     /**
-     * Parse a Date from a String using multiple matching patterns
+     * Parse a Date from a String using multiple matching patterns(Natty library)
      * @param candidate String to parse
      * @return Date object or null if the parsing failed
      */
     private Date parseDateFromString(String candidate){
-        for (SimpleDateFormat pattern : knownPatterns) {
-            try {
-                // Take a try
-                return new Date(pattern.parse(candidate).getTime());
-
-            } catch (ParseException pe) {
-                // Loop on
-            }
+        Parser parser = new Parser();
+        List<DateGroup> groups = parser.parse(candidate);
+        for(DateGroup group:groups) {
+            List<Date> dates = group.getDates();
+            return dates.get(0);
         }
         return  null;
     }

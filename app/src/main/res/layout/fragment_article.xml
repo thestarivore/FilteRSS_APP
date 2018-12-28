@@ -121,6 +121,7 @@
                             android:ellipsize="end"
                             android:gravity="bottom|left"
                             android:singleLine="true"
+                            android:layout_marginLeft="5dp"
                             android:text="Pub Dateb" />
 
                     </LinearLayout>
