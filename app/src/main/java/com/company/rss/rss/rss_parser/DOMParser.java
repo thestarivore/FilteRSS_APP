@@ -195,6 +195,7 @@ public class DOMParser {
                         }
                     }
                 }
+                article.setHashId(article.hashCode());
                 // Add the new item to the RSS feed
                 feed.addItem(article);
             }

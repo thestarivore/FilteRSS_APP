@@ -27,11 +27,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -209,15 +207,14 @@ public class ArticleActivity extends AppCompatActivity implements
                 dialogView.findViewById(R.id.linearLayoutFeedbackGood).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        sendArticlesFeedback(article, 1);
-                        Snackbar.make(view, R.string.thank_you_feedback_submit, Snackbar.LENGTH_LONG).show();
+                        sendArticleFeedback(article, 1);
                         feedbackDialog.dismiss();
                     }
                 });
                 dialogView.findViewById(R.id.linearLayoutFeedbackAverage).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        sendArticlesFeedback(article, 0);
+                        sendArticleFeedback(article, 0);
                         Snackbar.make(view, R.string.thank_you_feedback_submit, Snackbar.LENGTH_LONG).show();
                         feedbackDialog.dismiss();
                     }
@@ -225,7 +222,7 @@ public class ArticleActivity extends AppCompatActivity implements
                 dialogView.findViewById(R.id.linearLayoutFeedbackBad).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        sendArticlesFeedback(article, -1);
+                        sendArticleFeedback(article, -1);
                         Snackbar.make(view, R.string.thank_you_feedback_submit, Snackbar.LENGTH_LONG).show();
                         feedbackDialog.dismiss();
                     }
@@ -256,23 +253,63 @@ public class ArticleActivity extends AppCompatActivity implements
                     });
                     fabVisible = true;
 
-                    sendArticlesRead(article);
+                    sendArticleRead(article);
                 }
             }
         });
 
+        sendArticleOpened(article);
+    }
+
+    private void sendArticleOpened(final Article article) {
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Sending article opened for " + article.getHashId());
+        api.addUserOpenedArticle(loggedUser.getId(), article.getHashId(), new SQLOperationCallback() {
+            @Override
+            public void onLoad(SQLOperation sqlOperation) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback for " + article.getHashId() + " DONE");
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback for " + article.getHashId() + " ERROR");
+            }
+        });
 
     }
 
-    private void sendArticlesRead(Article article) {
-        // TODO: call the API and increment the article reads counter
-        Log.d(ArticleActivity.logTag + ":" + TAG, "Sending article count increment for " + article.toString());
+    private void sendArticleRead(final Article article) {
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Sending article read for " + article.getHashId());
+        api.addUserReadArticle(loggedUser.getId(), article.getHashId(), 2, new SQLOperationCallback() {
+            @Override
+            public void onLoad(SQLOperation sqlOperation) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback for " + article.getHashId() + " DONE");
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback for " + article.getHashId() + " ERROR");
+            }
+        });
 
     }
 
-    private void sendArticlesFeedback(Article article, int i) {
-        // TODO: call the API and send the feedback
-        Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback " + i + " for " + article.toString());
+    private void sendArticleFeedback(final Article article, final int vote) {
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback " + vote + " for " + article.getHashId());
+        api.addUserFeedbackArticle(loggedUser.getId(), article.getHashId(), vote, new SQLOperationCallback() {
+            @Override
+            public void onLoad(SQLOperation sqlOperation) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback " + vote + " for " + article.getHashId() + " DONE");
+                Snackbar.make(findViewById(android.R.id.content), R.string.thank_you_feedback_submit, Snackbar.LENGTH_LONG).show();
+
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback " + vote + " for " + article.getHashId() + " ERROR");
+                Snackbar.make(findViewById(android.R.id.content), R.string.error_connection, Snackbar.LENGTH_LONG).show();
+
+            }
+        });
     }
 
     /**
@@ -465,6 +502,7 @@ public class ArticleActivity extends AppCompatActivity implements
     }
 
     public void openWebPage(String url) {
+        sendArticleRead(article);
         Intent intent = new Intent(this, BrowserActivity.class);
         intent.putExtra(BrowserActivity.URL, url);
         startActivity(intent);

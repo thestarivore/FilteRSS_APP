@@ -887,14 +887,58 @@ public class RESTService {
     }
 
     /**
-     * Add an ReadArticle to the User
+     * Add an Article's Opened to the User
+     * @param user
+     * @param article
+     * @param callback Callback for API response management
+     */
+    public void addUserOpenedArticle(int user, long article, final SQLOperationCallback callback){
+        userRESTInterface.addUserOpenedArticle(user, article).enqueue(new retrofit2.Callback<SQLOperation>() {
+
+            @Override
+            public void onResponse(Call<SQLOperation> call, Response<SQLOperation> response) {
+                SQLOperation sqlOperation = response.body();
+                callback.onLoad(sqlOperation);
+            }
+
+            @Override
+            public void onFailure(Call<SQLOperation> call, Throwable t) {
+                callback.onFailure();
+            }
+        });
+    }
+
+    /**
+     * Add an Article's Read to the User
+     * @param user
+     * @param article
+     * @param callback Callback for API response management
+     */
+    public void addUserReadArticle(int user, long article, final SQLOperationCallback callback){
+        userRESTInterface.addUserReadArticle(user, article).enqueue(new retrofit2.Callback<SQLOperation>() {
+
+            @Override
+            public void onResponse(Call<SQLOperation> call, Response<SQLOperation> response) {
+                SQLOperation sqlOperation = response.body();
+                callback.onLoad(sqlOperation);
+            }
+
+            @Override
+            public void onFailure(Call<SQLOperation> call, Throwable t) {
+                callback.onFailure();
+            }
+        });
+    }
+
+    /**
+     * Add an Article's Feedback to the User
      * @param user
      * @param article
      * @param vote
      * @param callback Callback for API response management
      */
-    public void addUserReadArticle(int user, long article, int vote, final SQLOperationCallback callback){
-        userRESTInterface.addUserReadArticle(user, article, vote).enqueue(new retrofit2.Callback<SQLOperation>() {
+    public void addUserFeedbackArticle(int user, long article, int vote, final SQLOperationCallback callback){
+        userRESTInterface.addUserFeedbackArticle(user, article, vote).enqueue(new retrofit2.Callback<SQLOperation>() {
 
             @Override
             public void onResponse(Call<SQLOperation> call, Response<SQLOperation> response) {
@@ -930,5 +974,4 @@ public class RESTService {
             }
         });
     }
-
 }

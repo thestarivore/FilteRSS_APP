@@ -15,10 +15,6 @@ import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 import com.company.rss.rss.service.RESTService;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 
 public class RESTMiddleware {
     private Context context;
@@ -361,18 +357,8 @@ public class RESTMiddleware {
      */
     public void addUserArticleAssociatedToCollection(String title, String description, String comment, String link, String img_link,
                                                      String pub_date, int userId, int feedId, int collectionId, SQLOperationListCallback callback){
-        String pubDate;
-        //Control that the date is valid, otherwise choose the current one
-        if(pub_date.isEmpty()) {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date date = new Date();
-            pubDate = dateFormat.format(date);
-        }
-        else{
-            pubDate = pub_date;
-        }
         RESTService.getInstance(context).addUserArticleAssociatedToCollection(title, description, comment, link, img_link,
-                                                                                pubDate, userId, feedId, collectionId, callback);
+                                                                                pub_date, userId, feedId, collectionId, callback);
     }
 
     /**
@@ -399,14 +385,35 @@ public class RESTMiddleware {
     }
 
     /**
-     * Add an ReadArticle to the User
+     * Add an Article's Opened to the User
+     * @param user
+     * @param article
+     * @param callback Callback for API response management
+     */
+    public void addUserOpenedArticle(int user, long article, SQLOperationCallback callback){
+        RESTService.getInstance(context).addUserOpenedArticle(user, article, callback);
+    }
+
+    /**
+     * Add an Article's Read to the User
+     * @param user
+     * @param article
+     * @param i
+     * @param callback Callback for API response management
+     */
+    public void addUserReadArticle(int user, long article, int i, SQLOperationCallback callback){
+        RESTService.getInstance(context).addUserReadArticle(user, article, callback);
+    }
+
+    /**
+     * Add an Article's Feedback to the User
      * @param user
      * @param article
      * @param vote
      * @param callback Callback for API response management
      */
-    public void addUserReadArticle(int user, long article, int vote, SQLOperationCallback callback){
-        RESTService.getInstance(context).addUserReadArticle(user, article, vote, callback);
+    public void addUserFeedbackArticle(int user, long article, int vote, SQLOperationCallback callback){
+        RESTService.getInstance(context).addUserFeedbackArticle(user, article, vote, callback);
     }
 
     /**
@@ -418,4 +425,5 @@ public class RESTMiddleware {
     public void deleteUserReadArticle(int user, long article, SQLOperationCallback callback){
         RESTService.getInstance(context).deleteUserReadArticle(user, article, callback);
     }
+
 }
