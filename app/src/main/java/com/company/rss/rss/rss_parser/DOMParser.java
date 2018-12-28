@@ -195,7 +195,7 @@ public class DOMParser {
                         }
                     }
                 }
-                article.setHashId(article.hashCode());
+                article.setHashId(article.hashCode());              //TODO: rivedere questa istruzione, article.hashCode() non ha nessun legame con il HashID
                 // Add the new item to the RSS feed
                 feed.addItem(article);
             }
