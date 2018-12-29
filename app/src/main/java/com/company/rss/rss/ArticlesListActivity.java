@@ -57,6 +57,7 @@ import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
+import com.company.rss.rss.restful_api.callbacks.SQLOperationListCallback;
 import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncRSSFeedResponse;
@@ -109,6 +110,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private LinearLayout contentLinearLayout;
     private Map<String, Integer> feedArticlesNumberMap;
 
+    // articles added to Read It Later collection, used to avoid calling the api multiple times if multiple swipe are performed
+    private List<Long> articlesAddedToRIL;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,6 +201,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         progressBar.setVisibility(View.VISIBLE);
         contentLinearLayout = findViewById(R.id.articleListLinearLayout);
         contentLinearLayout.setVisibility(View.INVISIBLE);
+
+        articlesAddedToRIL = new ArrayList<>();
 
     }
 
@@ -392,6 +397,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 //Prepare the new ListToVisualize and Restart Activity
                 userData.setVisualizationMode(UserData.MODE_COLLECTION_ARTICLES);
                 userData.setCollectionPosition(groupPosition);
+
                 restartActivity();
                 return true; // This way the expander cannot be collapsed
             }
@@ -489,10 +495,61 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
      * @param article the swiped article
      */
     @Override
-    public void onListFragmentInteractionSwipe(Article article) {
-        Log.v(ArticleActivity.logTag, article.toString());
-        /* TODO: save article in the read it later collection if not already present
-        otherwise remove it from read it later */
+    public void onListFragmentInteractionSwipe(final Article article) {
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Saving article " + article.getTitle() + " into Read It Later");
+
+        // Find the id of the Read It Later collectiob
+        List<Collection> userCollections = userData.getCollectionList();
+        Collection readItLaterCollection = null;
+        for (Collection collection : userCollections){
+            if(collection.getTitle().equals(getText(R.string.read_it_later))){
+                readItLaterCollection = collection;
+                break;
+            }
+        }
+
+        // If the read it later collection exists and the article was not alrady added to id
+        if(readItLaterCollection!=null && !articlesAddedToRIL.contains(article.getHashId())){
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Article " +
+                    article.getTitle()+" " +
+                    article.getComment()+" " +
+                    article.getLink()+" " +
+                    article.getImgLink()+" " +
+                    article.getPubDateString("yyyy-MM-dd hh:mm:ss")+" " +
+                    userData.getUser().getId()+" " +
+                    article.getFeed()+" " +
+                    readItLaterCollection.getId()+ " to collection " + readItLaterCollection.getTitle());
+
+            api.addUserArticleAssociatedToCollection(
+                    article.getTitle(),
+                    article.getDescription(),
+                    article.getComment(),
+                    article.getLink(),
+                    article.getImgLink(),
+                    article.getPubDateString("yyyy-MM-dd hh:mm:ss"),
+                    userData.getUser().getId(),
+                    article.getFeed(),
+                    readItLaterCollection.getId(),
+                    new SQLOperationListCallback() {
+                        @Override
+                        public void onLoad(List<SQLOperation> sqlOperationList) {
+                            Log.d(ArticleActivity.logTag + ":" + TAG, "Article " + article.getTitle() + " to collection Read It Later saved");
+                            Snackbar.make(findViewById(android.R.id.content), R.string.article_added_to_collection, Snackbar.LENGTH_LONG).show();
+                            articlesAddedToRIL.add(article.getHashId());
+
+                            // refresh the user's collections
+                            loadUserCollections(false);
+                        }
+
+                        @Override
+                        public void onFailure() {
+                            Log.e(ArticleActivity.logTag + ":" + TAG, "Article " + article.getTitle() + " to collection Read It Later NOT saved");
+                            Snackbar.make(findViewById(android.R.id.content), R.string.error_adding_article, Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+            );
+        }
+
         boolean alreadyPresent = false;
         if (alreadyPresent) {
             Toast.makeText(this, R.string.unswipe_to_remove, Toast.LENGTH_LONG).show();
@@ -639,24 +696,31 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
             Log.d(ArticleActivity.logTag + ":" + TAG, "Refreshing User's Collections... ");
             Snackbar.make(findViewById(android.R.id.content), R.string.updating_user_information, Snackbar.LENGTH_LONG).show();
 
-            // Refresh the user's collection saved locally
-            new LoadUserCollections(new AsyncResponse() {
-                @Override
-                public void processFinish(Integer output) {
-                    Log.d(ArticleActivity.logTag + ":" + TAG, "User's Collections refreshed... ");
-
-                    userData.loadPersistedData(context);
-                    userData.processUserData();
-
-                    collectionListHeaders.clear();
-                    prepareCollectionsListData();
-                    collectionListAdapter.notifyDataSetChanged();
-
-                    Snackbar.make(findViewById(android.R.id.content), R.string.user_information_updated, Snackbar.LENGTH_LONG).show();
-                }
-            }, this, userData.getUser()).execute();
-
+            loadUserCollections(true);
         }
+    }
+
+    /**
+     * Refresh the user's collection saved locally
+     * @param showSnackBar boolean to show the SnackBar or not
+     */
+    private void loadUserCollections(final Boolean showSnackBar) {
+        new LoadUserCollections(new AsyncResponse() {
+            @Override
+            public void processFinish(Integer output) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "User's Collections refreshed... ");
+
+                userData.loadPersistedData(context);
+                userData.processUserData();
+
+                collectionListHeaders.clear();
+                prepareCollectionsListData();
+                collectionListAdapter.notifyDataSetChanged();
+
+                if(showSnackBar)
+                    Snackbar.make(findViewById(android.R.id.content), R.string.user_information_updated, Snackbar.LENGTH_LONG).show();
+            }
+        }, this, userData.getUser()).execute();
     }
 
     /**
