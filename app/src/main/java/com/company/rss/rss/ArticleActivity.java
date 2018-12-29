@@ -99,6 +99,9 @@ public class ArticleActivity extends AppCompatActivity implements
         //Get the User
         loggedUser = prefs.retrieveUser();
 
+        Log.d(ArticleActivity.logTag + ":" + TAG, "User " + loggedUser.toString());
+
+
         // Init tts
         tts = new TextToSpeech(this, this);
 
@@ -117,11 +120,12 @@ public class ArticleActivity extends AppCompatActivity implements
         articleTitleTextView.setText(articleTitle);
 
         TextView articlePubDateTextView = findViewById(R.id.textViewArticlePubDate);
-        String pubDate = article.getPubDateString();
+        String pubDate = article.getPubDateString("dd-MM-yyyy");
         if (pubDate == null || pubDate.isEmpty()) {
             Log.d(ArticleActivity.logTag + ":" + TAG, "Hiding article pub date...");
             articlePubDateTextView.setVisibility(View.GONE);
         } else {
+            pubDate = " // " + pubDate;
             articlePubDateTextView.setText(pubDate);
         }
 
@@ -473,14 +477,23 @@ public class ArticleActivity extends AppCompatActivity implements
      */
     private void addArticleToCollection(final Article article, final Collection collection) {
 
-        //Problem with types
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Article " +
+                article.getTitle()+" " +
+                article.getComment()+" " +
+                article.getLink()+" " +
+                article.getImgLink()+" " +
+                article.getPubDateString("yyyy-MM-dd hh:mm:ss")+" " +
+                loggedUser.getId()+" " +
+                article.getFeed()+" " +
+                collection.getId()+ " to collection " + collection.getTitle());
+
         api.addUserArticleAssociatedToCollection(
                 article.getTitle(),
                 article.getDescription(),
                 article.getComment(),
                 article.getLink(),
                 article.getImgLink(),
-                article.getPubDateString(),
+                article.getPubDateString("yyyy-MM-dd hh:mm:ss"),
                 loggedUser.getId(),
                 article.getFeed(),
                 collection.getId(),

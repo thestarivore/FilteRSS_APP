@@ -139,9 +139,9 @@ public class Article implements Serializable {
      * Return the publication date in String
      * @return String containig the publication date
      */
-    public String getPubDateString() {
+    public String getPubDateString(String pattern) {
         if (pubDate != null) {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            DateFormat dateFormat = new SimpleDateFormat(pattern);
             String strDate = dateFormat.format(pubDate);
             return strDate;
         }
@@ -214,7 +214,7 @@ public class Article implements Serializable {
         return "Article{" +
                 "hashId=" + hashId +
                 ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
+                //", description='" + description + '\'' +
                 ", comment='" + comment + '\'' +
                 ", link='" + link + '\'' +
                 ", imgLink='" + imgLink + '\'' +

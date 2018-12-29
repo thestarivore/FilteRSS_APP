@@ -57,6 +57,7 @@ public class DOMParser {
     //ARTICLE_LINK:"link"
     private ArrayList<String> linkList = new ArrayList<String>() {{
         add("link");
+        add("id");
     }};
     //THUMBNAIL_IMAGE_LINK:"thumbnail", "thumb"
     private ArrayList<String> thumbnailList = new ArrayList<String>() {{

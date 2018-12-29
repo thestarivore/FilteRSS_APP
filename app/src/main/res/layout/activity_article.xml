@@ -61,7 +61,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="#96000000"
+                        android:background="#000000"
                         android:orientation="vertical">
 
                         <TextView
@@ -73,6 +73,49 @@
                             android:text="Article Title"
                             android:textColor="#FFFFFF"
                             app:layout_constraintBottom_toBottomOf="@+id/imageViewArticleImage" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="#6b6b6b"
+                            android:orientation="horizontal"
+                            android:paddingStart="32dp"
+                            android:paddingLeft="32dp"
+                            android:paddingTop="8dp"
+                            android:paddingEnd="32dp"
+                            android:paddingRight="32dp"
+                            android:paddingBottom="8dp">
+
+                            <ImageView
+                                android:id="@+id/imageViewArticleFeedIcon"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginRight="4dp" />
+
+                            <TextView
+                                android:id="@+id/textViewArticleFeedName"
+                                style="@style/material_type_scale_overline"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:ellipsize="end"
+                                android:gravity="bottom|left"
+                                android:singleLine="true"
+                                android:text="Sub"
+                                android:textColor="#FFFFFF" />
+
+                            <TextView
+                                android:id="@+id/textViewArticlePubDate"
+                                style="@style/material_type_scale_overline"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:gravity="bottom|left"
+                                android:singleLine="true"
+                                android:text="Pub Dateb"
+                                android:textColor="#FFFFFF" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 
@@ -92,40 +135,6 @@
                             android:layout_marginRight="32dp"
                             android:layout_marginBottom="32dp"
                             android:orientation="vertical">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:orientation="horizontal">
-
-                                <ImageView
-                                    android:id="@+id/imageViewArticleFeedIcon"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="match_parent"
-                                    android:layout_marginRight="4dp" />
-
-                                <TextView
-                                    android:id="@+id/textViewArticleFeedName"
-                                    style="@style/material_type_scale_overline"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:ellipsize="end"
-                                    android:gravity="bottom|left"
-                                    android:singleLine="true"
-                                    android:text="Sub" />
-
-                                <TextView
-                                    android:id="@+id/textViewArticlePubDate"
-                                    style="@style/material_type_scale_overline"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="1"
-                                    android:ellipsize="end"
-                                    android:gravity="bottom|left"
-                                    android:singleLine="true"
-                                    android:text="Pub Dateb" />
-
-                            </LinearLayout>
 
 
                             <TextView

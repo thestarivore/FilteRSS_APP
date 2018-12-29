@@ -53,11 +53,12 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             holder.mDescriptionView.setText(description);
         }
 
-        String pubDate = mArticles.get(position).getPubDateString();
+        String pubDate = mArticles.get(position).getPubDateString("dd-MM-yyyy");
         if (pubDate == null || pubDate.isEmpty()) {
             Log.d(ArticleActivity.logTag + ":" + TAG, "Hiding article pub date...");
             holder.mPubDateView.setVisibility(View.GONE);
         } else {
+            pubDate = " // " + pubDate;
             holder.mPubDateView.setText(pubDate);
         }
 
