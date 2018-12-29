@@ -245,17 +245,19 @@ public class ArticleActivity extends AppCompatActivity implements
                 int scrollY = positionScrollView.getScrollY() + positionScrollView.getHeight();
                 int maxScroll = positionScrollView.getChildAt(0).getHeight();
                 float percentageScrolled = (float) scrollY / (float) maxScroll * 100;
-                //Log.v(logTag, Float.toString(percentageScrolled));
                 positionProgressBar.setProgress((int) percentageScrolled);
 
-                if (!fabVisible && percentageScrolled >= 70) {
+                if (percentageScrolled >= 70) {
+
+                    /*
+                    //Show the feedback button only if 70% read
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             fab.setVisibility(View.VISIBLE);
                         }
                     });
-                    fabVisible = true;
+                    fabVisible = true;*/
 
                     sendArticleRead(article);
                 }

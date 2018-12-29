@@ -327,20 +327,12 @@ public class FeedsSearchActivity extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.itemLanguageSelectorEN:
-                // TODO: retrieve EN language feed from API and save to preferences
-
                 setNavigationViewLang(R.menu.drawer_view_categories_en);
-
                 item.setChecked(!item.isChecked());
-                Toast.makeText(getBaseContext(), "English lang selected", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.itemLanguageSelectorIT:
-                // TODO: retrieve IT language feed from API and save to preferences
-
                 setNavigationViewLang(R.menu.drawer_view_categories_it);
-
                 item.setChecked(!item.isChecked());
-                Toast.makeText(getBaseContext(), "Italian lang selected", Toast.LENGTH_SHORT).show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
