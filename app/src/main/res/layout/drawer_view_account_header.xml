@@ -14,21 +14,21 @@
         android:id="@+id/imageViewAccountImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher" />
+        android:src="@mipmap/ic_launcher_foreground" />
 
     <TextView
-        android:id="@+id/textViewAccountEmail"
+        android:id="@+id/textViewAccountName"
         style="@style/material_type_scale_h5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="test@email.com" />
+        android:text="Account Name" />
 
     <TextView
-        android:id="@+id/textViewAccountLoginType"
-        style="@style/material_type_scale_subtitle2"
+        android:id="@+id/textViewAccountEmail"
+        style="@style/material_type_scale_h6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Logged in via email" />
+        android:text="test@email.com" />
 
     <Button
         android:id="@+id/buttonAccountLogout"

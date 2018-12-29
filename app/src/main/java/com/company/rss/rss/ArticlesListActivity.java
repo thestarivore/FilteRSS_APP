@@ -100,6 +100,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private TextView textViewMultifeedList;
     private TextView textViewCollectionsList;
     private TextView textViewAccountEmail;
+    private TextView textViewAccountName;
 
 
     private RESTMiddleware api;
@@ -170,8 +171,12 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 }
         );
         //Init User's Email TextView
-        textViewAccountEmail = (TextView) findViewById(R.id.textViewAccountEmail);
+        textViewAccountEmail = findViewById(R.id.textViewAccountEmail);
         textViewAccountEmail.setText(userData.getUser().getEmail());
+
+        //Init User's Name TextView
+        textViewAccountName = findViewById(R.id.textViewAccountName);
+        textViewAccountName.setText(userData.getUser().getName());
 
         //TOOLBAR
         initToolbar();
@@ -181,13 +186,13 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pagerArticles);
+        ViewPager viewPager = findViewById(R.id.pagerArticles);
         viewPager.getLayoutParams().height = size.y / 3;
 
         // Create mock articles for top articles
         List<Article> topArticles = Article.generateMockupArticles(6);
 
-        pager = (ViewPager) findViewById(R.id.pagerArticles);
+        pager = findViewById(R.id.pagerArticles);
         pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
         pager.setAdapter(pagerAdapter);
         pager.setCurrentItem(1, true);
