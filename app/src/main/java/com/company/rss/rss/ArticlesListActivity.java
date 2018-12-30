@@ -398,7 +398,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 if (itemType == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
                     startCollectionManagerActivity();
                 }
-                return false;
+                return true;
             }
         });
         //Group Click
@@ -474,7 +474,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
             //Add the associated feed list --> don't show the articles here
             //collectionListChild.put(collection.getTitle(), userData.getMapArticleTitlesListByKey(collection));
             //Add the associated color to each multifeed
-            multifeedColorList.put(collection.getTitle(), collection.getColor());
+            collectionColorList.put(collection.getTitle(), collection.getColor());
         }
     }
 
