@@ -93,5 +93,7 @@
     <string name="days">Days</string>
     <string name="error_collection_not_found">Error, collection not found</string>
     <string name="article_removed_from_collection">Article removed from collection</string>
+    <string name="add_some_content">Add some content with the + button</string>
+    <string name="no_content_yet">No content, yet!</string>
 
 </resources>
