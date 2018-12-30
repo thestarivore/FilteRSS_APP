@@ -6,6 +6,7 @@ import com.company.rss.rss.persistence.UserPrefs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -119,6 +120,11 @@ public class UserData {
                 }
             }
 
+            //For every feed in the list, assign the color of the multifeed
+            for (Feed feed: mfeedList){
+                feed.setMultifeedColor(multifeed.getColor());
+            }
+
             //Add the FeedList associated Multifeed in the MultifeedMap
             multifeedMap.put(multifeed, mfeedList);
         }
@@ -219,6 +225,14 @@ public class UserData {
         }
         return articleTitlesList;
     }
+
+ /*   public Multifeed getFeedsMultifeed(Feed feed){
+        for (Map.Entry<Multifeed, List<Feed>> entry : multifeedMap.entrySet()) {
+            Multifeed multifeed = entry.getKey();
+            List<Feed> feedList = entry.getValue();
+
+        }
+    }*/
 
     /********************************************/
     public User getUser() {

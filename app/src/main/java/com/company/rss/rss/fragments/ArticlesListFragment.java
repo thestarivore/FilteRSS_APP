@@ -170,8 +170,6 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                     public void processFinish(Object output, RSSFeed rssFeed) {
                         for (Article article : rssFeed.getItemList()) {
                             article.setFeed(feed.getId());
-
-                            // TODO: get the multifeed color
                             article.setColor(feed.getMultifeedColor());
                             article.setFeedName(feed.getTitle());
                             article.setFeedIcon(feed.getIconURL());

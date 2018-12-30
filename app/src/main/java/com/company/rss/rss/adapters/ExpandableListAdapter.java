@@ -27,16 +27,19 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private List<String> groups;
     private HashMap<String, List<String>> items;
     private HashMap<String, List<String>> icons;
+    private HashMap<String, Integer> colors;
     private int numberOfItems;
     private HashMap<String,Integer>  feedArticlesNumber;
 
     public ExpandableListAdapter(Context context, List<String> groups,
                                     HashMap<String, List<String>> items,
-                                    HashMap<String, List<String>> icons) {
+                                    HashMap<String, List<String>> icons,
+                                    HashMap<String, Integer> colors) {
         this.context    = context;
         this.groups     = groups;
         this.items      = items;
         this.icons      = icons;
+        this.colors     = colors;
         this.feedArticlesNumber = null;
 
         //Get the number of elements in the items HashMap
@@ -138,8 +141,13 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             groupHolder.img.setImageResource(R.drawable.group_up);
         }*/
 
-        TextView textView = (TextView) convertView
-                .findViewById(R.id.exp_menu_group_name);
+        //Set the ColorBar for each group
+        View colorView = (View) convertView.findViewById(R.id.exp_menu_group_colorbar);
+        if(colors.get(getGroup(groupPosition)) != null)
+            colorView.setBackgroundColor(colors.get(getGroup(groupPosition)));
+
+        //Set the Title for each group
+        TextView textView = (TextView) convertView.findViewById(R.id.exp_menu_group_name);
         textView.setTypeface(null, Typeface.BOLD);
         textView.setText(headerTitle);
 
