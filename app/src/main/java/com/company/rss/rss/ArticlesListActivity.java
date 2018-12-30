@@ -64,6 +64,9 @@ import com.company.rss.rss.restful_api.interfaces.AsyncRSSFeedResponse;
 import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
 import com.company.rss.rss.rss_parser.LoadRSSFeed;
 
+
+import net.boeckling.crc.CRC64;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,9 +1,13 @@
 package com.company.rss.rss.models;
 
+import android.util.Log;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
+
+import net.boeckling.crc.CRC64;
 
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -89,6 +93,18 @@ public class Article implements Serializable {
 
     public void setHashId(long hashId) {
         this.hashId = hashId;
+    }
+
+    /**
+     * Compute the HashID locally using the same Hashing function used on the server(CRC64 ECMA182).
+     * The string being hashed is the Article's URL.
+     * @return HashId newly generated
+     */
+    public long computeHashId(){
+        String str = this.link;
+        CRC64 crc64 = new CRC64(str.getBytes(), str.length());
+        this.hashId = crc64.getValue() - 9223372036854775807L;
+        return this.hashId;
     }
 
     public String getTitle() {
