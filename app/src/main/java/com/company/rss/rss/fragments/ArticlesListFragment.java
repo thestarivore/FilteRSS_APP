@@ -93,7 +93,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener));
+
+            recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, context, userData.getVisualizationMode() == UserData.MODE_COLLECTION_ARTICLES));
         }
         return view;
     }
