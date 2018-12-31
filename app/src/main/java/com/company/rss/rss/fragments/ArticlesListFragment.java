@@ -47,7 +47,6 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     private UserData userData;
     private int feedCounter;
 
-
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -134,20 +133,30 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         mListener.onListFragmentInteractionSwipe(articles.get(position));
     }
 
+    public void refreshRecyclerViewData() {
+        // do something in fragment
+        Log.d(TAG, "OK passato DATI dA ACTIVITY a FRAGMENT");
+
+        this.articles.clear();
+        onUserDataLoaded();
+    }
+
+
     /**
      * Callback launched (on Fragment Attach) from the activity to inform the fragment that the UserData has been loaded
      */
     public void onUserDataLoaded() {
-        final List<Feed>        feedList                = new ArrayList<>();
-        final List<Article>           articleList             = new ArrayList<>();
-        final Map<String,Integer>    feedArticlesNumberMap   = new HashMap<>();
+        final List<Feed>            feedList                = new ArrayList<>();
+        final List<Article>         articleList             = new ArrayList<>();
+        final Map<String,Integer>   feedArticlesNumberMap   = new HashMap<>();
         final int numberOfFeeds;
 
         //Get the Transferred UserData
         this.userData = UserData.getInstance();
 
         //Prepare the articles list
-        this.articles = new ArrayList<>();
+        if (articles == null)
+            this.articles = new ArrayList<>();
 
         //Get the list of feeds to show in the RecyclerView
         //All Multifeeds Feeds Articles
@@ -251,6 +260,9 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         else {
             articles.addAll(articleList);
             mListener.onListFragmentArticlesReady();
+
+            //Notify a change in the RecyclerView's Article List
+            recyclerView.getAdapter().notifyDataSetChanged();
         }
 
     }

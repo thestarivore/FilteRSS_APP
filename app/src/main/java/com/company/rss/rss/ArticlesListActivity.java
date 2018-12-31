@@ -1,7 +1,6 @@
 package com.company.rss.rss;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,44 +27,25 @@ import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.company.rss.rss.adapters.ArticleSlidePagerAdapter;
 import com.company.rss.rss.adapters.ExpandableListAdapter;
 import com.company.rss.rss.fragments.ArticlesListFragment;
 import com.company.rss.rss.fragments.ArticlesSlideFragment;
 import com.company.rss.rss.models.Article;
-import com.company.rss.rss.models.Category;
 import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
-import com.company.rss.rss.models.FeedGrouping;
 import com.company.rss.rss.models.Multifeed;
-import com.company.rss.rss.models.RSSFeed;
-import com.company.rss.rss.models.ReadArticle;
 import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.SavedArticle;
-import com.company.rss.rss.models.User;
 import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.restful_api.LoadUserCollections;
 import com.company.rss.rss.restful_api.LoadUserMultifeeds;
 import com.company.rss.rss.restful_api.RESTMiddleware;
-import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
-import com.company.rss.rss.restful_api.callbacks.CategoryCallback;
-import com.company.rss.rss.restful_api.callbacks.CollectionCallback;
-import com.company.rss.rss.restful_api.callbacks.FeedCallback;
-import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
-import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
-import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationListCallback;
-import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
-import com.company.rss.rss.restful_api.callbacks.UserCallback;
-import com.company.rss.rss.restful_api.interfaces.AsyncRSSFeedResponse;
 import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
-import com.company.rss.rss.rss_parser.LoadRSSFeed;
 
-
-import net.boeckling.crc.CRC64;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -297,7 +277,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
             public void onClick(View v) {
                 //Prepare the new ListToVisualize and Restart Activity
                 userData.setVisualizationMode(UserData.MODE_ALL_MULTIFEEDS_FEEDS);
-                restartActivity();
+                //restartActivity();
+                refreshFragmentData();
             }
         });
         textViewMultifeedList.setOnLongClickListener(new View.OnLongClickListener() {
@@ -362,7 +343,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.setVisualizationMode(UserData.MODE_FEED_ARTICLES);
                 userData.setMultifeedPosition(groupPosition);
                 userData.setFeedPosition(childPosition);
-                restartActivity();
+                //restartActivity();
+                refreshFragmentData();
                 return true;
             }
         });
@@ -376,7 +358,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 //Prepare the new ListToVisualize and Restart Activity
                 userData.setVisualizationMode(UserData.MODE_MULTIFEED_ARTICLES);
                 userData.setMultifeedPosition(groupPosition);
-                restartActivity();
+                //restartActivity();
+                refreshFragmentData();
                 return true; // This way the expander cannot be collapsed
             }
         });
@@ -413,7 +396,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.setVisualizationMode(UserData.MODE_COLLECTION_ARTICLES);
                 userData.setCollectionPosition(groupPosition);
 
-                restartActivity();
+                //restartActivity();
+                refreshFragmentData();
                 return true; // This way the expander cannot be collapsed
             }
         });
@@ -667,28 +651,36 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         //Update the TopArticles in the ArticlesSlidePager
         runOnUiThread(new Runnable(){
             public void run() {
-                //Add 10 random Articles to the TopList Slider
-                //TODO: add the most important instead of a random list
-                if(articleList.size() >= 10) {
-                    int i=0, j;
-                    topArticles = new ArrayList<>();
-                    Random rand = new Random();
-                    int maxIndex = articleList.size()-1;
-
-                    for (i=0; i<10;i++){
-                        do {
-                            j = rand.nextInt(maxIndex);
-                        }while(articleList.get(j).getImgLink() == null);
-                        topArticles.add(articleList.get(j));
-                    }
-                }
-                else
-                    topArticles = articleList;
-                pager = findViewById(R.id.pagerArticles);
-                pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
-                pager.setAdapter(pagerAdapter);
+                updateArticlesSlidePager(articleList);
             }
         });
+    }
+
+    /**
+     * Update the ArticlesSlidePager with a new List of Articles to visualize as TopArticles
+     * @param articleList   List of Articles from which to choose from
+     */
+    private void updateArticlesSlidePager(List<Article> articleList){
+        //Add 10 random Articles to the TopList Slider
+        //TODO: add the most important instead of a random list
+        if(articleList.size() >= 10) {
+            int i=0, j;
+            topArticles = new ArrayList<>();
+            Random rand = new Random();
+            int maxIndex = articleList.size()-1;
+
+            for (i=0; i<10;i++){
+                do {
+                    j = rand.nextInt(maxIndex);
+                }while(articleList.get(j).getImgLink() == null);
+                topArticles.add(articleList.get(j));
+            }
+        }
+        else
+            topArticles = articleList;
+        pager = findViewById(R.id.pagerArticles);
+        pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
+        pager.setAdapter(pagerAdapter);
     }
 
     /**
@@ -741,18 +733,57 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     }
 
     @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putSerializable("feedArticlesNumberMap", (Serializable) feedArticlesNumberMap);
+        savedInstanceState.putSerializable("topArticles", (Serializable) topArticles);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    /**
+     * Refresh ArticlesListFragment's Data without the need for a activity reboot
+     */
+    private void refreshFragmentData(){
+        ArticlesListFragment articlesListFragment = (ArticlesListFragment)
+                getSupportFragmentManager().findFragmentById(R.id.articles_list_fragment);
+        articlesListFragment.refreshRecyclerViewData();
+        drawerLayout.closeDrawers();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         //Get intent passed data
         Intent intent = getIntent();
-        feedArticlesNumberMap = (HashMap<String, Integer>) intent.getSerializableExtra("feedArticlesNumberMap");
-        topArticles = (List<Article>) intent.getSerializableExtra("topArticles");
+        if(intent.hasExtra("feedArticlesNumberMap")) {
+            feedArticlesNumberMap = (HashMap<String, Integer>) intent.getSerializableExtra("feedArticlesNumberMap");
+            multifeedListAdapter.updateFeedArticlesNumbers(feedArticlesNumberMap);
+            multifeedListAdapter.notifyDataSetChanged();
+        }
+        if(intent.hasExtra("topArticles")) {
+            topArticles = (List<Article>) intent.getSerializableExtra("topArticles");
+            pager = findViewById(R.id.pagerArticles);
+            pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
+            pager.setAdapter(pagerAdapter);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        //Get Bundle saved data
+        feedArticlesNumberMap = (HashMap<String, Integer>) savedInstanceState.getSerializable("feedArticlesNumberMap");
+        topArticles = (List<Article>) savedInstanceState.getSerializable("topArticles");
         multifeedListAdapter.updateFeedArticlesNumbers(feedArticlesNumberMap);
         multifeedListAdapter.notifyDataSetChanged();
         pager = findViewById(R.id.pagerArticles);
         pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
         pager.setAdapter(pagerAdapter);
     }
+
+
 
     /**
      * When returning from an activity that performs changes on the data we need to refresh
