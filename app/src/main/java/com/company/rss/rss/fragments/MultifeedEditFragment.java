@@ -68,6 +68,8 @@ public class MultifeedEditFragment extends Fragment {
         color = view.findViewById(R.id.viewMultifeedEditColor);
         importance = view.findViewById(R.id.seekBarMultifeedEdit);
 
+
+
         // if fragment called for creation do not populate the view leaving it blank
         if (!multifeedCreationMode) {
             Log.d(ArticleActivity.logTag + ":" + TAG, "Populating view...");
@@ -120,6 +122,8 @@ public class MultifeedEditFragment extends Fragment {
             });
         } else {
             multifeed = new Multifeed();
+            multifeed.setColor(-16777216);
+            multifeed.setImportance(1);
 
             // Hide the feeds list layout
             LinearLayout feedsList = view.findViewById(R.id.feedListMultifeedEdit);
@@ -141,7 +145,7 @@ public class MultifeedEditFragment extends Fragment {
                 new ColorPickerPopup.Builder(getContext())
                         .initialColor(multifeed.getColor())
                         .enableBrightness(false)
-                        .enableAlpha(false)
+                        .enableAlpha(true)
                         .okTitle(getString(R.string.choose))
                         .cancelTitle(getString(R.string.cancel))
                         .showIndicator(false)

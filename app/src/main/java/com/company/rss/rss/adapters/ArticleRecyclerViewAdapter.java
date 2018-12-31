@@ -1,6 +1,7 @@
 package com.company.rss.rss.adapters;
 
 
+import android.content.Context;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,6 +18,7 @@ import com.company.rss.rss.fragments.ArticlesListFragment.OnListFragmentInteract
 import com.company.rss.rss.models.Article;
 import com.squareup.picasso.Picasso;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -24,16 +26,26 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
     private final String TAG = getClass().getName();
     private final List<Article> mArticles;
     private final OnListFragmentInteractionListener mListener;
+    private final Context mContext;
+    private final boolean mCollectionMode;
 
-    public ArticleRecyclerViewAdapter(List<Article> articles, OnListFragmentInteractionListener listener) {
+    public ArticleRecyclerViewAdapter(List<Article> articles, OnListFragmentInteractionListener listener, Context context, boolean collectionMode) {
         mArticles = articles;
         mListener = listener;
+        mContext = context;
+        mCollectionMode = collectionMode;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_article, parent, false);
+
+        if(mCollectionMode){
+            TextView articleSwipeTextView = view.findViewById(R.id.articleSwipeTextView);
+            articleSwipeTextView.setText(R.string.removed_from_collection);
+        }
+
         return new ViewHolder(view);
     }
 
@@ -58,6 +70,9 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             Log.d(ArticleActivity.logTag + ":" + TAG, "Hiding article pub date...");
             holder.mPubDateView.setVisibility(View.GONE);
         } else {
+            Date articlePubDate = mArticles.get(position).getPubDate();
+            pubDate = computeDaysDiff(pubDate, articlePubDate);
+
             pubDate = " // " + pubDate;
             holder.mPubDateView.setText(pubDate);
         }
@@ -105,6 +120,19 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
                 }
             }
         });
+    }
+
+    private String computeDaysDiff(String pubDate, Date articlePubDate) {
+        Date nowDate = new Date();
+
+        long diff = nowDate.getTime() - articlePubDate.getTime();
+
+        int diffDays = (int) (diff / (24 * 60 * 60 * 1000));
+
+        if(diffDays == 0) pubDate = mContext.getString(R.string.today);
+        else if(diffDays == 1) pubDate = mContext.getString(R.string.yesterday);
+        else if(diffDays > 1) pubDate = diffDays + " " + mContext.getString(R.string.days);
+        return pubDate;
     }
 
     @Override

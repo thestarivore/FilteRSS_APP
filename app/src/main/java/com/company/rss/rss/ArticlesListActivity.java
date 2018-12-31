@@ -119,20 +119,22 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
     //Articles added to Read It Later collection, used to avoid calling the api multiple times if multiple swipe are performed
     private List<Long> articlesAddedToRIL;
+    // articles removed from a collection, used to avoid calling the api multiple times if multiple swipe are performed
+    private List<Long> articlesRemovedFromColl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_articles_list);
         context = this;
-        multifeedListHeaders    = new ArrayList<String>();
-        multifeedListChild      = new HashMap<String, List<String>>();
-        multifeedListFeedIcon   = new HashMap<String, List<String>>();
-        multifeedColorList      = new HashMap<String, Integer>();
-        collectionListHeaders   = new ArrayList<String>();
-        collectionListChild     = new HashMap<String, List<String>>();
-        collectionListFeedIcon  = new HashMap<String, List<String>>();
-        collectionColorList      = new HashMap<String, Integer>();
+        multifeedListHeaders = new ArrayList<String>();
+        multifeedListChild = new HashMap<String, List<String>>();
+        multifeedListFeedIcon = new HashMap<String, List<String>>();
+        multifeedColorList = new HashMap<String, Integer>();
+        collectionListHeaders = new ArrayList<String>();
+        collectionListChild = new HashMap<String, List<String>>();
+        collectionListFeedIcon = new HashMap<String, List<String>>();
+        collectionColorList = new HashMap<String, Integer>();
 
         //Instantiate the Middleware for the RESTful API's
         api = new RESTMiddleware(this);
@@ -216,7 +218,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         contentLinearLayout.setVisibility(View.INVISIBLE);
 
         articlesAddedToRIL = new ArrayList<>();
-
+        articlesRemovedFromColl = new ArrayList<>();
     }
 
     /**
@@ -499,6 +501,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
     /**
      * Handles the interactions with the list, click
+     *
      * @param article the clicked article
      */
     @Override
@@ -508,68 +511,119 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     }
 
     /**
-     * Handles the interactions with the list, swipe
+     * Handles the interactions with the list, swipe.
+     * If the visualization is Collection then on swipe remove the article from the collection
+     * if the visualization is Multifeed then on swipe add the article to the Read It Later collection
+     *
      * @param article the swiped article
      */
     @Override
     public void onListFragmentInteractionSwipe(final Article article) {
-        Log.d(ArticleActivity.logTag + ":" + TAG, "Saving article " + article.getTitle() + " into Read It Later");
+        if (userData.getVisualizationMode() == UserData.MODE_COLLECTION_ARTICLES) {
+            // Remove swiped article from collection
 
-        // Find the id of the Read It Later collectiob
-        List<Collection> userCollections = userData.getCollectionList();
-        Collection readItLaterCollection = null;
-        for (Collection collection : userCollections){
-            if(collection.getTitle().equals(getText(R.string.read_it_later))){
-                readItLaterCollection = collection;
-                break;
-            }
-        }
+            // Check if not already removed to avoid multiple deletion
+            if (!articlesRemovedFromColl.contains(article.getHashId())) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Removing article " + article.getTitle() + " from saved articles");
 
-        // If the read it later collection exists and the article was not already added to id
-        if(readItLaterCollection!=null && !articlesAddedToRIL.contains(article.getHashId())){
-            Log.d(ArticleActivity.logTag + ":" + TAG, "Article " +
-                    article.getTitle()+" " +
-                    article.getComment()+" " +
-                    article.getLink()+" " +
-                    article.getImgLink()+" " +
-                    article.getPubDateString("yyyy-MM-dd hh:mm:ss")+" " +
-                    userData.getUser().getId()+" " +
-                    article.getFeed()+" " +
-                    readItLaterCollection.getId()+ " to collection " + readItLaterCollection.getTitle());
-
-            api.addUserArticleAssociatedToCollection(
-                    article.getTitle(),
-                    article.getDescription(),
-                    article.getComment(),
-                    article.getLink(),
-                    article.getImgLink(),
-                    article.getPubDateString("yyyy-MM-dd hh:mm:ss"),
-                    userData.getUser().getId(),
-                    article.getFeed(),
-                    readItLaterCollection.getId(),
-                    new SQLOperationListCallback() {
-                        @Override
-                        public void onLoad(List<SQLOperation> sqlOperationList) {
-                            Log.d(ArticleActivity.logTag + ":" + TAG, "Article " + article.getTitle() + " to collection Read It Later saved");
-                            Snackbar.make(findViewById(android.R.id.content), R.string.article_added_to_collection, Snackbar.LENGTH_LONG).show();
-                            articlesAddedToRIL.add(article.getHashId());
-
-                            // refresh the user's collections
-                            loadUserCollections(false);
-                        }
-
-                        @Override
-                        public void onFailure() {
-                            Log.e(ArticleActivity.logTag + ":" + TAG, "Article " + article.getTitle() + " to collection Read It Later NOT saved");
-                            Snackbar.make(findViewById(android.R.id.content), R.string.error_adding_article, Snackbar.LENGTH_LONG).show();
-                        }
+                // Find the id of the collection where the article is saved
+                List<SavedArticle> userSavedArticles = userData.getSavedArticleList();
+                int coll = 0;
+                for (SavedArticle savedArticle : userSavedArticles) {
+                    long articleHash = savedArticle.getArticle();
+                    if (articleHash == article.getHashId()) {
+                        coll = savedArticle.getCollection();
+                        break;
                     }
-            );
-        }
+                }
+                if (coll == 0) {
+                    Snackbar.make(findViewById(android.R.id.content), R.string.error_collection_not_found, Snackbar.LENGTH_LONG).show();
+                    return;
+                }
 
-        boolean alreadyPresent = false;
-        if (alreadyPresent) {
-            Toast.makeText(this, R.string.unswipe_to_remove, Toast.LENGTH_LONG).show();
+                final int finalColl = coll;
+                api.deleteUserSavedArticle(article.getHashId(), coll, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "Article " + article.getTitle() + " from collection " + finalColl + " removed");
+                        Snackbar.make(findViewById(android.R.id.content), R.string.article_removed_from_collection, Snackbar.LENGTH_LONG).show();
+                        articlesRemovedFromColl.add(article.getHashId());
+
+                        // refresh the user's collections
+                        loadUserCollections(false);
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "Article " + article.getTitle() + " from collection " + finalColl + " NOT removed");
+                        Snackbar.make(findViewById(android.R.id.content), R.string.error_connection, Snackbar.LENGTH_LONG).show();
+
+                    }
+                });
+            }
+
+
+        } else {
+            // Add swiped article to Read It Later collection
+
+            // If the read it later collection exists and the article was not already added to id
+            if (!articlesAddedToRIL.contains(article.getHashId())) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Saving article " + article.getTitle() + " into Read It Later");
+
+                // Find the id of the Read It Later collection
+                List<Collection> userCollections = userData.getCollectionList();
+                Collection readItLaterCollection = null;
+                for (Collection collection : userCollections) {
+                    if (collection.getTitle().equals(getText(R.string.read_it_later))) {
+                        readItLaterCollection = collection;
+                        break;
+                    }
+                }
+                if (readItLaterCollection == null) {
+                    Snackbar.make(findViewById(android.R.id.content), R.string.error_collection_not_found, Snackbar.LENGTH_LONG).show();
+                    return;
+                }
+
+
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Article " +
+                        article.getTitle() + " " +
+                        article.getComment() + " " +
+                        article.getLink() + " " +
+                        article.getImgLink() + " " +
+                        article.getPubDateString("yyyy-MM-dd hh:mm:ss") + " " +
+                        userData.getUser().getId() + " " +
+                        article.getFeed() + " " +
+                        readItLaterCollection.getId() + " to collection " + readItLaterCollection.getTitle());
+
+                api.addUserArticleAssociatedToCollection(
+                        article.getTitle(),
+                        article.getDescription(),
+                        article.getComment(),
+                        article.getLink(),
+                        article.getImgLink(),
+                        article.getPubDateString("yyyy-MM-dd hh:mm:ss"),
+                        userData.getUser().getId(),
+                        article.getFeed(),
+                        readItLaterCollection.getId(),
+                        new SQLOperationListCallback() {
+                            @Override
+                            public void onLoad(List<SQLOperation> sqlOperationList) {
+                                Log.d(ArticleActivity.logTag + ":" + TAG, "Article " + article.getTitle() + " to collection Read It Later saved");
+                                Snackbar.make(findViewById(android.R.id.content), R.string.article_added_to_collection, Snackbar.LENGTH_LONG).show();
+                                articlesAddedToRIL.add(article.getHashId());
+
+                                // refresh the user's collections
+                                loadUserCollections(false);
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                Log.e(ArticleActivity.logTag + ":" + TAG, "Article " + article.getTitle() + " to collection Read It Later NOT saved");
+                                Snackbar.make(findViewById(android.R.id.content), R.string.error_adding_article, Snackbar.LENGTH_LONG).show();
+                            }
+                        }
+                );
+            }
         }
     }
 
@@ -579,7 +633,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while(progressBar == null || contentLinearLayout == null) {
+                while (progressBar == null || contentLinearLayout == null) {
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
@@ -604,7 +658,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         //Update the Number of Articles per Feed in the ExpandableList in the Drawer and notify the change
         multifeedListAdapter.updateFeedArticlesNumbers(feedArticlesNumberMap);
         this.feedArticlesNumberMap = feedArticlesNumberMap;
-        runOnUiThread(new Runnable(){
+        runOnUiThread(new Runnable() {
             public void run() {
                 multifeedListAdapter.notifyDataSetChanged();
             }
@@ -639,6 +693,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
     /**
      * Handles the interactions with the top slider
+     *
      * @param article the article clicked on the slider
      */
     @Override
@@ -704,6 +759,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
      * the drawer with the new data.
      * REQUEST_CODE_MULTIFEED_EDIT is used for changes to Multifeed
      * REQUEST_CODE_COLLECTION_EDIT is used for changes to Collections
+     *
      * @param requestCode
      * @param resultCode
      * @param data
@@ -749,6 +805,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
     /**
      * Refresh the user's collection saved locally
+     *
      * @param showSnackBar boolean to show the SnackBar or not
      */
     private void loadUserCollections(final Boolean showSnackBar) {
@@ -764,7 +821,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 prepareCollectionsListData();
                 collectionListAdapter.notifyDataSetChanged();
 
-                if(showSnackBar)
+                if (showSnackBar)
                     Snackbar.make(findViewById(android.R.id.content), R.string.user_information_updated, Snackbar.LENGTH_LONG).show();
             }
         }, this, userData.getUser()).execute();

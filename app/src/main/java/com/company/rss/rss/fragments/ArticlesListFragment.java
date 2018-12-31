@@ -77,24 +77,37 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_article_list, container, false);
 
-        // Create the RecyclerView and Set it's adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            recyclerView = (RecyclerView) view;
+        View view;
 
-            // Set the swipe controller
-            ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ArticleListSwipeController(0, ItemTouchHelper.RIGHT, this);
-            new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
+        if(userData.getFeedList().isEmpty()){
+            // no articles, suggest the user to add a feed
+            view = inflater.inflate(R.layout.fragment_article_list_empty, container, false);
 
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+            mListener.onListFragmentArticlesReady();
+
+        } else {
+            view = inflater.inflate(R.layout.fragment_article_list, container, false);
+
+            // Create the RecyclerView and Set it's adapter
+            if (view instanceof RecyclerView) {
+                Context context = view.getContext();
+                recyclerView = (RecyclerView) view;
+
+                // Set the swipe controller
+                ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ArticleListSwipeController(0, ItemTouchHelper.RIGHT, this);
+                new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
+
+                if (mColumnCount <= 1) {
+                    recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                } else {
+                    recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                }
+
+                recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, context, userData.getVisualizationMode() == UserData.MODE_COLLECTION_ARTICLES));
             }
-            recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener));
         }
+
         return view;
     }
 
