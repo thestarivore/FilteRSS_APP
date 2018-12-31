@@ -199,7 +199,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         }
 
                         //Save the number of articles for each feed, mapped in a HashMap
-                        feedArticlesNumberMap.put(feed.getTitle(),articles.size());
+                        feedArticlesNumberMap.put(feed.getTitle(),rssFeed.getItemCount());
 
                         //Wait for onCreateView to set RecyclerView's Adapter
                         while (recyclerView == null || recyclerView.getAdapter() == null) ;

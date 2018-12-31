@@ -90,7 +90,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         String feedTitle = (String) getChild(groupPosition, childPosition);
         int numberOfArticles = 0;       //Default: Not known yet
         //If updated, pick the real number of articles, else use the default momentary (it will be called again once the number is updated)
-        if(feedArticlesNumber != null) {
+        if(feedArticlesNumber != null && feedArticlesNumber.containsKey(feedTitle)) {
             numberOfArticles = feedArticlesNumber.get(feedTitle);        //Get the number of articles for the feed with the title=feedTitle
         }
         countTextView.setText(String.valueOf(numberOfArticles));

@@ -420,6 +420,9 @@ public class ArticleActivity extends AppCompatActivity implements
                                 public void onLoad(SQLOperation sqlOperation) {
                                     Log.d(ArticleActivity.logTag + ":" + TAG, "Collection " + collection.toString() + " saved...");
                                     Snackbar.make(findViewById(android.R.id.content), R.string.collection_created, Snackbar.LENGTH_LONG).show();
+                                    Collection newCollection = collection;
+                                    newCollection.setId(sqlOperation.getInsertId());
+                                    addArticleToCollection(article, newCollection);
                                     collectionsChange = true;
                                 }
 
