@@ -126,7 +126,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
      */
     public void onUserDataLoaded() {
         final List<Feed>        feedList                = new ArrayList<>();
-        List<Article>           articleList             = new ArrayList<>();
+        final List<Article>           articleList             = new ArrayList<>();
         final Map<String,Integer>    feedArticlesNumberMap   = new HashMap<>();
         final int numberOfFeeds;
 
@@ -213,7 +213,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                     //map of the number of articles for each feed
                     while (feedCounter < numberOfFeeds);
                     if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
-                        mListener.onListFragmentAllArticlesReady(feedArticlesNumberMap);
+                        mListener.onListFragmentAllArticlesReady(feedArticlesNumberMap, articles);
                     }
                 }
             });
@@ -260,7 +260,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
         void onListFragmentArticlesReady();
 
-        void onListFragmentAllArticlesReady(Map<String, Integer> feedArticlesNumberMap);
+        void onListFragmentAllArticlesReady(Map<String, Integer> feedArticlesNumberMap, List<Article> articleList);
     }
 
 

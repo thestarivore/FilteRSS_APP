@@ -72,6 +72,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 
 public class ArticlesListActivity extends AppCompatActivity implements ArticlesListFragment.OnListFragmentInteractionListener,
@@ -107,7 +108,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private TextView textViewAccountEmail;
     private TextView textViewAccountName;
 
-
     private RESTMiddleware api;
     private List<Feed> feedList = new ArrayList<>();
     private Context context;
@@ -115,8 +115,9 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private ProgressBar progressBar;
     private LinearLayout contentLinearLayout;
     private Map<String, Integer> feedArticlesNumberMap;
+    private List<Article> topArticles;
 
-    // articles added to Read It Later collection, used to avoid calling the api multiple times if multiple swipe are performed
+    //Articles added to Read It Later collection, used to avoid calling the api multiple times if multiple swipe are performed
     private List<Long> articlesAddedToRIL;
 
     @Override
@@ -197,10 +198,10 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         viewPager.getLayoutParams().height = size.y / 3;
 
         // Create mock articles for top articles
-        List<Article> topArticles = Article.generateMockupArticles(6);
+        //topArticles = new ArrayList<>();//Article.generateMockupArticles(6);
 
         pager = findViewById(R.id.pagerArticles);
-        pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
+        //pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
         pager.setAdapter(pagerAdapter);
         pager.setCurrentItem(1, true);
         pager.setClipToPadding(false);
@@ -599,14 +600,40 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     }
 
     @Override
-    public void onListFragmentAllArticlesReady(Map<String, Integer> feedArticlesNumberMap) {
+    public void onListFragmentAllArticlesReady(Map<String, Integer> feedArticlesNumberMap, final List<Article> articleList) {
+        //Update the Number of Articles per Feed in the ExpandableList in the Drawer and notify the change
         multifeedListAdapter.updateFeedArticlesNumbers(feedArticlesNumberMap);
         this.feedArticlesNumberMap = feedArticlesNumberMap;
         runOnUiThread(new Runnable(){
             public void run() {
                 multifeedListAdapter.notifyDataSetChanged();
             }
+        });
 
+        //Update the TopArticles in the ArticlesSlidePager
+        runOnUiThread(new Runnable(){
+            public void run() {
+                //Add 10 random Articles to the TopList Slider
+                //TODO: add the most important instead of a random list
+                if(articleList.size() >= 10) {
+                    int i=0, j;
+                    topArticles = new ArrayList<>();
+                    Random rand = new Random();
+                    int maxIndex = articleList.size()-1;
+
+                    for (i=0; i<10;i++){
+                        do {
+                            j = rand.nextInt(maxIndex);
+                        }while(articleList.get(j).getImgLink() == null);
+                        topArticles.add(articleList.get(j));
+                    }
+                }
+                else
+                    topArticles = articleList;
+                pager = findViewById(R.id.pagerArticles);
+                pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
+                pager.setAdapter(pagerAdapter);
+            }
         });
     }
 
@@ -653,6 +680,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         Intent intent = new Intent(ArticlesListActivity.this, ArticlesListActivity.class);
         //Sent the Map of the NumberOfArticles per Feed, so that it doesn't get lost
         intent.putExtra("feedArticlesNumberMap", (Serializable) feedArticlesNumberMap);
+        intent.putExtra("topArticles", (Serializable) topArticles);
         finish();
         startActivity(intent);
     }
@@ -663,9 +691,12 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         //Get intent passed data
         Intent intent = getIntent();
         feedArticlesNumberMap = (HashMap<String, Integer>) intent.getSerializableExtra("feedArticlesNumberMap");
+        topArticles = (List<Article>) intent.getSerializableExtra("topArticles");
         multifeedListAdapter.updateFeedArticlesNumbers(feedArticlesNumberMap);
         multifeedListAdapter.notifyDataSetChanged();
-
+        pager = findViewById(R.id.pagerArticles);
+        pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
+        pager.setAdapter(pagerAdapter);
     }
 
     /**

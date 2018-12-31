@@ -50,21 +50,21 @@ public class ArticlesSlideFragment extends Fragment {
         TextView articleSource = (TextView) view.findViewById(R.id.textViewSliderArticleSource);
         ImageView articleImage = (ImageView) view.findViewById(R.id.imageViewArticleSlider);
 
-        articleTitle.setText(mArticle.getTitle());
-        articleSource.setText(mArticle.getLink());
-
-        Picasso.get().load(mArticle.getImgLink()).into(articleImage);
-
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onFragmentInteraction(mArticle);
+        if(mArticle != null) {
+            articleTitle.setText(mArticle.getTitle());
+            articleSource.setText(mArticle.getLink());
+            Picasso.get().load(mArticle.getImgLink()).into(articleImage);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (null != mListener) {
+                        // Notify the active callbacks interface (the activity, if the
+                        // fragment is attached to one) that an item has been selected.
+                        mListener.onFragmentInteraction(mArticle);
+                    }
                 }
-            }
-        });
+            });
+        }
         return view;
     }
 
