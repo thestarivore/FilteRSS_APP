@@ -3,6 +3,7 @@ package com.company.rss.rss.service;
 import android.content.Context;
 
 import com.company.rss.rss.models.Article;
+import com.company.rss.rss.models.ArticlesScores;
 import com.company.rss.rss.models.Category;
 import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
@@ -13,25 +14,27 @@ import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.SavedArticle;
 import com.company.rss.rss.models.User;
 import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
+import com.company.rss.rss.restful_api.callbacks.ArticlesScoresCallback;
 import com.company.rss.rss.restful_api.callbacks.CategoryCallback;
 import com.company.rss.rss.restful_api.callbacks.CollectionCallback;
 import com.company.rss.rss.restful_api.callbacks.FeedCallback;
 import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
+import com.company.rss.rss.restful_api.callbacks.JsonArrayCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationListCallback;
 import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
+import com.company.rss.rss.restful_api.interfaces.ArticlesRESTInterface;
 import com.company.rss.rss.restful_api.interfaces.AuthenticationRESTInterface;
 import com.company.rss.rss.restful_api.interfaces.CategoryRESTInterface;
 import com.company.rss.rss.restful_api.interfaces.FeedsRESTInterface;
 import com.company.rss.rss.restful_api.interfaces.UserRESTInterface;
+import com.google.gson.JsonObject;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -47,11 +50,12 @@ public class RESTService {
     private AuthenticationRESTInterface authenticationRESTInterface;
     private FeedsRESTInterface          feedsRESTInterface;
     private UserRESTInterface           userRESTInterface;
+    private final ArticlesRESTInterface articlesRESTInterface;
 
     private RESTService(Context context){
         Retrofit retrofit = new Retrofit.Builder()
-                //.baseUrl("http://192.168.1.110:3000/")                                         //In local Nicholas
-                .baseUrl("http://192.168.1.157:3000/")                                         //In local Eddy
+                .baseUrl("http://192.168.1.110:3000/")                                         //In local Nicholas
+                //.baseUrl("http://192.168.1.157:3000/")                                         //In local Eddy
                 //.baseUrl("http://ec2-35-180-230-227.eu-west-3.compute.amazonaws.com:3000")      //On Amazon AWS
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -60,6 +64,7 @@ public class RESTService {
         authenticationRESTInterface = retrofit.create(AuthenticationRESTInterface.class);
         feedsRESTInterface          = retrofit.create(FeedsRESTInterface.class);
         userRESTInterface           = retrofit.create(UserRESTInterface.class);
+        articlesRESTInterface       = retrofit.create(ArticlesRESTInterface.class);
     }
 
     public static synchronized RESTService getInstance(Context context){
@@ -972,6 +977,53 @@ public class RESTService {
             public void onFailure(Call<SQLOperation> call, Throwable t) {
                 callback.onFailure();
             }
+        });
+    }
+
+    /*********************** Articles *********************************/
+    /**
+     * Gets the score for an article
+     * @param articleHashId
+     * @param callback Callback for API response management
+     */
+    public void getArticleScore(long articleHashId, final JsonArrayCallback callback) {
+        articlesRESTInterface.getArticleScore(articleHashId).enqueue(new retrofit2.Callback<JsonObject>() {
+
+            @Override
+            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                callback.onLoad(response.body().getAsJsonObject());
+            }
+
+            @Override
+            public void onFailure(Call<JsonObject> call, Throwable t) {
+                callback.onFailure();
+            }
+
+        });
+    }
+
+    /**
+     * Gets the scores for a list of articles
+     * @param articlesHashes
+     * @param callback Callback for API response management
+     */
+    public void getArticlesScores(List<Long> articlesHashes, final ArticlesScoresCallback callback) {
+        HashMap<String, Object> hashMap = new HashMap();
+        hashMap.put("ids", articlesHashes);
+
+        articlesRESTInterface.getArticlesScores(hashMap).enqueue(new retrofit2.Callback<List<ArticlesScores>>() {
+
+            @Override
+            public void onResponse(Call<List<ArticlesScores>> call, Response<List<ArticlesScores>> response) {
+                callback.onLoad(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<List<ArticlesScores>> call, Throwable t) {
+                callback.onFailure();
+            }
+
+
         });
     }
 }

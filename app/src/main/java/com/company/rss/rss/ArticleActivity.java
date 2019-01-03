@@ -76,6 +76,7 @@ public class ArticleActivity extends AppCompatActivity implements
 
     private TextView articleBodyTextView;
     private boolean collectionsChange;
+    private boolean articleReadSend;
 
 
     @Override
@@ -247,7 +248,7 @@ public class ArticleActivity extends AppCompatActivity implements
                 float percentageScrolled = (float) scrollY / (float) maxScroll * 100;
                 positionProgressBar.setProgress((int) percentageScrolled);
 
-                if (percentageScrolled >= 70) {
+                if (!articleReadSend && percentageScrolled >= 70) {
 
                     /*
                     //Show the feedback button only if 70% read
@@ -289,6 +290,7 @@ public class ArticleActivity extends AppCompatActivity implements
             @Override
             public void onLoad(SQLOperation sqlOperation) {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback for " + article.getHashId() + " DONE");
+                articleReadSend = true;
             }
 
             @Override

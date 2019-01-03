@@ -7,13 +7,17 @@ import com.company.rss.rss.restful_api.callbacks.CategoryCallback;
 import com.company.rss.rss.restful_api.callbacks.CollectionCallback;
 import com.company.rss.rss.restful_api.callbacks.FeedCallback;
 import com.company.rss.rss.restful_api.callbacks.FeedGroupCallback;
+import com.company.rss.rss.restful_api.callbacks.JsonArrayCallback;
 import com.company.rss.rss.restful_api.callbacks.MultifeedCallback;
 import com.company.rss.rss.restful_api.callbacks.ReadArticleCallback;
+import com.company.rss.rss.restful_api.callbacks.ArticlesScoresCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationListCallback;
 import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 import com.company.rss.rss.service.RESTService;
+
+import java.util.List;
 
 
 public class RESTMiddleware {
@@ -426,4 +430,24 @@ public class RESTMiddleware {
         RESTService.getInstance(context).deleteUserReadArticle(user, article, callback);
     }
 
+    /********************************************************************
+     *                       Articles
+     ********************************************************************/
+    /**
+     * Gets the score for an article
+     * @param articleHashId
+     * @param callback Callback for API response management
+     */
+    public void getArticleScore(long articleHashId, JsonArrayCallback callback){
+        RESTService.getInstance(context).getArticleScore(articleHashId, callback);
+    }
+
+    /**
+     * Gets the scores for a list of articles
+     * @param articlesHashes
+     * @param callback Callback for API response management
+     */
+    public void getArticlesScores(List<Long> articlesHashes, ArticlesScoresCallback callback) {
+        RESTService.getInstance(context).getArticlesScores(articlesHashes, callback);
+    }
 }

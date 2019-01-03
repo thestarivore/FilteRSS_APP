@@ -57,7 +57,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         holder.mTitleView.setText(mArticles.get(position).getTitle());
 
         String description = mArticles.get(position).getDescription();
-        Log.d(ArticleActivity.logTag + ":" + TAG, "Article description " + description);
+
         if (description == null || description.isEmpty() || description.length() < 10) {
             Log.d(ArticleActivity.logTag + ":" + TAG, "Hiding article description...");
             holder.mDescriptionView.setVisibility(View.GONE);

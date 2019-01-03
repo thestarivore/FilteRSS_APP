@@ -58,6 +58,7 @@ public class Article implements Serializable {
     private String feedName;
     private String iconURL;
     private int color;
+    private float score;
 
     //TODO: aggiunto perche usato nella mockapp, ma non c'era nel ER_Model originale, valutare se serve
     private String excerpt;
@@ -223,6 +224,14 @@ public class Article implements Serializable {
 
     public int getColor() {
         return color;
+    }
+
+    public float getScore() {
+        return score;
+    }
+
+    public void setScore(float score) {
+        this.score = score;
     }
 
     @Override
