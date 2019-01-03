@@ -38,6 +38,7 @@ import com.company.rss.rss.adapters.ExpandableListAdapter;
 import com.company.rss.rss.fragments.ArticlesListFragment;
 import com.company.rss.rss.fragments.ArticlesSlideFragment;
 import com.company.rss.rss.models.Article;
+import com.company.rss.rss.models.ArticlesScores;
 import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.Multifeed;
@@ -47,6 +48,7 @@ import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.restful_api.LoadUserCollections;
 import com.company.rss.rss.restful_api.LoadUserMultifeeds;
 import com.company.rss.rss.restful_api.RESTMiddleware;
+import com.company.rss.rss.restful_api.callbacks.ArticlesScoresCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationListCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
@@ -128,6 +130,30 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
         //Instantiate the Middleware for the RESTful API's
         api = new RESTMiddleware(this);
+
+        //Test api getScores
+        //TODO: DELETE
+        final List<Long> articleHashes = new ArrayList<>();
+        articleHashes.add(8108301604236482133L);
+        articleHashes.add(-8468317698692704000L);
+        articleHashes.add(-7377751668903717000L);
+        api.getArticlesScores(articleHashes, new ArticlesScoresCallback() {
+            @Override
+            public void onLoad(List<ArticlesScores> articlesScores) {
+                for (int i = 0; i < articlesScores.size(); i++) {
+
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "Scores for articles " + articleHashes + " score: " + articlesScores.get(i));
+
+                }
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Scores for articles " + articleHashes + " score: " + articlesScores);
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Scores for articles " + articleHashes + "NOT received");
+                //article.setScore(0);
+            }
+        });
 
         //Get a UserData instance
         loadUserData();     // Fragment's onAttachFragment should run first, but this function

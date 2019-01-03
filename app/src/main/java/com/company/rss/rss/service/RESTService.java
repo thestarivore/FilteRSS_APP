@@ -54,8 +54,8 @@ public class RESTService {
 
     private RESTService(Context context){
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.1.110:3000/")                                         //In local Nicholas
-                //.baseUrl("http://192.168.1.157:3000/")                                         //In local Eddy
+                //.baseUrl("http://192.168.1.110:3000/")                                         //In local Nicholas
+                .baseUrl("http://192.168.1.22:3000/")                                         //In local Eddy
                 //.baseUrl("http://ec2-35-180-230-227.eu-west-3.compute.amazonaws.com:3000")      //On Amazon AWS
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -1007,7 +1007,7 @@ public class RESTService {
      * @param articlesHashes
      * @param callback Callback for API response management
      */
-    public void getArticlesScores(List<Long> articlesHashes, final ArticlesScoresCallback callback) {
+    public void getArticlesScores(List<String> articlesHashes, final ArticlesScoresCallback callback) {
         HashMap<String, Object> hashMap = new HashMap();
         hashMap.put("ids", articlesHashes);
 

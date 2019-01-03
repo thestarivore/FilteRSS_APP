@@ -17,6 +17,7 @@ import com.company.rss.rss.restful_api.callbacks.SavedArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.UserCallback;
 import com.company.rss.rss.service.RESTService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -448,6 +449,12 @@ public class RESTMiddleware {
      * @param callback Callback for API response management
      */
     public void getArticlesScores(List<Long> articlesHashes, ArticlesScoresCallback callback) {
-        RESTService.getInstance(context).getArticlesScores(articlesHashes, callback);
+        //First convert the List of Longs in a List of Strings
+        List<String> articlesStringHashes = new ArrayList<>();
+        for (Long articleHash: articlesHashes){
+            articlesStringHashes.add(articleHash.toString());
+        }
+
+        RESTService.getInstance(context).getArticlesScores(articlesStringHashes, callback);
     }
 }
