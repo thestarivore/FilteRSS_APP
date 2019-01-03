@@ -34,6 +34,10 @@
             android:icon="@drawable/ic_attach_money_black_24dp"
             android:title="Marketing" />
         <item
+            android:id="@+id/nav_notizie"
+            android:icon="@drawable/ic_local_library_black_24dp"
+            android:title="Notizie" />
+        <item
             android:id="@+id/nav_scienza"
             android:icon="@drawable/ic_spa_black_24dp"
             android:title="Scienza" />

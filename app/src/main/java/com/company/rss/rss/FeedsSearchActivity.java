@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -329,10 +330,12 @@ public class FeedsSearchActivity extends AppCompatActivity {
             case R.id.itemLanguageSelectorEN:
                 setNavigationViewLang(R.menu.drawer_view_categories_en);
                 item.setChecked(!item.isChecked());
+                drawerLayout.openDrawer(Gravity.START);
                 return true;
             case R.id.itemLanguageSelectorIT:
                 setNavigationViewLang(R.menu.drawer_view_categories_it);
                 item.setChecked(!item.isChecked());
+                drawerLayout.openDrawer(Gravity.START);
                 return true;
         }
         return super.onOptionsItemSelected(item);
