@@ -12,10 +12,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.R;
+import com.company.rss.rss.adapters.ArticleRecyclerViewAdapter;
 import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
 import com.squareup.picasso.Picasso;
+
+import java.util.Date;
 
 public class ArticlesSlideFragment extends Fragment {
     private static final String ARTICLE = "article";
@@ -46,14 +50,42 @@ public class ArticlesSlideFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_article_slide_single, container, false);
-        TextView articleTitle = (TextView) view.findViewById(R.id.textViewSliderArticleTitle);
-        TextView articleSource = (TextView) view.findViewById(R.id.textViewSliderArticleSource);
-        ImageView articleImage = (ImageView) view.findViewById(R.id.imageViewArticleSlider);
+        TextView articleTitle = view.findViewById(R.id.textViewSliderArticleTitle);
+        TextView articleSource = view.findViewById(R.id.textViewSliderArticleSource);
+        TextView articlePubDateTextView = view.findViewById(R.id.textViewSliderArticlePubDate);
+        ImageView articleImage = view.findViewById(R.id.imageViewArticleSlider);
+        ImageView articleFeedIcon = view.findViewById(R.id.imageViewArticleFeedIcon);
 
         if(mArticle != null) {
             articleTitle.setText(mArticle.getTitle());
-            articleSource.setText(mArticle.getLink());
-            Picasso.get().load(mArticle.getImgLink()).into(articleImage);
+
+            articleSource.setText(mArticle.getFeedName());
+
+
+            String imgLink = mArticle.getImgLink();
+            if (imgLink == null || imgLink.isEmpty()) {
+                articleImage.setVisibility(View.GONE);
+            } else {
+                Picasso.get().load(imgLink).into(articleImage);
+            }
+
+            String feedIcon = mArticle.getFeedIcon();
+            if (feedIcon == null || feedIcon.isEmpty()) {
+                articleFeedIcon.setVisibility(View.GONE);
+            } else {
+                Picasso.get().load(feedIcon).into(articleFeedIcon);
+            }
+
+            String pubDate = mArticle.getPubDateString("dd-MM-yyyy");
+            if (pubDate == null || pubDate.isEmpty()) {
+                articlePubDateTextView.setVisibility(View.GONE);
+            } else {
+                Date articlePubDate = mArticle.getPubDate();
+                pubDate = ArticleRecyclerViewAdapter.computeDaysDiff(getContext(), pubDate, articlePubDate);
+                articlePubDateTextView.setText(pubDate);
+            }
+
+
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

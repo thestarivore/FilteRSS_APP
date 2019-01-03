@@ -71,7 +71,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             holder.mPubDateView.setVisibility(View.GONE);
         } else {
             Date articlePubDate = mArticles.get(position).getPubDate();
-            pubDate = computeDaysDiff(pubDate, articlePubDate);
+            pubDate = computeDaysDiff(mContext, pubDate, articlePubDate);
 
             pubDate = " // " + pubDate;
             holder.mPubDateView.setText(pubDate);
@@ -93,22 +93,9 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             Picasso.get().load(feedIcon).into(holder.mFeedIcon);
         }
 
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             holder.mImageView.setClipToOutline(true);
         }
-
-        holder.mTitleView.post(new Runnable() {
-            @Override
-            public void run() {
-                Log.v(ArticleActivity.logTag, String.valueOf(holder.mTitleView.getLineCount()));
-                if (holder.mTitleView.getLineCount() == 1) {
-                    //Log.v(ArticleActivity.logTag, "Increase excerpt");
-                    holder.mDescriptionView.setMaxLines(3);
-                }
-            }
-        });
-
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,16 +109,16 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         });
     }
 
-    private String computeDaysDiff(String pubDate, Date articlePubDate) {
+    static public String computeDaysDiff(Context context, String pubDate, Date articlePubDate) {
         Date nowDate = new Date();
 
         long diff = nowDate.getTime() - articlePubDate.getTime();
 
         int diffDays = (int) (diff / (24 * 60 * 60 * 1000));
 
-        if(diffDays == 0) pubDate = mContext.getString(R.string.today);
-        else if(diffDays == 1) pubDate = mContext.getString(R.string.yesterday);
-        else if(diffDays > 1) pubDate = diffDays + " " + mContext.getString(R.string.days);
+        if(diffDays == 0) pubDate = context.getString(R.string.today);
+        else if(diffDays == 1) pubDate = context.getString(R.string.yesterday);
+        else if(diffDays > 1) pubDate = diffDays + " " + context.getString(R.string.days);
         return pubDate;
     }
 
