@@ -141,15 +141,16 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             groupHolder.img.setImageResource(R.drawable.group_up);
         }*/
 
-        //Set the ColorBar for each group
+        /*//Set the ColorBar for each group
         View colorView = (View) convertView.findViewById(R.id.exp_menu_group_colorbar);
         if(colors.get(getGroup(groupPosition)) != null)
-            colorView.setBackgroundColor(colors.get(getGroup(groupPosition)));
+            colorView.setBackgroundColor(colors.get(getGroup(groupPosition)));*/
 
         //Set the Title for each group
-        TextView textView = (TextView) convertView.findViewById(R.id.exp_menu_group_name);
+        TextView textView = convertView.findViewById(R.id.exp_menu_group_name);
         textView.setTypeface(null, Typeface.BOLD);
         textView.setText(headerTitle);
+        textView.setTextColor(colors.get(getGroup(groupPosition)));
 
         return convertView;
     }

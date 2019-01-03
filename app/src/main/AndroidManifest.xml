@@ -48,9 +48,10 @@
         <activity
             android:name=".LoadingActivity"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:noHistory="true" />
-        <activity android:name=".BrowserActivity"
+            android:noHistory="true"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".BrowserActivity"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 

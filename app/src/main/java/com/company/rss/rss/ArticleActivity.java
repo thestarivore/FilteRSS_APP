@@ -451,7 +451,7 @@ public class ArticleActivity extends AppCompatActivity implements
                 editCollectionDialog.dismiss(); // dismiss the edit dialog
                 new ColorPickerPopup.Builder(ArticleActivity.this)
                         .initialColor(collection.getColor())
-                        .enableBrightness(false)
+                        .enableBrightness(true)
                         .enableAlpha(false)
                         .okTitle(getString(R.string.choose))
                         .cancelTitle(getString(R.string.cancel))
@@ -566,7 +566,7 @@ public class ArticleActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                onBackPressed();
                 return true;
             case R.id.itemReadArticle:
                 speakOut();

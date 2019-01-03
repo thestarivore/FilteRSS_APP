@@ -4,7 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -21,6 +24,8 @@ import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -101,11 +106,16 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private List<Long> articlesAddedToRIL;
     // articles removed from a collection, used to avoid calling the api multiple times if multiple swipe are performed
     private List<Long> articlesRemovedFromColl;
+    private ActionBar actionbar;
+    private Window window;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_articles_list);
+
+        window = this.getWindow();
+
         context = this;
         multifeedListHeaders = new ArrayList<String>();
         multifeedListChild = new HashMap<String, List<String>>();
@@ -169,7 +179,19 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         textViewAccountName.setText(userData.getUser().getName());
 
         //TOOLBAR
+        Toolbar toolbar = findViewById(R.id.articles_list_toolbar);
+        setSupportActionBar(toolbar);
+        actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
+
         initToolbar();
+
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            Window w = getWindow();
+            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            //toolbar.setPadding(0, getStatusBarHeight(this), 0, 0);
+        }*/
 
         // TOP ARTICLES - SLIDER
         // Set the slider to third the size of the viewport
@@ -237,32 +259,35 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
      * Initialize the Activity's Toolbar(ActionBar)
      */
     private void initToolbar() {
-        Toolbar toolbar = findViewById(R.id.articles_list_toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionbar = getSupportActionBar();
-        actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
-
         //Set the appropriate title
         //All Multifeeds Feeds Articles
         if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
-            actionbar.setTitle("All");
+            updatedActionBar((String) getText(R.string.multifeed_title), Color.BLACK);
+
         }
         //Multifeed Articles
         else if (userData.getVisualizationMode() == UserData.MODE_MULTIFEED_ARTICLES) {
             Multifeed multifeed = userData.getMultifeedList().get(userData.getMultifeedPosition());
-            actionbar.setTitle(multifeed.getTitle());
+            updatedActionBar(multifeed.getTitle(), multifeed.getColor());
         }
         //Feed Articles
         else if (userData.getVisualizationMode() == UserData.MODE_FEED_ARTICLES) {
             Multifeed multifeed = userData.getMultifeedList().get(userData.getMultifeedPosition());
             Feed feed = userData.getMultifeedMap().get(multifeed).get(userData.getFeedPosition());
-            actionbar.setTitle(feed.getTitle());
+            updatedActionBar(feed.getTitle(), multifeed.getColor());
         }
         //Collection Articles
         else if (userData.getVisualizationMode() == UserData.MODE_COLLECTION_ARTICLES) {
             Collection collection = userData.getCollectionList().get(userData.getCollectionPosition());
-            actionbar.setTitle(collection.getTitle());
+            updatedActionBar(collection.getTitle(), collection.getColor());
+        }
+    }
+
+    private void updatedActionBar(String title, int color) {
+        actionbar.setTitle(title);
+        actionbar.setBackgroundDrawable(new ColorDrawable(color));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.setStatusBarColor(color);
         }
     }
 
@@ -343,6 +368,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.setVisualizationMode(UserData.MODE_FEED_ARTICLES);
                 userData.setMultifeedPosition(groupPosition);
                 userData.setFeedPosition(childPosition);
+
                 //restartActivity();
                 refreshFragmentData();
                 return true;
@@ -748,6 +774,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         ArticlesListFragment articlesListFragment = (ArticlesListFragment)
                 getSupportFragmentManager().findFragmentById(R.id.articles_list_fragment);
         articlesListFragment.refreshRecyclerViewData();
+        initToolbar();
         drawerLayout.closeDrawers();
     }
 

@@ -5,20 +5,12 @@
     android:orientation="horizontal"
     android:padding="8dp">
 
-    <View
-        android:id="@+id/exp_menu_group_colorbar"
-        android:layout_width="15dp"
-        android:layout_height="22dp"
-        android:layout_marginLeft="20dp"
-        android:background="@color/colorPrimary" />
-
     <TextView
         android:id="@+id/exp_menu_group_name"
-        style="@style/material_type_scale_h5"
+        style="@style/material_type_scale_h6"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="2dp"
-        android:text="Menu Group"
-        android:textSize="17dp" />
+        android:layout_marginLeft="22dp"
+        android:text="Menu Group" />
 
 </LinearLayout>
