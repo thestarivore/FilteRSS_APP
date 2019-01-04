@@ -9,6 +9,7 @@ import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -23,6 +24,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -64,7 +66,7 @@ import java.util.Random;
 
 public class ArticlesListActivity extends AppCompatActivity implements ArticlesListFragment.OnListFragmentInteractionListener,
         ArticlesSlideFragment.OnFragmentInteractionListener {
-    private static final String TAG = "LoadingActivity";
+    private final String TAG = getClass().getName();
     private static final int REQUEST_CODE_MULTIFEED_EDIT = 1; // used for activities that can edit multifeed
     private static final int REQUEST_CODE_COLLECTION_EDIT = 2; // used for activities that can edit collections
 
@@ -110,6 +112,13 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private List<Long> articlesRemovedFromColl;
     private ActionBar actionbar;
     private Window window;
+
+    // Autoslider
+    int currentSlide = 0;
+    boolean autoSliderOn;
+    private Handler autoSliderHandler;
+    private Runnable autoSliderRunnable;
+    private int autoSliderTimeoutMillis = 6000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -224,7 +233,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        ViewPager viewPager = findViewById(R.id.pagerArticles);
+        final ViewPager viewPager = findViewById(R.id.pagerArticles);
         viewPager.getLayoutParams().height = size.y / 3;
 
         // Create mock articles for top articles
@@ -233,9 +242,9 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         pager = findViewById(R.id.pagerArticles);
         //pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
         pager.setAdapter(pagerAdapter);
-        pager.setCurrentItem(1, true);
+        pager.setCurrentItem(0, true);
         pager.setClipToPadding(false);
-        pager.setPadding(0, 0, 60, 0);
+        pager.setPadding(60, 0, 60, 0);
         pager.setPageMargin(0);
 
 
@@ -247,6 +256,31 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
         articlesAddedToRIL = new ArrayList<>();
         articlesRemovedFromColl = new ArrayList<>();
+
+
+        // AUTOSLIDER
+        autoSliderHandler = new Handler();
+        autoSliderRunnable = new Runnable() {
+            public void run() {
+                if(topArticles!=null) {
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "Autoslider page: " + currentSlide);
+                    viewPager.setCurrentItem(currentSlide, true);
+                    currentSlide++;
+                    if(currentSlide >= topArticles.size())
+                        currentSlide = 0;
+                }
+                autoSliderHandler.postDelayed(this, autoSliderTimeoutMillis);
+            }
+        };
+
+        // Disable autoslider when the slider is touched
+        viewPager.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                toggleAutoslider(false);
+                return false;
+            }
+        });
     }
 
     /**
@@ -521,6 +555,22 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         }
     }
 
+    private void toggleAutoslider(boolean start) {
+        if(start){
+            if(!autoSliderOn){
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Autoslider started");
+                autoSliderHandler.postDelayed(autoSliderRunnable, autoSliderTimeoutMillis);
+                autoSliderOn = true;
+            }
+        } else {
+            if(autoSliderOn){
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Autoslider stopped");
+                autoSliderHandler.removeCallbacks(autoSliderRunnable);
+                autoSliderOn = false;
+            }
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -548,7 +598,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
      */
     @Override
     public void onListFragmentInteractionClick(Article article) {
-        Log.v(ArticleActivity.logTag, article.toString());
+        Log.d(ArticleActivity.logTag + ":" + TAG, article.toString());
         startArticleActivity(article);
     }
 
@@ -748,7 +798,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
      */
     @Override
     public void onFragmentInteraction(Article article) {
-        Log.v(ArticleActivity.logTag, article.toString());
+        Log.d(ArticleActivity.logTag + ":" + TAG, article.toString());
         startArticleActivity(article);
     }
 
@@ -811,8 +861,16 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        toggleAutoslider(false);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+        toggleAutoslider(true);
+
         //Get intent passed data
         Intent intent = getIntent();
         if(intent.hasExtra("feedArticlesNumberMap")) {
