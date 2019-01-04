@@ -131,7 +131,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         //Instantiate the Middleware for the RESTful API's
         api = new RESTMiddleware(this);
 
-        //Test api getScores
+        /*//Test api getScores
         //TODO: DELETE
         final List<Long> articleHashes = new ArrayList<>();
         articleHashes.add(8108301604236482133L);
@@ -153,7 +153,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 Log.d(ArticleActivity.logTag + ":" + TAG, "Scores for articles " + articleHashes + "NOT received");
                 //article.setScore(0);
             }
-        });
+        });*/
 
         //Get a UserData instance
         loadUserData();     // Fragment's onAttachFragment should run first, but this function
@@ -328,6 +328,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
             public void onClick(View v) {
                 //Prepare the new ListToVisualize and Restart Activity
                 userData.setVisualizationMode(UserData.MODE_ALL_MULTIFEEDS_FEEDS);
+
+                progressBar.setVisibility(View.VISIBLE);
                 //restartActivity();
                 refreshFragmentData();
             }
@@ -395,6 +397,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.setMultifeedPosition(groupPosition);
                 userData.setFeedPosition(childPosition);
 
+                progressBar.setVisibility(View.VISIBLE);
                 //restartActivity();
                 refreshFragmentData();
                 return true;
@@ -410,6 +413,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 //Prepare the new ListToVisualize and Restart Activity
                 userData.setVisualizationMode(UserData.MODE_MULTIFEED_ARTICLES);
                 userData.setMultifeedPosition(groupPosition);
+
+                progressBar.setVisibility(View.VISIBLE);
                 //restartActivity();
                 refreshFragmentData();
                 return true; // This way the expander cannot be collapsed
@@ -448,6 +453,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.setVisualizationMode(UserData.MODE_COLLECTION_ARTICLES);
                 userData.setCollectionPosition(groupPosition);
 
+                progressBar.setVisibility(View.VISIBLE);
                 //restartActivity();
                 refreshFragmentData();
                 return true; // This way the expander cannot be collapsed

@@ -8,34 +8,34 @@ import java.io.Serializable;
 public class ArticlesScores implements Serializable {
     @SerializedName("article")
     @Expose
-    private String article;
+    private Long article;
 
     @SerializedName("score")
     @Expose
-    private String score;
+    private Float score;
 
 
     public ArticlesScores() {
     }
 
-    public ArticlesScores(String article, String score) {
+    public ArticlesScores(Long article, Float score) {
         this.article = article;
         this.score = score;
     }
 
-    public String getArticle() {
+    public Long getArticle() {
         return article;
     }
 
-    public void setArticle(String article) {
+    public void setArticle(Long article) {
         this.article = article;
     }
 
-    public String getScore() {
+    public Float getScore() {
         return score;
     }
 
-    public void setScore(String score) {
+    public void setScore(Float score) {
         this.score = score;
     }
 

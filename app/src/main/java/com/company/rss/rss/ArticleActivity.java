@@ -123,7 +123,6 @@ public class ArticleActivity extends AppCompatActivity implements
         TextView articlePubDateTextView = findViewById(R.id.textViewArticlePubDate);
         String pubDate = article.getPubDateString("dd-MM-yyyy");
         if (pubDate == null || pubDate.isEmpty()) {
-            Log.d(ArticleActivity.logTag + ":" + TAG, "Hiding article pub date...");
             articlePubDateTextView.setVisibility(View.GONE);
         } else {
             pubDate = " // " + pubDate;
@@ -146,7 +145,6 @@ public class ArticleActivity extends AppCompatActivity implements
         ImageView articleImageView = findViewById(R.id.imageViewArticleImage);
         String articleImgLink = article.getImgLink();
         if (articleImgLink == null || articleImgLink.isEmpty()) {
-            Log.d(ArticleActivity.logTag + ":" + TAG, "Hiding article image...");
         } else {
             Picasso.get().load(articleImgLink).into(articleImageView);
 
@@ -273,12 +271,12 @@ public class ArticleActivity extends AppCompatActivity implements
         api.addUserOpenedArticle(loggedUser.getId(), article.getHashId(), new SQLOperationCallback() {
             @Override
             public void onLoad(SQLOperation sqlOperation) {
-                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback for " + article.getHashId() + " DONE");
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback opened for " + article.getHashId() + " DONE");
             }
 
             @Override
             public void onFailure() {
-                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback for " + article.getHashId() + " ERROR");
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback opened for " + article.getHashId() + " ERROR");
             }
         });
 
@@ -286,16 +284,18 @@ public class ArticleActivity extends AppCompatActivity implements
 
     private void sendArticleRead(final Article article) {
         Log.d(ArticleActivity.logTag + ":" + TAG, "Sending article read for " + article.getHashId());
+        articleReadSend = true;
+
         api.addUserReadArticle(loggedUser.getId(), article.getHashId(), 2, new SQLOperationCallback() {
             @Override
             public void onLoad(SQLOperation sqlOperation) {
-                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback for " + article.getHashId() + " DONE");
-                articleReadSend = true;
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback read for " + article.getHashId() + " DONE");
             }
 
             @Override
             public void onFailure() {
-                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback for " + article.getHashId() + " ERROR");
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Sending feedback read for " + article.getHashId() + " ERROR");
+                articleReadSend = false;
             }
         });
 

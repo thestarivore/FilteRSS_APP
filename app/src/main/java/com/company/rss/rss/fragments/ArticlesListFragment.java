@@ -3,6 +3,7 @@ package com.company.rss.rss.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +24,7 @@ import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.RSSFeed;
+import com.company.rss.rss.models.User;
 import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.ArticlesScoresCallback;
@@ -32,6 +34,8 @@ import com.company.rss.rss.rss_parser.LoadRSSFeed;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +56,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     private UserData userData;
     private RESTMiddleware api;
     private int feedCounter;
+    private int scoreCounter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -74,7 +79,6 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         api = new RESTMiddleware(getContext());
-
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
@@ -111,7 +115,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                     recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
                 }
 
-                recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, context, userData.getVisualizationMode() == UserData.MODE_COLLECTION_ARTICLES));
+                recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, context));
             }
         }
 
@@ -142,11 +146,9 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     }
 
     public void refreshRecyclerViewData() {
-        // do something in fragment
-        Log.d(TAG, "OK passato DATI dA ACTIVITY a FRAGMENT");
-
         this.articles.clear();
         onUserDataLoaded();
+        recyclerView.scrollToPosition(0);
     }
 
 
@@ -193,12 +195,13 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         //MODE_ALL_MULTIFEEDS_FEEDS || MODE_MULTIFEED_ARTICLES || MODE_FEED_ARTICLES
         if (userData.getVisualizationMode() != UserData.MODE_COLLECTION_ARTICLES) {
             feedCounter = 0;
+            scoreCounter = 0;
             //Start Downloading the Articles, even if the UI hasn't loaded yet
             for (final Feed feed : feedList) {
                 new LoadRSSFeed(new AsyncRSSFeedResponse() {
                     @Override
                     public void processFinish(Object output, RSSFeed rssFeed) {
-                        final List<Long> articlesHashes = new ArrayList<>();
+                        final HashMap<Long, Article> articlesHashesMap = new HashMap<>();
                         for (final Article article : rssFeed.getItemList()) {
                             article.setFeed(feed.getId());
                             article.setColor(feed.getMultifeedColor());
@@ -221,31 +224,13 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                                 }
                             });*/
 
-                            articlesHashes.add(article.getHashId());
+                            articlesHashesMap.put(article.getHashId(), article);
 
                             articles.add(article);
                         }
 
-                        if(!articlesHashes.isEmpty()){
-                            api.getArticlesScores(articlesHashes, new ArticlesScoresCallback() {
-
-                                @Override
-                                public void onLoad(List<ArticlesScores> articlesScores) {
-                                    for (int i = 0; i < articlesScores.size(); i++) {
-
-                                        Log.d(ArticleActivity.logTag + ":" + TAG, "Scores for articles " + articlesHashes + " score: " + articlesScores.get(i));
-
-                                    }
-                                    Log.d(ArticleActivity.logTag + ":" + TAG, "Scores for articles " + articlesHashes + " score: " + articlesScores);
-                                    //article.setScore(jsonObject.get("Score").getAsFloat());
-                                }
-
-                                @Override
-                                public void onFailure() {
-                                    Log.d(ArticleActivity.logTag + ":" + TAG, "Scores for articles " + articlesHashes + "NOT received");
-                                    //article.setScore(0);
-                                }
-                            });
+                        if(!articlesHashesMap.keySet().isEmpty()){
+                            getArticlesScores(articlesHashesMap);
                         }
 
                         //Save the number of articles for each feed, mapped in a HashMap
@@ -255,7 +240,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         while (recyclerView == null || recyclerView.getAdapter() == null) ;
 
                         //Notify a change in the RecyclerView's Article List
-                        recyclerView.getAdapter().notifyDataSetChanged();
+                        //recyclerView.getAdapter().notifyDataSetChanged();
 
                         Log.d(ArticleActivity.logTag + ":" + TAG, "LoadRSSFeed finished: " + (feedCounter + 1) + "/" + feedList.size());
 
@@ -269,24 +254,56 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             final Thread waitAllFeedsLoaded = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while (feedCounter < 1) { // wait until we have something to show
+                    while (feedCounter < numberOfFeeds || scoreCounter < numberOfFeeds) {
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
-                    if (mListener != null) {
-                        Log.d(ArticleActivity.logTag + ":" + TAG, "All LoadRSSFeed finished");
-                        mListener.onListFragmentArticlesReady();
-                    }
 
                     //Wait for all articles to load, then notify the activity with a callback, and pass the
                     //map of the number of articles for each feed
-                    while (feedCounter < numberOfFeeds) ;
                     if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
                         mListener.onListFragmentAllArticlesReady(feedArticlesNumberMap, articles);
                     }
+
+                    if (mListener != null) {
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "All LoadRSSFeed and getScores finished");
+
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "# Articles: " + articles.size());
+
+
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "Sorting articles...");
+
+                        for (int i = 0; i<articles.size(); i++) {
+                            Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
+                        }
+
+                        Collections.sort(articles, new Comparator<Article>(){
+                            @Override
+                            public int compare(Article a1, Article a2) {
+                                if(a1.getScore() == a2.getScore())
+                                    return 0;
+                                return a1.getScore() > a2.getScore() ? -1 : 1;
+                            }
+                        });
+
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "Sorting DONE");
+                        for (int i = 0; i<articles.size(); i++) {
+                            Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
+                        }
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                recyclerView.getAdapter().notifyDataSetChanged();
+                            }
+                        });
+
+                        mListener.onListFragmentArticlesReady();
+                    }
+
                 }
             });
             waitAllFeedsLoaded.start();
@@ -315,6 +332,32 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             recyclerView.getAdapter().notifyDataSetChanged();
         }
 
+    }
+
+    /**
+     * Gets the scores for a list of articles hashes
+     * @param articlesHashes
+     */
+    private void getArticlesScores(final HashMap<Long, Article> articlesHashes) {
+        api.getArticlesScores(articlesHashes.keySet(), new ArticlesScoresCallback() {
+
+            @Override
+            public void onLoad(List<ArticlesScores> articlesScores) {
+                scoreCounter++;
+
+                for (int i = 0; i < articlesScores.size(); i++) {
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "Received scores for article" + articlesScores.get(i));
+                    Article article = articlesHashes.get(articlesScores.get(i).getArticle());
+                    article.setScore(articlesScores.get(i).getScore());
+                }
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Scores for articles " + articlesHashes + "NOT received");
+                //article.setScore(0);
+            }
+        });
     }
 
     /**

@@ -19,6 +19,7 @@ import com.company.rss.rss.service.RESTService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 public class RESTMiddleware {
@@ -448,7 +449,7 @@ public class RESTMiddleware {
      * @param articlesHashes
      * @param callback Callback for API response management
      */
-    public void getArticlesScores(List<Long> articlesHashes, ArticlesScoresCallback callback) {
+    public void getArticlesScores(Set<Long> articlesHashes, ArticlesScoresCallback callback) {
         //First convert the List of Longs in a List of Strings
         List<String> articlesStringHashes = new ArrayList<>();
         for (Long articleHash: articlesHashes){

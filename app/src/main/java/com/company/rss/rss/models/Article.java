@@ -237,7 +237,8 @@ public class Article implements Serializable {
     @Override
     public String toString() {
         return "Article{" +
-                "hashId=" + hashId +
+                "score=" + score +
+                ", hashId=" + hashId + '\'' +
                 ", title='" + title + '\'' +
                 //", description='" + description + '\'' +
                 ", comment='" + comment + '\'' +
