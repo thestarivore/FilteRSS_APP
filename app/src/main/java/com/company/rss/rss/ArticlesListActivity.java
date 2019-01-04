@@ -262,11 +262,11 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         autoSliderHandler = new Handler();
         autoSliderRunnable = new Runnable() {
             public void run() {
-                if(topArticles!=null) {
+                if (topArticles != null) {
                     Log.d(ArticleActivity.logTag + ":" + TAG, "Autoslider page: " + currentSlide);
                     viewPager.setCurrentItem(currentSlide, true);
                     currentSlide++;
-                    if(currentSlide >= topArticles.size())
+                    if (currentSlide >= topArticles.size())
                         currentSlide = 0;
                 }
                 autoSliderHandler.postDelayed(this, autoSliderTimeoutMillis);
@@ -556,14 +556,14 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     }
 
     private void toggleAutoslider(boolean start) {
-        if(start){
-            if(!autoSliderOn){
+        if (start) {
+            if (!autoSliderOn) {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "Autoslider started");
                 autoSliderHandler.postDelayed(autoSliderRunnable, autoSliderTimeoutMillis);
                 autoSliderOn = true;
             }
         } else {
-            if(autoSliderOn){
+            if (autoSliderOn) {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "Autoslider stopped");
                 autoSliderHandler.removeCallbacks(autoSliderRunnable);
                 autoSliderOn = false;
@@ -757,7 +757,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         });
 
         //Update the TopArticles in the ArticlesSlidePager
-        runOnUiThread(new Runnable(){
+        runOnUiThread(new Runnable() {
             public void run() {
                 updateArticlesSlidePager(articleList);
             }
@@ -766,25 +766,25 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
     /**
      * Update the ArticlesSlidePager with a new List of Articles to visualize as TopArticles
-     * @param articleList   List of Articles from which to choose from
+     *
+     * @param articleList List of Articles from which to choose from
      */
-    private void updateArticlesSlidePager(List<Article> articleList){
+    private void updateArticlesSlidePager(List<Article> articleList) {
         //Add 10 random Articles to the TopList Slider
         //TODO: add the most important instead of a random list
-        if(articleList.size() >= 10) {
-            int i=0, j;
+        if (articleList.size() >= ArticleSlidePagerAdapter.NUM_ARTICLES) {
+            int i = 0, j;
             topArticles = new ArrayList<>();
             Random rand = new Random();
-            int maxIndex = articleList.size()-1;
+            int maxIndex = articleList.size() - 1;
 
-            for (i=0; i<10;i++){
+            for (i = 0; i < ArticleSlidePagerAdapter.NUM_ARTICLES; i++) {
                 do {
                     j = rand.nextInt(maxIndex);
-                }while(articleList.get(j).getImgLink() == null);
+                } while (articleList.get(j).getImgLink() == null);
                 topArticles.add(articleList.get(j));
             }
-        }
-        else
+        } else
             topArticles = articleList;
         pager = findViewById(R.id.pagerArticles);
         pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
@@ -852,7 +852,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     /**
      * Refresh ArticlesListFragment's Data without the need for a activity reboot
      */
-    private void refreshFragmentData(){
+    private void refreshFragmentData() {
         ArticlesListFragment articlesListFragment = (ArticlesListFragment)
                 getSupportFragmentManager().findFragmentById(R.id.articles_list_fragment);
         articlesListFragment.refreshRecyclerViewData();
@@ -873,12 +873,12 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
         //Get intent passed data
         Intent intent = getIntent();
-        if(intent.hasExtra("feedArticlesNumberMap")) {
+        if (intent.hasExtra("feedArticlesNumberMap")) {
             feedArticlesNumberMap = (HashMap<String, Integer>) intent.getSerializableExtra("feedArticlesNumberMap");
             multifeedListAdapter.updateFeedArticlesNumbers(feedArticlesNumberMap);
             multifeedListAdapter.notifyDataSetChanged();
         }
-        if(intent.hasExtra("topArticles")) {
+        if (intent.hasExtra("topArticles")) {
             topArticles = (List<Article>) intent.getSerializableExtra("topArticles");
             pager = findViewById(R.id.pagerArticles);
             pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
@@ -899,7 +899,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
         pager.setAdapter(pagerAdapter);
     }
-
 
 
     /**

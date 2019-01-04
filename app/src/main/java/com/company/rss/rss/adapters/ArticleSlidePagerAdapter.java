@@ -10,7 +10,7 @@ import com.company.rss.rss.models.Article;
 import java.util.List;
 
 public class ArticleSlidePagerAdapter extends FragmentStatePagerAdapter {
-    private static final int NUM_ARTICLES = 6;
+    public static final int NUM_ARTICLES = 10;
     private List<Article> mArticles;
 
     // https://stackoverflow.com/questions/7766630/changing-viewpager-to-enable-infinite-page-scrolling
