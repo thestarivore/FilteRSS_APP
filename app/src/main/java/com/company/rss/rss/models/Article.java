@@ -2,6 +2,8 @@ package com.company.rss.rss.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.joestelmach.natty.DateGroup;
+import com.joestelmach.natty.Parser;
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
 
@@ -164,6 +166,14 @@ public class Article implements Serializable {
             return "";
     }
 
+    /**
+     * Set the Publication Date by passing the String form of the date
+     * @param pubDateStr String of the date
+     */
+    public void setPubDateFromString(String pubDateStr){
+        setPubDate(parseDateFromString(pubDateStr));
+    }
+
     public void setPubDate(Date pubDate) {
         this.pubDate = pubDate;
     }
@@ -210,6 +220,10 @@ public class Article implements Serializable {
 
     public void setScore(float score) {
         this.score = score;
+    }
+
+    public void setFeed(int feed) {
+        this.feed = feed;
     }
 
     @Override
@@ -315,6 +329,21 @@ public class Article implements Serializable {
             articles.add(createMockArticle());
         }
         return articles;
+    }
+
+    /**
+     * Parse a Date from a String using multiple matching patterns(Natty library)
+     * @param candidate String to parse
+     * @return Date object or null if the parsing failed
+     */
+    private Date parseDateFromString(String candidate){
+        Parser parser = new Parser();
+        List<DateGroup> groups = parser.parse(candidate);
+        for(DateGroup group:groups) {
+            List<Date> dates = group.getDates();
+            return dates.get(0);
+        }
+        return  null;
     }
 }
 

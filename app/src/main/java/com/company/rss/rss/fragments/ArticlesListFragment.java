@@ -23,11 +23,15 @@ import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.RSSFeed;
+import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.restful_api.RESTMiddleware;
+import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.ArticlesScoresCallback;
+import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncRSSFeedResponse;
 import com.company.rss.rss.rss_parser.LoadRSSFeed;
+import com.company.rss.rss.service.SQLiteService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -260,6 +264,41 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                     //map of the number of articles for each feed
                     if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
                         mListener.onListFragmentAllArticlesReady(feedArticlesNumberMap, articles);
+
+                        /*************************************************************************************/
+                        //TODO:DELETE, just a test
+                        final SQLiteService sqLiteService = SQLiteService.getInstance(getContext());
+                        sqLiteService.deleteAllArticles(new SQLOperationCallback() {
+                            @Override
+                            public void onLoad(SQLOperation sqlOperation) {
+                                sqLiteService.putArticles(articles, new SQLOperationCallback() {
+                                    @Override
+                                    public void onLoad(SQLOperation sqlOperation) {
+                                        sqLiteService.getAllArticles(new ArticleCallback() {
+                                            @Override
+                                            public void onLoad(List<Article> newArticles) {
+                                                List<Article>  articleList1 = newArticles;
+                                                Log.d(ArticleActivity.logTag + ":" + TAG, "Articles retrieved = " + articleList1.size());
+                                            }
+
+                                            @Override
+                                            public void onFailure() {
+                                                Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
+                                            }
+                                        });
+                                    }
+                                    @Override
+                                    public void onFailure() {
+                                        Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
+                                    }
+                                });
+                            }
+                            @Override
+                            public void onFailure() {
+                                Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
+                            }
+                        });
+                        /***************************************************************************************/
                     }
 
                     if (mListener != null) {
