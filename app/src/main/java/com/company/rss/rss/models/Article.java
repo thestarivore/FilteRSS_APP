@@ -194,8 +194,8 @@ public class Article implements Serializable {
         return feed;
     }
 
-    public void setFeedId(int feedID) {
-        this.feed = feed;
+    public void setFeedId(int feedId) {
+        this.feed = feedId;
     }
 
     public String getExcerpt() {

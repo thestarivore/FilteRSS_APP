@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
@@ -13,6 +14,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -30,6 +32,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -38,6 +41,7 @@ import com.company.rss.rss.adapters.ArticleSlidePagerAdapter;
 import com.company.rss.rss.adapters.ExpandableListAdapter;
 import com.company.rss.rss.fragments.ArticlesListFragment;
 import com.company.rss.rss.fragments.ArticlesSlideFragment;
+import com.company.rss.rss.fragments.MultifeedListFragment;
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
@@ -116,6 +120,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private Handler autoSliderHandler;
     private Runnable autoSliderRunnable;
     private int autoSliderTimeoutMillis = 4000;
+    private ArticlesListFragment articlesListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -230,7 +235,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         articlesAddedToRIL = new ArrayList<>();
         articlesRemovedFromColl = new ArrayList<>();
 
-
         // AUTOSLIDER
         autoSliderHandler = new Handler();
         autoSliderRunnable = new Runnable() {
@@ -254,6 +258,26 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 return false;
             }
         });
+
+        showArticleListFragment();
+    }
+
+    private void showArticleListFragment() {
+        int screenLayout = context.getResources().getConfiguration().screenLayout;
+        screenLayout &= Configuration.SCREENLAYOUT_SIZE_MASK;
+
+        int numColumn;
+        if (screenLayout == Configuration.SCREENLAYOUT_SIZE_LARGE
+                || screenLayout == 4) { // x-large
+            numColumn = 2;
+        } else {
+            numColumn = 1;
+        }
+
+        articlesListFragment = ArticlesListFragment.newInstance(numColumn);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.articleListFrameLayout, articlesListFragment);
+        ft.commit();
     }
 
     /**
@@ -826,8 +850,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
      * Refresh ArticlesListFragment's Data without the need for a activity reboot
      */
     private void refreshFragmentData() {
-        ArticlesListFragment articlesListFragment = (ArticlesListFragment)
-                getSupportFragmentManager().findFragmentById(R.id.articles_list_fragment);
         articlesListFragment.refreshRecyclerViewData();
         initToolbar();
         drawerLayout.closeDrawers();

@@ -333,7 +333,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                recyclerView.getAdapter().notifyDataSetChanged();
+                                if(recyclerView!=null)
+                                    recyclerView.getAdapter().notifyDataSetChanged();
                             }
                         });
 
