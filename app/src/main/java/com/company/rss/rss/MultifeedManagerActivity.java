@@ -132,7 +132,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
     public void onUpdateMultifeed(final Multifeed multifeed) {
         // TODO: call the API and update the multifeed
         Log.d(ArticleActivity.logTag + ":" + TAG, "Saving multifeed to API: " + multifeed.toString());
-        api.updateUserMultifeed(multifeed.getId(), multifeed.getTitle(), multifeed.getColor(), new SQLOperationCallback() {
+        api.updateUserMultifeed(multifeed.getId(), multifeed.getTitle(), multifeed.getColor(), multifeed.getRating(), new SQLOperationCallback() {
             @Override
             public void onLoad(SQLOperation sqlOperation) {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed " + multifeed.getTitle() + " updated");

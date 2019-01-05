@@ -49,7 +49,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mArticles.get(position);
 
-        holder.mArticleColorView.setBackgroundColor(mArticles.get(position).getColor());
+        holder.mArticleColorView.setBackgroundColor(mArticles.get(position).getFeed().getMultifeed().getColor());
         holder.mTitleView.setText(mArticles.get(position).getTitle());
 
         String description = mArticles.get(position).getDescription();
@@ -71,7 +71,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             holder.mPubDateView.setText(pubDate);
         }
 
-        holder.mFeedNameView.setText(mArticles.get(position).getFeedName());
+        holder.mFeedNameView.setText(mArticles.get(position).getFeed().getTitle());
 
         String imgLink = mArticles.get(position).getImgLink();
         if (imgLink == null || imgLink.isEmpty()) {
@@ -80,7 +80,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             Picasso.get().load(imgLink).into(holder.mImageView);
         }
 
-        String feedIcon = mArticles.get(position).getFeedIcon();
+        String feedIcon = mArticles.get(position).getFeed().getIconURL();
         if (feedIcon == null || feedIcon.isEmpty()) {
             holder.mFeedIcon.setVisibility(View.GONE);
         } else {

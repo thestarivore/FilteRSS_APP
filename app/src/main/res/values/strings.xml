@@ -20,7 +20,7 @@
     <string name="language_en">English</string>
     <string name="language_it">Italian</string>
     <string name="name">Name</string>
-    <string name="importance">Importance</string>
+    <string name="rating">Importance</string>
     <string name="color">Color</string>
     <string name="choose">Choose</string>
     <string name="dialog_remove_feed_title">Remove this feed?</string>

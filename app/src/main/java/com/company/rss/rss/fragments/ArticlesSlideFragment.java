@@ -59,7 +59,7 @@ public class ArticlesSlideFragment extends Fragment {
         if(mArticle != null) {
             articleTitle.setText(mArticle.getTitle());
 
-            articleSource.setText(mArticle.getFeedName());
+            articleSource.setText(mArticle.getFeed().getTitle());
 
 
             String imgLink = mArticle.getImgLink();
@@ -69,7 +69,7 @@ public class ArticlesSlideFragment extends Fragment {
                 Picasso.get().load(imgLink).into(articleImage);
             }
 
-            String feedIcon = mArticle.getFeedIcon();
+            String feedIcon = mArticle.getFeed().getIconURL();
             if (feedIcon == null || feedIcon.isEmpty()) {
                 articleFeedIcon.setVisibility(View.GONE);
             } else {

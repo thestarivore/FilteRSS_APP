@@ -38,7 +38,7 @@ public class MultifeedEditFragment extends Fragment {
 
     private EditText name;
     private View color;
-    private SeekBar importance;
+    private SeekBar rating;
 
     public static MultifeedEditFragment newInstance(Multifeed multifeed) {
         MultifeedEditFragment multifeedEditFragment = new MultifeedEditFragment();
@@ -66,8 +66,7 @@ public class MultifeedEditFragment extends Fragment {
 
         name = view.findViewById(R.id.editTextMultifeedName);
         color = view.findViewById(R.id.viewMultifeedEditColor);
-        importance = view.findViewById(R.id.seekBarMultifeedEdit);
-
+        rating = view.findViewById(R.id.seekBarMultifeedEdit);
 
 
         // if fragment called for creation do not populate the view leaving it blank
@@ -84,7 +83,7 @@ public class MultifeedEditFragment extends Fragment {
             // set the button's color
             GradientDrawable background = (GradientDrawable) color.getBackground();
             background.setColor(multifeed.getColor());
-            importance.setProgress(multifeed.getImportance());
+            rating.setProgress(multifeed.getRating()-1);
 
             // multifeed's feeds list
             final List<Feed> feeds = multifeed.getFeeds();
@@ -123,7 +122,7 @@ public class MultifeedEditFragment extends Fragment {
         } else {
             multifeed = new Multifeed();
             multifeed.setColor(-16777216);
-            multifeed.setImportance(1);
+            multifeed.setRating(1);
 
             // Hide the feeds list layout
             LinearLayout feedsList = view.findViewById(R.id.feedListMultifeedEdit);
@@ -200,10 +199,10 @@ public class MultifeedEditFragment extends Fragment {
     private void setMultifeedData() {
         name = view.findViewById(R.id.editTextMultifeedName);
         color = view.findViewById(R.id.viewMultifeedEditColor);
-        importance = view.findViewById(R.id.seekBarMultifeedEdit);
+        rating = view.findViewById(R.id.seekBarMultifeedEdit);
 
         multifeed.setTitle(String.valueOf(name.getText()));
-        multifeed.setImportance(importance.getProgress());
+        multifeed.setRating(rating.getProgress()+1);
     }
 
     public Multifeed getMultifeed() {

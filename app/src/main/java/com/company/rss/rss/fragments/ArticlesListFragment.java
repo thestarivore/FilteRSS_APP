@@ -3,7 +3,6 @@ package com.company.rss.rss.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,14 +23,11 @@ import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.RSSFeed;
-import com.company.rss.rss.models.User;
 import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.ArticlesScoresCallback;
-import com.company.rss.rss.restful_api.callbacks.JsonArrayCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncRSSFeedResponse;
 import com.company.rss.rss.rss_parser.LoadRSSFeed;
-import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -203,10 +199,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                     public void processFinish(Object output, RSSFeed rssFeed) {
                         final HashMap<Long, Article> articlesHashesMap = new HashMap<>();
                         for (final Article article : rssFeed.getItemList()) {
-                            article.setFeed(feed.getId());
-                            article.setColor(feed.getMultifeedColor());
-                            article.setFeedName(feed.getTitle());
-                            article.setFeedIcon(feed.getIconURL());
+                            article.setFeedId(feed.getId());
+                            article.setFeed(feed);
 
                            /* // get and set the article score
                             api.getArticleScore(article.getHashId(), new ArticlesScoresCallback() {
@@ -277,6 +271,9 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         Log.d(ArticleActivity.logTag + ":" + TAG, "Sorting articles...");
 
                         for (int i = 0; i<articles.size(); i++) {
+                            Article article = articles.get(i);
+                            float articleScoreByRating = article.getScore() * article.getFeed().getMultifeed().getRating();
+                            article.setScore(articleScoreByRating);
                             Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
                         }
 
@@ -346,8 +343,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                 scoreCounter++;
 
                 for (int i = 0; i < articlesScores.size(); i++) {
-                    Log.d(ArticleActivity.logTag + ":" + TAG, "Received scores for article" + articlesScores.get(i));
                     Article article = articlesHashes.get(articlesScores.get(i).getArticle());
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "Received score for article: " + articlesScores.get(i) + " : Multifeed rating: " + article.getFeed().getMultifeed().getRating());
                     article.setScore(articlesScores.get(i).getScore());
                 }
             }

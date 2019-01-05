@@ -71,7 +71,7 @@ public class Feed implements Serializable {
     @Expose
     private int popolarity;
 
-    private int multifeedColor;
+    private Multifeed multifeed;
 
     public Feed(){
 
@@ -193,12 +193,12 @@ public class Feed implements Serializable {
         return coverColor;
     }
 
-    public void setMultifeedColor(int multifeedColor) {
-        this.multifeedColor = multifeedColor;
+    public void setMultifeed(Multifeed multifeed) {
+        this.multifeed = multifeed;
     }
 
-    public int getMultifeedColor(){
-        return this.multifeedColor;
+    public Multifeed getMultifeed(){
+        return this.multifeed;
     }
 
     public void setCoverColor(String coverColor) {

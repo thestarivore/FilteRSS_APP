@@ -201,8 +201,8 @@ public class RESTMiddleware {
      * @param color Color used to indicate the multifeed on user's app
      * @param callback Callback for API response management
      */
-    public void addUserMultifeed(String title, int user, int color, SQLOperationCallback callback){
-        RESTService.getInstance(context).addUserMultifeed(title, user, color, callback);
+    public void addUserMultifeed(String title, int user, int color, int rating, SQLOperationCallback callback){
+        RESTService.getInstance(context).addUserMultifeed(title, user, color, rating, callback);
     }
 
     /**
@@ -220,8 +220,8 @@ public class RESTMiddleware {
      * @param newTitle  The new title to set instead of the old one
      * @param newColor  The new color to set instead of the old one
      */
-    public void updateUserMultifeed(int id, String newTitle, int newColor, SQLOperationCallback callback){
-        RESTService.getInstance(context).updateUserMultifeed(id, newTitle, newColor, callback);
+    public void updateUserMultifeed(int id, String newTitle, int newColor, int newRating, SQLOperationCallback callback){
+        RESTService.getInstance(context).updateUserMultifeed(id, newTitle, newColor, newRating, callback);
     }
 
     /********************************************************************

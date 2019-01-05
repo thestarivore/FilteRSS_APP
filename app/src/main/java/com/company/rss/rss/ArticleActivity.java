@@ -111,7 +111,6 @@ public class ArticleActivity extends AppCompatActivity implements
         article = (Article) intent.getSerializableExtra(ArticlesListActivity.EXTRA_ARTICLE);
 
         final String articleLink = article.getLink();
-        String articleFeedName = article.getFeedName();
         articleTitle = article.getTitle();
         articleBody = article.getDescription();
         //int readingTime = article.getReadingTime();
@@ -129,12 +128,12 @@ public class ArticleActivity extends AppCompatActivity implements
             articlePubDateTextView.setText(pubDate);
         }
 
-
+        String articleFeedName = article.getFeed().getTitle();
         TextView articleFeedNameTextView = findViewById(R.id.textViewArticleFeedName);
-        articleFeedNameTextView.setText(article.getFeedName());
+        articleFeedNameTextView.setText(articleFeedName);
 
         ImageView feedIconImageView = findViewById(R.id.imageViewArticleFeedIcon);
-        String feedIcon = article.getFeedIcon();
+        String feedIcon = article.getFeed().getIconURL();
         if (feedIcon == null || feedIcon.isEmpty()) {
             feedIconImageView.setVisibility(View.GONE);
         } else {
@@ -491,7 +490,7 @@ public class ArticleActivity extends AppCompatActivity implements
                 article.getImgLink()+" " +
                 article.getPubDateString("yyyy-MM-dd hh:mm:ss")+" " +
                 loggedUser.getId()+" " +
-                article.getFeed()+" " +
+                article.getFeedId()+" " +
                 collection.getId()+ " to collection " + collection.getTitle());
 
         api.addUserArticleAssociatedToCollection(
@@ -502,7 +501,7 @@ public class ArticleActivity extends AppCompatActivity implements
                 article.getImgLink(),
                 article.getPubDateString("yyyy-MM-dd hh:mm:ss"),
                 loggedUser.getId(),
-                article.getFeed(),
+                article.getFeedId(),
                 collection.getId(),
                 new SQLOperationListCallback() {
                     @Override

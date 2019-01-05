@@ -27,7 +27,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -40,7 +39,6 @@ import com.company.rss.rss.adapters.ExpandableListAdapter;
 import com.company.rss.rss.fragments.ArticlesListFragment;
 import com.company.rss.rss.fragments.ArticlesSlideFragment;
 import com.company.rss.rss.models.Article;
-import com.company.rss.rss.models.ArticlesScores;
 import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.Multifeed;
@@ -50,7 +48,6 @@ import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.restful_api.LoadUserCollections;
 import com.company.rss.rss.restful_api.LoadUserMultifeeds;
 import com.company.rss.rss.restful_api.RESTMiddleware;
-import com.company.rss.rss.restful_api.callbacks.ArticlesScoresCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationListCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
@@ -118,7 +115,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     boolean autoSliderOn;
     private Handler autoSliderHandler;
     private Runnable autoSliderRunnable;
-    private int autoSliderTimeoutMillis = 6000;
+    private int autoSliderTimeoutMillis = 4000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -684,7 +681,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                         article.getImgLink() + " " +
                         article.getPubDateString("yyyy-MM-dd hh:mm:ss") + " " +
                         userData.getUser().getId() + " " +
-                        article.getFeed() + " " +
+                        article.getFeedId() + " " +
                         readItLaterCollection.getId() + " to collection " + readItLaterCollection.getTitle());
 
                 api.addUserArticleAssociatedToCollection(
@@ -695,7 +692,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                         article.getImgLink(),
                         article.getPubDateString("yyyy-MM-dd hh:mm:ss"),
                         userData.getUser().getId(),
-                        article.getFeed(),
+                        article.getFeedId(),
                         readItLaterCollection.getId(),
                         new SQLOperationListCallback() {
                             @Override

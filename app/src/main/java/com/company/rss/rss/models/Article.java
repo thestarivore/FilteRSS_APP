@@ -1,7 +1,5 @@
 package com.company.rss.rss.models;
 
-import android.util.Log;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.thedeanda.lorem.Lorem;
@@ -55,10 +53,10 @@ public class Article implements Serializable {
     @Expose
     private int feed;
 
-    private String feedName;
-    private String iconURL;
-    private int color;
-    private float score;
+
+    private Feed feedO;
+
+    private float score = 1;
 
     //TODO: aggiunto perche usato nella mockapp, ma non c'era nel ER_Model originale, valutare se serve
     private String excerpt;
@@ -76,7 +74,7 @@ public class Article implements Serializable {
         this.pubDate = pubDate;
     }
 
-    public Article(long hashId, String title, String description, String comment, String link, String imgLink, Date pubDate, int user, int feed) {
+    public Article(long hashId, String title, String description, String comment, String link, String imgLink, Date pubDate, int user, int feedId) {
         this.hashId = hashId;
         this.title = title;
         this.description = description;
@@ -85,7 +83,7 @@ public class Article implements Serializable {
         this.imgLink = imgLink;
         this.pubDate = pubDate;
         this.user = user;
-        this.feed = feed;
+        this.feed = feedId;
     }
 
     public long getHashId() {
@@ -178,11 +176,15 @@ public class Article implements Serializable {
         this.user = user;
     }
 
-    public int getFeed() {
+    public Feed getFeed() { return feedO; }
+
+    public void setFeed(Feed feedO) { this.feedO = feedO; }
+
+    public int getFeedId() {
         return feed;
     }
 
-    public void setFeed(int feed) {
+    public void setFeedId(int feedID) {
         this.feed = feed;
     }
 
@@ -200,30 +202,6 @@ public class Article implements Serializable {
 
     public void setAuthor(String author) {
         this.author = author;
-    }
-
-    public void setFeedName(String feedName) {
-        this.feedName = feedName;
-    }
-
-    public String getFeedName() {
-        return feedName;
-    }
-
-    public void setFeedIcon(String iconURL) {
-        this.iconURL = iconURL;
-    }
-
-    public String getFeedIcon() {
-        return iconURL;
-    }
-
-    public void setColor(int color) {
-        this.color = color;
-    }
-
-    public int getColor() {
-        return color;
     }
 
     public float getScore() {

@@ -1,9 +1,7 @@
 package com.company.rss.rss.models;
 
 import android.graphics.Color;
-import android.util.Log;
 
-import com.company.rss.rss.ArticleActivity;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.thedeanda.lorem.Lorem;
@@ -31,10 +29,12 @@ public class Multifeed implements Serializable {
     @Expose
     private int color;
 
+    @SerializedName("rating")
+    @Expose
+    private int rating;
+
     //TODO: aggiunto perche usato nella mockapp, ma non c'era nel ER_Model originale, valutare se gestire la lista dei feeds qui, oppure esternamente
     private List<Feed> feeds;
-    //TODO: aggiunto perche usato nella mockapp, ma non c'era nel ER_Model originale, valutare se serve
-    private int importance;
 
     public Multifeed() {
     }
@@ -86,12 +86,12 @@ public class Multifeed implements Serializable {
         this.feeds = feeds;
     }
 
-    public int getImportance() {
-        return importance;
+    public int getRating() {
+        return rating;
     }
 
-    public void setImportance(int importance) {
-        this.importance = importance;
+    public void setRating(int rating) {
+        this.rating = rating;
     }
 
     @Override

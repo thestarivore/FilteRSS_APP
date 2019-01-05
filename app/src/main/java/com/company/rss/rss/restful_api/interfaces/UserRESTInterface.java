@@ -58,7 +58,8 @@ public interface UserRESTInterface {
     @PUT("/v1/user/multifeeds")
     public Call<SQLOperation> addUserMultifeed(@Field("title") String title,
                                                @Field("user") int user,
-                                               @Field("color") int color);
+                                               @Field("color") int color,
+                                               @Field("rating") int rating);
 
     @FormUrlEncoded
     @HTTP(method = "DELETE", path = "/v1/user/multifeeds", hasBody = true)
@@ -67,8 +68,9 @@ public interface UserRESTInterface {
     @FormUrlEncoded
     @PATCH("/v1/user/multifeeds")
     public Call<SQLOperation> updateUserMultifeed(@Field("id") int userId,
-                                                    @Field("title") String newTitle,
-                                                    @Field("color") int newColor);
+                                                  @Field("title") String newTitle,
+                                                  @Field("color") int newColor,
+                                                  @Field("rating") int newRating);
     /*********************** User - Collections *********************************/
     @GET("/v1/user/collections")
     public Call<List<Collection>> getUserCollections(@Query("email") String userEmail);

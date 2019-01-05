@@ -477,8 +477,8 @@ public class RESTService {
      * @param color Color used to indicate the multifeed on user's app
      * @param callback Callback for API response management
      */
-    public void addUserMultifeed(String title, int user, int color, final SQLOperationCallback callback){
-        userRESTInterface.addUserMultifeed(title, user, color).enqueue(new retrofit2.Callback<SQLOperation>() {
+    public void addUserMultifeed(String title, int user, int color, int rating, final SQLOperationCallback callback){
+        userRESTInterface.addUserMultifeed(title, user, color, rating).enqueue(new retrofit2.Callback<SQLOperation>() {
 
             @Override
             public void onResponse(Call<SQLOperation> call, Response<SQLOperation> response) {
@@ -520,8 +520,8 @@ public class RESTService {
      * @param newTitle  The new title to set instead of the old one
      * @param newColor  The new color to set instead of the old one
      */
-    public void updateUserMultifeed(int id, String newTitle, int newColor, final SQLOperationCallback callback){
-        userRESTInterface.updateUserMultifeed(id, newTitle, newColor).enqueue(new retrofit2.Callback<SQLOperation>() {
+    public void updateUserMultifeed(int id, String newTitle, int newColor, int newRating, final SQLOperationCallback callback){
+        userRESTInterface.updateUserMultifeed(id, newTitle, newColor, newRating).enqueue(new retrofit2.Callback<SQLOperation>() {
             @Override
             public void onResponse(Call<SQLOperation> call, Response<SQLOperation> response) {
                 SQLOperation sqlOperation = response.body();

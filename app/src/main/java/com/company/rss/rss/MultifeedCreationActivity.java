@@ -111,7 +111,7 @@ public class MultifeedCreationActivity extends AppCompatActivity implements Mult
             Log.d(ArticleActivity.logTag + ":" + TAG, "Saving newly created multifeed, info: " + multifeed.toString());
 
             // Call the API and add the user
-            api.addUserMultifeed(multifeed.getTitle(), userData.getUser().getId(), multifeed.getColor(), new SQLOperationCallback() {
+            api.addUserMultifeed(multifeed.getTitle(), userData.getUser().getId(), multifeed.getColor(), multifeed.getRating(), new SQLOperationCallback() {
                 @Override
                 public void onLoad(SQLOperation sqlOperation) {
                     Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed saved successfully via API " + sqlOperation.toString());

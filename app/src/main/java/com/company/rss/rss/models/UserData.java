@@ -122,7 +122,7 @@ public class UserData {
 
             //For every feed in the list, assign the color of the multifeed
             for (Feed feed: mfeedList){
-                feed.setMultifeedColor(multifeed.getColor());
+                feed.setMultifeed(multifeed);
             }
 
             //Add the FeedList associated Multifeed in the MultifeedMap
