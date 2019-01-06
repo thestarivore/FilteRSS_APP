@@ -166,7 +166,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         final Map<String, Integer> feedArticlesNumberMap = new HashMap<>();
         final int numberOfFeeds;
         final SQLiteService sqLiteService = SQLiteService.getInstance(getContext());
-        final boolean[] articlesSQLiteLoaded = {false};
+        //final boolean[] articlesSQLiteLoaded = {false};
 
         //Get the Transferred UserData
         this.userData = UserData.getInstance();
@@ -177,7 +177,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             this.articles = new ArrayList<>();
 
             //Get all the articles, and notify the change to the RecyclerView once we have them
-            sqLiteService.getAllArticles(new ArticleCallback() {
+            /*sqLiteService.getAllArticles(new ArticleCallback() {
                 @Override
                 public void onLoad(List<Article> localArticles) {
                     if (localArticles != null) {
@@ -200,7 +200,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                 public void onFailure() {
                     Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
                 }
-            });
+            });*/
         }
 
         //Get the list of feeds to show in the RecyclerView
@@ -287,11 +287,24 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             final Thread waitSQLiteLoaded = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while (!articlesSQLiteLoaded[0]) {
+                    while (!userData.isLocalArticleListLoaded()) {
                         try {
                             Thread.sleep(200);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                        }
+                    }
+
+                    //When the local ArticleList has finished loading, get the new articles in the RecyclerView adapter's list
+                    articles.clear();
+                    articles.addAll(userData.getLocalArticleList());
+
+                    //Associate the FeedObjects to each Article (since these are not stored in the local SQLite Database
+                    for (Article article: articles){
+                        for (Feed feed: userData.getFeedList()){
+                            if (feed.getId() == article.getFeed()){
+                                article.setFeedObj(feed);
+                            }
                         }
                     }
 
@@ -395,7 +408,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         mListener.onListFragmentArticlesReady();
 
                         //Wait for the SQLite Article to load
-                        while (!articlesSQLiteLoaded[0]) {
+                        while (!userData.isLocalArticleListLoaded()) {
                             try {
                                 Thread.sleep(200);
                             } catch (InterruptedException e) {

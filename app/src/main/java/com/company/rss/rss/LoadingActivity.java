@@ -10,10 +10,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.company.rss.rss.models.Article;
+import com.company.rss.rss.models.Feed;
 import com.company.rss.rss.models.User;
+import com.company.rss.rss.models.UserData;
 import com.company.rss.rss.restful_api.LoadUserData;
+import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
+import com.company.rss.rss.service.SQLiteService;
 
+import java.util.List;
 import java.util.Random;
 
 public class LoadingActivity extends AppCompatActivity {
@@ -89,6 +95,26 @@ public class LoadingActivity extends AppCompatActivity {
         Intent intent = getIntent();
         User loggedUser = (User) intent.getSerializableExtra("logged-user");
 
+        //Get SQLite Service instance
+        SQLiteService sqLiteService = SQLiteService.getInstance(this);
+        //Get a UserData instance
+        final UserData userData = UserData.getInstance();
+
+        //Get all the articles satored locally in the SQLite Database
+        sqLiteService.getAllArticles(new ArticleCallback() {
+            @Override
+            public void onLoad(List<Article> localArticles) {
+                if (localArticles != null) {
+                    userData.setLocalArticleList(localArticles);
+                }
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
+            }
+        });
+
         //Load user data from the server only if there is internet connection
         if (isNetworkAvailable()) {
             Log.d(ArticleActivity.logTag + ":" + TAG, "Starting user's data loading...");
@@ -109,7 +135,17 @@ public class LoadingActivity extends AppCompatActivity {
         }
         //Offline Mode
         else{
-            startArticlesListActivity();
+            Thread waitAllFeedsLoaded = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    //Wait for the local list of articles to load first in offline mode
+                    while (userData.isLocalArticleListLoaded() == false) ;
+
+                    //Then afterwards start the ArticlesList Activity
+                    startArticlesListActivity();
+                }
+            });
+            waitAllFeedsLoaded.start();
         }
     }
 

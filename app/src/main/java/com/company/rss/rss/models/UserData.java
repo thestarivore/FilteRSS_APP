@@ -29,8 +29,8 @@ public class UserData {
     private List<Collection>        collectionList;
     private List<SavedArticle>      savedArticleList;   //Article-Collection connections
     private List<Article>           articleList;        //User's saved/read articles
-    //private List<Article>           dlArticleList;      //Downloaded Article List (The List of Articles that is actually downloaded from each Feed
-                                                        //and later stored on a local SQLite Database)
+    private List<Article>           localArticleList;   //Local stored Article List (the list of articles stored in the local SQLite Database)
+    private boolean                 localArticleListLoaded;
 
     //Maps
     private Map<Multifeed,List<Feed>>       multifeedMap;
@@ -47,9 +47,6 @@ public class UserData {
     private int collectionPosition;
     private UserPrefs prefs;
     private Context context;
-
-    //SQLite
-    private ArticleSQLiteRepository repository;
 
     /**
      * Get Singleton's instance
@@ -239,68 +236,22 @@ public class UserData {
         return articleTitlesList;
     }
 
- /*   public Multifeed getFeedsMultifeed(Feed feed){
-        for (Map.Entry<Multifeed, List<Feed>> entry : multifeedMap.entrySet()) {
-            Multifeed multifeed = entry.getKey();
-            List<Feed> feedList = entry.getValue();
-
-        }
-    }*/
-
-   /* public void initSQLiteRepository(Context ctx){
-        //Initialize the SQLite Repository
-        repository = new ArticleSQLiteRepository(ctx);
+    public List<Article> getLocalArticleList() {
+        return localArticleList;
     }
 
-    public List<Article> getDownloadedArticleList() {
-        return dlArticleList;
+    public void setLocalArticleList(List<Article> localArticleList) {
+        this.localArticleList = localArticleList;
+        this.localArticleListLoaded = true;
     }
 
-    public void setDlArticleList(final List<Article> newDlArticleList) {
-        this.dlArticleList = newDlArticleList;
-
-        //Also persist the change
-        Thread thread = new Thread() {
-            @Override
-            public void run() {
-                setSQLStoredAllDownloadedArticles(newDlArticleList);
-            }
-        };
-        thread.start();
+    public boolean isLocalArticleListLoaded() {
+        return localArticleListLoaded;
     }
 
-    public List<Article> getSQLStoredAllDownloadedArticles(){
-        ArticleCursor cursor = repository.findAll();
-        return getArticleListFromCursor(cursor);
+    public void setLocalArticleListLoaded(boolean localArticleListLoaded) {
+        this.localArticleListLoaded = localArticleListLoaded;
     }
-
-    public void setSQLStoredAllDownloadedArticles(List<Article> articles){
-        for (Article article: articles){
-            repository.add(article);
-        }
-    }
-
-    public List<Article> getArticleListFromCursor(ArticleCursor cursor){
-        final List<Article> articles = new ArrayList<>();
-
-        //Iterate with the cursor and fill the list of articles
-        while (cursor.moveToNext()){
-            Article newArticle = new Article();
-            newArticle.setHashId(cursor.getHashId());
-            newArticle.setTitle(cursor.getTitle());
-            newArticle.setAuthor(cursor.getAuthor());
-            newArticle.setDescription(cursor.getDescription());
-            newArticle.setComment(cursor.getComment());
-            newArticle.setLink(cursor.getLink());
-            newArticle.setImgLink(cursor.getImageLink());
-            newArticle.setPubDateFromString(cursor.getPubDate());
-            newArticle.setUser(cursor.getUser());
-            newArticle.setFeedObj(cursor.getFeedObj());
-            newArticle.setScore(cursor.getScore());
-            articles.add(newArticle);
-        }
-        return articles;
-    }*/
 
     /********************************************/
     public User getUser() {
