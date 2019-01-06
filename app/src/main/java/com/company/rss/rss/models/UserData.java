@@ -295,7 +295,7 @@ public class UserData {
             newArticle.setImgLink(cursor.getImageLink());
             newArticle.setPubDateFromString(cursor.getPubDate());
             newArticle.setUser(cursor.getUser());
-            newArticle.setFeed(cursor.getFeed());
+            newArticle.setFeedObj(cursor.getFeedObj());
             newArticle.setScore(cursor.getScore());
             articles.add(newArticle);
         }

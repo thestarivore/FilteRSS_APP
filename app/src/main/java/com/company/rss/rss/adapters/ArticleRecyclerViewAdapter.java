@@ -2,9 +2,9 @@ package com.company.rss.rss.adapters;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.R;
 import com.company.rss.rss.fragments.ArticlesListFragment.OnListFragmentInteractionListener;
 import com.company.rss.rss.models.Article;
@@ -49,7 +48,11 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mArticles.get(position);
 
-        holder.mArticleColorView.setBackgroundColor(mArticles.get(position).getFeed().getMultifeed().getColor());
+        if(mArticles.get(position).getFeedObj() != null)
+            holder.mArticleColorView.setBackgroundColor(mArticles.get(position).getFeedObj().getMultifeed().getColor());
+        else
+            holder.mArticleColorView.setBackgroundColor(Color.BLACK);
+
         holder.mTitleView.setText(mArticles.get(position).getTitle());
 
         String description = mArticles.get(position).getDescription();
@@ -71,7 +74,8 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             holder.mPubDateView.setText(pubDate);
         }
 
-        holder.mFeedNameView.setText(mArticles.get(position).getFeed().getTitle());
+        if(mArticles.get(position).getFeedObj() != null)
+            holder.mFeedNameView.setText(mArticles.get(position).getFeedObj().getTitle());
 
         String imgLink = mArticles.get(position).getImgLink();
         if (imgLink == null || imgLink.isEmpty()) {
@@ -80,7 +84,9 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             Picasso.get().load(imgLink).into(holder.mImageView);
         }
 
-        String feedIcon = mArticles.get(position).getFeed().getIconURL();
+        String feedIcon = null;
+        if(mArticles.get(position).getFeedObj() != null)
+            feedIcon = mArticles.get(position).getFeedObj().getIconURL();
         if (feedIcon == null || feedIcon.isEmpty()) {
             holder.mFeedIcon.setVisibility(View.GONE);
         } else {

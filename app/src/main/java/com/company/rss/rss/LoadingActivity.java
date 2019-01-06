@@ -1,6 +1,9 @@
 package com.company.rss.rss;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -86,22 +89,28 @@ public class LoadingActivity extends AppCompatActivity {
         Intent intent = getIntent();
         User loggedUser = (User) intent.getSerializableExtra("logged-user");
 
-        Log.d(ArticleActivity.logTag + ":" + TAG, "Starting user's data loading...");
-        //Start an AsyncTask to gather all the User's information before stepping into the main Activity
-        new LoadUserData(new AsyncResponse() {
-            @Override
-            public void processFinish(Integer output) {
-                if(output == LoadUserData.DATA_LOADING_TERMINTAED) {
-                    //All the data has been gathered so we can open the main activity
-                    Log.d(ArticleActivity.logTag + ":" + TAG, "User's data loaded...");
-                    startArticlesListActivity();
+        //Load user data from the server only if there is internet connection
+        if (isNetworkAvailable()) {
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Starting user's data loading...");
+            //Start an AsyncTask to gather all the User's information before stepping into the main Activity
+            new LoadUserData(new AsyncResponse() {
+                @Override
+                public void processFinish(Integer output) {
+                    if (output == LoadUserData.DATA_LOADING_TERMINTAED) {
+                        //All the data has been gathered so we can open the main activity
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "User's data loaded...");
+                        startArticlesListActivity();
+                    } else if (output == LoadUserData.AUTHENTICATION_FAILED) {
+                        startLoginActivityOnAuthFailed();
+                        Snackbar.make(findViewById(android.R.id.content), R.string.authentication_failed, Snackbar.LENGTH_LONG).show();
+                    }
                 }
-                else if (output == LoadUserData.AUTHENTICATION_FAILED){
-                    startLoginActivityOnAuthFailed();
-                    Snackbar.make(findViewById(android.R.id.content), R.string.authentication_failed, Snackbar.LENGTH_LONG).show();
-                }
-            }
-        }, this, loggedUser).execute();
+            }, this, loggedUser).execute();
+        }
+        //Offline Mode
+        else{
+            startArticlesListActivity();
+        }
     }
 
     /**
@@ -121,4 +130,14 @@ public class LoadingActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Query if there is Internet Connection or the device is Offline
+     * @return True if there is Internet connection, false if Offline
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+    }
 }

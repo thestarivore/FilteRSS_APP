@@ -57,6 +57,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     private RESTMiddleware api;
     private int feedCounter;
     private int scoreCounter;
+    private Context context;
+    private ArticleRecyclerViewAdapter adapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -103,6 +105,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             // Create the RecyclerView and Set it's adapter
             if (view instanceof RecyclerView) {
                 Context context = view.getContext();
+                this.context = context;
                 recyclerView = (RecyclerView) view;
 
                 // Set the swipe controller
@@ -115,7 +118,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                     recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
                 }
 
-                recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, context));
+                adapter = new ArticleRecyclerViewAdapter(articles, mListener, context);
+                recyclerView.setAdapter(adapter);
             }
         }
 
@@ -157,16 +161,47 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
      */
     public void onUserDataLoaded() {
         final List<Feed> feedList = new ArrayList<>();
-        final List<Article> articleList = new ArrayList<>();
+        final List<Article> collectionArticleList = new ArrayList<>();
+        final List<Article> downloadedArticleList = new ArrayList<>();
         final Map<String, Integer> feedArticlesNumberMap = new HashMap<>();
         final int numberOfFeeds;
+        final SQLiteService sqLiteService = SQLiteService.getInstance(getContext());
+        final boolean[] articlesSQLiteLoaded = {false};
 
         //Get the Transferred UserData
         this.userData = UserData.getInstance();
 
-        //Prepare the articles list
-        if (articles == null)
+        //Prepare the articles list, and before downloading the real list of articles, retrieve the list
+        //of articles stored in the local SQLite Database;
+        if (articles == null) {
             this.articles = new ArrayList<>();
+
+            //Get all the articles, and notify the change to the RecyclerView once we have them
+            sqLiteService.getAllArticles(new ArticleCallback() {
+                @Override
+                public void onLoad(List<Article> localArticles) {
+                    if (localArticles != null) {
+                        articlesSQLiteLoaded[0] = true;
+                        articles.clear();
+                        articles.addAll(localArticles);
+
+                        //Associate the FeedObjects to each Article (since these are not stored in the local SQLite Database
+                        for (Article article: articles){
+                            for (Feed feed: userData.getFeedList()){
+                                if (feed.getId() == article.getFeed()){
+                                    article.setFeedObj(feed);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure() {
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
+                }
+            });
+        }
 
         //Get the list of feeds to show in the RecyclerView
         //All Multifeeds Feeds Articles
@@ -186,7 +221,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         //Collection Articles
         else if (userData.getVisualizationMode() == UserData.MODE_COLLECTION_ARTICLES) {
             Collection collection = userData.getCollectionList().get(userData.getCollectionPosition());
-            articleList.addAll(userData.getCollectionMap().get(collection));
+            collectionArticleList.addAll(userData.getCollectionMap().get(collection));
         }
 
         //Total number of feeds
@@ -204,7 +239,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         final HashMap<Long, Article> articlesHashesMap = new HashMap<>();
                         for (final Article article : rssFeed.getItemList()) {
                             article.setFeedId(feed.getId());
-                            article.setFeed(feed);
+                            article.setFeedObj(feed);
 
                            /* // get and set the article score
                             api.getArticleScore(article.getHashId(), new ArticlesScoresCallback() {
@@ -224,7 +259,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
                             articlesHashesMap.put(article.getHashId(), article);
 
-                            articles.add(article);
+                            //articles.add(article);
+                            downloadedArticleList.add(article);
                         }
 
                         if(!articlesHashesMap.keySet().isEmpty()){
@@ -247,6 +283,33 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                 }, getContext(), feed).execute();
             }
 
+            // Wait until all the articles stored locally in the SQLite database are retrieved
+            final Thread waitSQLiteLoaded = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (!articlesSQLiteLoaded[0]) {
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(recyclerView!=null) {
+                                recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, getContext()));
+                                recyclerView.getAdapter().notifyDataSetChanged();
+                            }
+                        }
+                    });
+                    mListener.onListFragmentAllArticlesReady(feedArticlesNumberMap, articles);
+                    mListener.onListFragmentArticlesReady();
+                }
+            });
+            waitSQLiteLoaded.start();
+
             // Wait until at least one LoadRSSFeed has finished then call onListFragmentArticlesReady
             // to notify that we have something to show
             final Thread waitAllFeedsLoaded = new Thread(new Runnable() {
@@ -260,45 +323,30 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         }
                     }
 
+                    /**
+                     * All articles have been downloaded -->
+                     *      Control if there are any changes, between the copy in the local SQLite Database and
+                     *      the list of articles just downloaded;
+                     *
+                     * If we find even one downloaded article missing in the local list --> substitute all
+                     */
+                    boolean articleMismatch = false;
+                    for (Article article: downloadedArticleList){
+                        if (article.isArticleInTheList(articles) == false){
+                            articleMismatch = true;
+
+                            //Substitute all the articles in the recycler view with those downloaded
+                            articles = downloadedArticleList;
+
+                            //Exit for loop prematurely
+                            break;
+                        }
+                    }
+
                     //Wait for all articles to load, then notify the activity with a callback, and pass the
                     //map of the number of articles for each feed
                     if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
                         mListener.onListFragmentAllArticlesReady(feedArticlesNumberMap, articles);
-
-                        /*************************************************************************************/
-                        //TODO:DELETE, just a test
-                        final SQLiteService sqLiteService = SQLiteService.getInstance(getContext());
-                        sqLiteService.deleteAllArticles(new SQLOperationCallback() {
-                            @Override
-                            public void onLoad(SQLOperation sqlOperation) {
-                                sqLiteService.putArticles(articles, new SQLOperationCallback() {
-                                    @Override
-                                    public void onLoad(SQLOperation sqlOperation) {
-                                        sqLiteService.getAllArticles(new ArticleCallback() {
-                                            @Override
-                                            public void onLoad(List<Article> newArticles) {
-                                                List<Article>  articleList1 = newArticles;
-                                                Log.d(ArticleActivity.logTag + ":" + TAG, "Articles retrieved = " + articleList1.size());
-                                            }
-
-                                            @Override
-                                            public void onFailure() {
-                                                Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
-                                            }
-                                        });
-                                    }
-                                    @Override
-                                    public void onFailure() {
-                                        Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
-                                    }
-                                });
-                            }
-                            @Override
-                            public void onFailure() {
-                                Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
-                            }
-                        });
-                        /***************************************************************************************/
                     }
 
                     if (mListener != null) {
@@ -311,7 +359,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
                         for (int i = 0; i<articles.size(); i++) {
                             Article article = articles.get(i);
-                            float articleScoreByRating = article.getScore() * article.getFeed().getMultifeed().getRating();
+                            float articleScoreByRating = article.getScore() * article.getFeedObj().getMultifeed().getRating();
                             article.setScore(articleScoreByRating);
                             Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
                         }
@@ -330,15 +378,65 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                             Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
                         }
 
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(recyclerView!=null)
-                                    recyclerView.getAdapter().notifyDataSetChanged();
-                            }
-                        });
+                        //Reload RecyclerView only if the downloaded articles are different that those stored locally
+                        if(articleMismatch) {
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (recyclerView != null) {
+                                        recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, getContext()));
+                                        recyclerView.getAdapter().notifyDataSetChanged();
+                                    }
+                                }
+                            });
+                        }
 
+                        //Callback
                         mListener.onListFragmentArticlesReady();
+
+                        //Wait for the SQLite Article to load
+                        while (!articlesSQLiteLoaded[0]) {
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        /**
+                         * If the LocalCopy of the articles is different from the one just downloaded, we also
+                         * need to persist the new list of articles downloaded. It is important to do it here,
+                         * after the list has been sorted, otherwise if we change the list during the persistence
+                         * we might get a concurrency problem (ex ConcurrentModificationException).
+                         */
+                        if(articleMismatch){
+                            //Once all the articles have been downloaded for each feed, store them in the local SQLite Database
+                            //(but first clear the table of the old rows)
+                            sqLiteService.deleteAllArticles(new SQLOperationCallback() {
+                                @Override
+                                public void onLoad(SQLOperation sqlOperation) {
+                                    Log.d(ArticleActivity.logTag + ":" + TAG,
+                                            "All the articles have been deleted from the local SQLite DB, Article Table!");
+
+                                    //Once the Table have been cleaned, add/store the list of articles
+                                    sqLiteService.putArticles(articles, new SQLOperationCallback() {
+                                        @Override
+                                        public void onLoad(SQLOperation sqlOperation) {
+                                            Log.d(ArticleActivity.logTag + ":" + TAG,
+                                                    "Added "+sqlOperation.getAffectedRows()+" articles into the local SQLite DB, Article Table!");
+                                        }
+                                        @Override
+                                        public void onFailure() {
+                                            Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
+                                        }
+                                    });
+                                }
+                                @Override
+                                public void onFailure() {
+                                    Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
+                                }
+                            });
+                        }
                     }
 
                 }
@@ -362,7 +460,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         }
         //MODE_COLLECTION_ARTICLES
         else {
-            articles.addAll(articleList);
+            articles.addAll(collectionArticleList);
             mListener.onListFragmentArticlesReady();
 
             //Notify a change in the RecyclerView's Article List
@@ -384,7 +482,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
                 for (int i = 0; i < articlesScores.size(); i++) {
                     Article article = articlesHashes.get(articlesScores.get(i).getArticle());
-                    Log.d(ArticleActivity.logTag + ":" + TAG, "Received score for article: " + articlesScores.get(i) + " : Multifeed rating: " + article.getFeed().getMultifeed().getRating());
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "Received score for article: " + articlesScores.get(i) + " : Multifeed rating: " + article.getFeedObj().getMultifeed().getRating());
                     article.setScore(articlesScores.get(i).getScore());
                 }
             }

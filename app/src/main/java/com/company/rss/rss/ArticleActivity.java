@@ -128,12 +128,12 @@ public class ArticleActivity extends AppCompatActivity implements
             articlePubDateTextView.setText(pubDate);
         }
 
-        String articleFeedName = article.getFeed().getTitle();
+        String articleFeedName = article.getFeedObj().getTitle();
         TextView articleFeedNameTextView = findViewById(R.id.textViewArticleFeedName);
         articleFeedNameTextView.setText(articleFeedName);
 
         ImageView feedIconImageView = findViewById(R.id.imageViewArticleFeedIcon);
-        String feedIcon = article.getFeed().getIconURL();
+        String feedIcon = article.getFeedObj().getIconURL();
         if (feedIcon == null || feedIcon.isEmpty()) {
             feedIconImageView.setVisibility(View.GONE);
         } else {

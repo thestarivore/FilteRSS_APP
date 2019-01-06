@@ -10,7 +10,6 @@ import com.company.rss.rss.persistence.articles.ArticleCursor;
 import com.company.rss.rss.persistence.articles.ArticleSQLiteRepository;
 import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
-import com.company.rss.rss.restful_api.callbacks.SQLOperationListCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +30,12 @@ public class SQLiteService {
         return instance;
     }
 
+    /**
+     * Get/Retrieve the List of all the articles in the local SQLite Database (from the Article Table)
+     * @param callback  ArticleCallback callback object with the onLoad() and onFailed() methods
+     *                  that are used to notify the result of the execution. This callback returns
+     *                  a List<Article> on the onLoad() method.
+     */
     public synchronized void getAllArticles(final ArticleCallback callback){
         Thread thread = new Thread() {
             @Override
@@ -46,6 +51,14 @@ public class SQLiteService {
         thread.start();
     }
 
+    /**
+     * Put/Store a list of articles in the local SQLite Database (into the Article Table)
+     * @param articles  List<Article> object containing the list of articles passed as argument
+     * @param callback  SQLOperationCallback callback object with the onLoad() and onFailed() methods
+     *                  that are used to notify the result of the execution. This callback returns
+     *                  a SQLOperation object on the onLoad() method, containing informations about
+     *                  the query ran.
+     */
     public synchronized void putArticles(final List<Article> articles, final SQLOperationCallback callback){
         Thread thread = new Thread() {
             @Override
@@ -67,6 +80,13 @@ public class SQLiteService {
         thread.start();
     }
 
+    /**
+     * Delete all the articles from the local SQLite Database (from the Article Table)
+     * @param callback  SQLOperationCallback callback object with the onLoad() and onFailed() methods
+     *                  that are used to notify the result of the execution. This callback returns
+     *                  a SQLOperation object on the onLoad() method, containing informations about
+     *                  the query ran.
+     */
     public synchronized void deleteAllArticles(final SQLOperationCallback callback){
         Thread thread = new Thread() {
             @Override
@@ -85,6 +105,14 @@ public class SQLiteService {
         thread.start();
     }
 
+    /**
+     * Delete an articles from the local SQLite Database (from the Article Table)
+     * @param article   Article object to be deleted from the database
+     * @param callback  SQLOperationCallback callback object with the onLoad() and onFailed() methods
+     *                  that are used to notify the result of the execution. This callback returns
+     *                  a SQLOperation object on the onLoad() method, containing informations about
+     *                  the query ran.
+     */
     public synchronized void deleteArticle(final Article article, final SQLOperationCallback callback){
         Thread thread = new Thread() {
             @Override
@@ -103,6 +131,11 @@ public class SQLiteService {
         thread.start();
     }
 
+    /**
+     * A Helper function, that given an ArticleCursor object, it retrieves and returns a list of articles(List<Article>)
+     * @param   cursor      ArticleCursor object
+     * @return  articles    List<Article> object
+     */
     public List<Article> getArticleListFromCursor(ArticleCursor cursor){
         final List<Article> articles = new ArrayList<>();
 
@@ -122,6 +155,22 @@ public class SQLiteService {
             newArticle.setScore(cursor.getScore());
             articles.add(newArticle);
         }
+        /*
+        while (cursor.moveToNext()){
+            Article newArticle = new Article();
+            newArticle.setHashId(cursor.getLong(0));
+            newArticle.setTitle(cursor.getString(1));
+            newArticle.setAuthor(cursor.getString(2));
+            newArticle.setDescription(cursor.getString(3));
+            newArticle.setComment(cursor.getString(4));
+            newArticle.setLink(cursor.getString(5));
+            newArticle.setImgLink(cursor.getString(6));
+            newArticle.setPubDateFromString(cursor.getString(7));
+            newArticle.setUser(cursor.getInt(8));
+            newArticle.setFeed(cursor.getInt(9));
+            newArticle.setScore(cursor.getFloat(10));
+            articles.add(newArticle);
+        }*/
         return articles;
     }
 }

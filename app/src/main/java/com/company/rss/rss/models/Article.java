@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.StringTokenizer;
 
@@ -171,7 +172,11 @@ public class Article implements Serializable {
      * @param pubDateStr String of the date
      */
     public void setPubDateFromString(String pubDateStr){
-        setPubDate(parseDateFromString(pubDateStr));
+        SimpleDateFormat sdfFromSQLiteDB = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+        try{
+            setPubDate(sdfFromSQLiteDB.parse("Wed Mar 30 00:00:00 GMT+05:30 2016"));
+        }catch (Exception e){ e.printStackTrace(); }
+        //etPubDate(parseDateFromString(pubDateStr));
     }
 
     public void setPubDate(Date pubDate) {
@@ -186,9 +191,9 @@ public class Article implements Serializable {
         this.user = user;
     }
 
-    public Feed getFeed() { return feedO; }
+    public Feed getFeedObj() { return feedO; }
 
-    public void setFeed(Feed feedO) { this.feedO = feedO; }
+    public void setFeedObj(Feed feedO) { this.feedO = feedO; }
 
     public int getFeedId() {
         return feed;
@@ -224,6 +229,10 @@ public class Article implements Serializable {
 
     public void setFeed(int feed) {
         this.feed = feed;
+    }
+
+    public int getFeed() {
+        return feed;
     }
 
     @Override
@@ -344,6 +353,19 @@ public class Article implements Serializable {
             return dates.get(0);
         }
         return  null;
+    }
+
+    /**
+     * Find out if this article is present in the passed List of articles
+     * @param articleList
+     * @return True if article is present in the list, false otherwise
+     */
+    public boolean isArticleInTheList(List<Article> articleList){
+        for (Article article: articleList){
+            if (hashId == article.hashId)
+                return true;
+        }
+        return false;
     }
 }
 

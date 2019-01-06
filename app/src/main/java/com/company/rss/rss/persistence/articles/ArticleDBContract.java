@@ -22,7 +22,8 @@ public class ArticleDBContract {
                     ArticleEntry.PUB_DATE_CLMN      +" datetime NOT NULL, "+
                     ArticleEntry.USER_CLMN          +" int(11) NOT NULL, "+
                     ArticleEntry.FEED_CLMN          +" int(11) NOT NULL, "+
-                    ArticleEntry.SCORE_CLMN         +" float)";
+                    ArticleEntry.SCORE_CLMN         +" float);" +
+            "CREATE INDEX hashid_index ON " + ArticleEntry.TABLE_NAME + " (" + ArticleEntry.HASH_ID_CLMN + ");";
 
     public static SQLiteDatabase getWritableDatabase(Context context){
         return new ArticleDBHelper(context).getWritableDatabase();

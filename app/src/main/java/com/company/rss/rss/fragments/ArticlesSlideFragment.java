@@ -5,17 +5,14 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.R;
 import com.company.rss.rss.adapters.ArticleRecyclerViewAdapter;
-import com.company.rss.rss.helpers.DownloadImageTask;
 import com.company.rss.rss.models.Article;
 import com.squareup.picasso.Picasso;
 
@@ -59,7 +56,7 @@ public class ArticlesSlideFragment extends Fragment {
         if(mArticle != null) {
             articleTitle.setText(mArticle.getTitle());
 
-            articleSource.setText(mArticle.getFeed().getTitle());
+            articleSource.setText(mArticle.getFeedObj().getTitle());
 
 
             String imgLink = mArticle.getImgLink();
@@ -69,7 +66,7 @@ public class ArticlesSlideFragment extends Fragment {
                 Picasso.get().load(imgLink).into(articleImage);
             }
 
-            String feedIcon = mArticle.getFeed().getIconURL();
+            String feedIcon = mArticle.getFeedObj().getIconURL();
             if (feedIcon == null || feedIcon.isEmpty()) {
                 articleFeedIcon.setVisibility(View.GONE);
             } else {
