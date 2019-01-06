@@ -12,6 +12,10 @@ import net.boeckling.crc.CRC64;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -174,7 +178,7 @@ public class Article implements Serializable {
     public void setPubDateFromString(String pubDateStr){
         SimpleDateFormat sdfFromSQLiteDB = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
         try{
-            setPubDate(sdfFromSQLiteDB.parse("Wed Mar 30 00:00:00 GMT+05:30 2016"));
+            setPubDate(sdfFromSQLiteDB.parse(pubDateStr));
         }catch (Exception e){ e.printStackTrace(); }
         //etPubDate(parseDateFromString(pubDateStr));
     }
