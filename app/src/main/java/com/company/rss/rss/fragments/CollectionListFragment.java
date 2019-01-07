@@ -121,7 +121,7 @@ public class CollectionListFragment extends Fragment {
                 editCollectionDialog.dismiss();
                 new ColorPickerPopup.Builder(getContext())
                         .initialColor(collection.getColor())
-                        .enableBrightness(false)
+                        .enableBrightness(true)
                         .enableAlpha(false)
                         .okTitle(getString(R.string.choose))
                         .cancelTitle(getString(R.string.cancel))

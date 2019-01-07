@@ -40,6 +40,7 @@ public class CollectionManagerActivity extends AppCompatActivity implements Coll
         Toolbar toolbar = findViewById(R.id.collection_manager_toolbar);
         setSupportActionBar(toolbar);
         actionbar = getSupportActionBar();
+        actionbar.setTitle(R.string.collections);
         actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
 
@@ -116,22 +117,30 @@ public class CollectionManagerActivity extends AppCompatActivity implements Coll
      */
     @Override
     public void onDeleteCollection(final Collection collection, final List<Collection> collections, final int position, final CollectionListAdapter adapter) {
-        api.deleteUserCollection(collection.getId(), new SQLOperationCallback() {
-            @Override
-            public void onLoad(SQLOperation sqlOperation) {
-                Log.d(ArticleActivity.logTag + ":" + TAG, "Collection " + collection.getTitle() + " removed");
-                collections.remove(position);
-                adapter.notifyDataSetChanged();
-                Snackbar.make(findViewById(android.R.id.content), R.string.collection_removed_successfully, Snackbar.LENGTH_LONG).show();
-                collectionsChange = true;
-            }
 
-            @Override
-            public void onFailure() {
-                Log.e(ArticleActivity.logTag + ":" + TAG, "Collection " + collection.getTitle() + " NOT removed");
-                Snackbar.make(findViewById(android.R.id.content), R.string.collection_remove_error, Snackbar.LENGTH_LONG).show();
-            }
-        });
+        if(!collection.getTitle().equals(R.string.read_it_later)){
+
+            api.deleteUserCollection(collection.getId(), new SQLOperationCallback() {
+                @Override
+                public void onLoad(SQLOperation sqlOperation) {
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "Collection " + collection.getTitle() + " removed");
+                    collections.remove(position);
+                    adapter.notifyDataSetChanged();
+                    Snackbar.make(findViewById(android.R.id.content), R.string.collection_removed_successfully, Snackbar.LENGTH_LONG).show();
+                    collectionsChange = true;
+                }
+
+                @Override
+                public void onFailure() {
+                    Log.e(ArticleActivity.logTag + ":" + TAG, "Collection " + collection.getTitle() + " NOT removed");
+                    Snackbar.make(findViewById(android.R.id.content), R.string.collection_remove_error, Snackbar.LENGTH_LONG).show();
+                }
+            });
+
+        } else {
+            Snackbar.make(findViewById(android.R.id.content), R.string.not_possible_remove_this_collection, Snackbar.LENGTH_LONG).show();
+
+        }
 
     }
 

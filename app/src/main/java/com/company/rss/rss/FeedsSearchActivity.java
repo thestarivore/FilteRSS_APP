@@ -53,6 +53,9 @@ public class FeedsSearchActivity extends AppCompatActivity {
     private List<Feed> feeds;
     private ListView feedsListview;
     private boolean multifeedsChange;
+    private Feed selectedFeed;
+    private DialogInterface selectedDialog;
+    private View selectedView;
 
     // TODO: view https://developer.android.com/training/improving-layouts/smooth-scrolling#java
 
@@ -209,6 +212,9 @@ public class FeedsSearchActivity extends AppCompatActivity {
                         .setPositiveButton(R.string.dialog_add_feed_positive_button, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                selectedFeed = feed;
+                                selectedDialog = dialog;
+                                selectedView = view;
                                 startMultifeedCreationActivity();
                             }
                         })
@@ -313,6 +319,10 @@ public class FeedsSearchActivity extends AppCompatActivity {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "Returned from MultifeedCreationActivity with RESULT_OK");
                 Snackbar.make(findViewById(android.R.id.content), R.string.multifeed_saved, Snackbar.LENGTH_LONG).show();
                 multifeedsChange = true;
+
+                Multifeed createdMultifeed = (Multifeed) data.getSerializableExtra(MultifeedCreationActivity.CREATED_MULTIFEED_EXTRA);
+                addFeedToMultifeed(selectedFeed, createdMultifeed, selectedDialog, selectedView);
+
             } else {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "Returned from MultifeedCreationActivity without RESULT_OK");
                 Snackbar.make(findViewById(android.R.id.content), R.string.multifeed_not_saved, Snackbar.LENGTH_LONG).show();

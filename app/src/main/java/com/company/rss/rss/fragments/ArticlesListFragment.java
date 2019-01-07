@@ -91,13 +91,13 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
         View view;
 
-        if (userData.getFeedList().isEmpty()) {
-            // No feeds, suggest the user to add a feed
+        /*if (this.articles==null || this.articles.isEmpty()) {
+            // No articles, suggest the user to add a feed
             view = inflater.inflate(R.layout.fragment_article_list_empty, container, false);
 
             mListener.onListFragmentArticlesReady();
 
-        } else {
+        } else {*/
             view = inflater.inflate(R.layout.fragment_article_list, container, false);
 
             // Create the RecyclerView and Set it's adapter
@@ -119,7 +119,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                 adapter = new ArticleRecyclerViewAdapter(articles, mListener, context);
                 recyclerView.setAdapter(adapter);
             }
-        }
+        //}
 
         return view;
     }
@@ -250,7 +250,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         }
 
                         // Get the scores for the set of articles
-                        if(!articlesHashesMap.keySet().isEmpty()){
+                        if (!articlesHashesMap.keySet().isEmpty()) {
                             getArticlesScores(articlesHashesMap);
                         }
 
@@ -286,9 +286,9 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                     articles.addAll(userData.getLocalArticleList());
 
                     //Associate the FeedObjects to each Article (since these are not stored in the local SQLite Database
-                    for (Article article: articles){
-                        for (Feed feed: userData.getFeedList()){
-                            if (feed.getId() == article.getFeed()){
+                    for (Article article : articles) {
+                        for (Feed feed : userData.getFeedList()) {
+                            if (feed.getId() == article.getFeed()) {
                                 article.setFeedObj(feed);
                             }
                         }
@@ -297,7 +297,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(recyclerView!=null) {
+                            if (recyclerView != null) {
                                 recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, getContext()));
                                 recyclerView.getAdapter().notifyDataSetChanged();
                             }
@@ -330,8 +330,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                      * If we find even one downloaded article missing in the local list --> substitute all
                      */
                     boolean articleMismatch = false;
-                    for (Article article: downloadedArticleList){
-                        if (article.isArticleInTheList(articles) == false){
+                    for (Article article : downloadedArticleList) {
+                        if (article.isArticleInTheList(articles) == false) {
                             articleMismatch = true;
 
                             //Substitute all the articles in the recycler view with those downloaded
@@ -355,29 +355,29 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
                         Log.d(ArticleActivity.logTag + ":" + TAG, "Sorting articles...");
 
-                        for (int i = 0; i<articles.size(); i++) {
+                        for (int i = 0; i < articles.size(); i++) {
                             Article article = articles.get(i);
                             float articleScoreByRating = article.getScore() * article.getFeedObj().getMultifeed().getRating();
                             article.setScore(articleScoreByRating);
                             Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
                         }
 
-                        Collections.sort(articles, new Comparator<Article>(){
+                        Collections.sort(articles, new Comparator<Article>() {
                             @Override
                             public int compare(Article a1, Article a2) {
-                                if(a1.getScore() == a2.getScore())
+                                if (a1.getScore() == a2.getScore())
                                     return 0;
                                 return a1.getScore() > a2.getScore() ? -1 : 1;
                             }
                         });
 
                         Log.d(ArticleActivity.logTag + ":" + TAG, "Sorting DONE");
-                        for (int i = 0; i<articles.size(); i++) {
+                        for (int i = 0; i < articles.size(); i++) {
                             Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
                         }
 
                         //Reload RecyclerView only if the downloaded articles are different that those stored locally
-                        if(articleMismatch) {
+                        if (articleMismatch) {
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -407,7 +407,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                          * after the list has been sorted, otherwise if we change the list during the persistence
                          * we might get a concurrency problem (ex ConcurrentModificationException).
                          */
-                        if(articleMismatch){
+                        if (articleMismatch) {
                             //Once all the articles have been downloaded for each feed, store them in the local SQLite Database
                             //(but first clear the table of the old rows)
                             sqLiteService.deleteAllArticles(new SQLOperationCallback() {
@@ -421,14 +421,16 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                                         @Override
                                         public void onLoad(SQLOperation sqlOperation) {
                                             Log.d(ArticleActivity.logTag + ":" + TAG,
-                                                    "Added "+sqlOperation.getAffectedRows()+" articles into the local SQLite DB, Article Table!");
+                                                    "Added " + sqlOperation.getAffectedRows() + " articles into the local SQLite DB, Article Table!");
                                         }
+
                                         @Override
                                         public void onFailure() {
                                             Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
                                         }
                                     });
                                 }
+
                                 @Override
                                 public void onFailure() {
                                     Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
@@ -471,6 +473,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
     /**
      * Gets the scores for a list of articles hashes
+     *
      * @param articlesHashes
      */
     private void getArticlesScores(final HashMap<Long, Article> articlesHashes) {

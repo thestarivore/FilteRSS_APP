@@ -143,8 +143,8 @@ public class MultifeedEditFragment extends Fragment {
             public void onClick(final View v) {
                 new ColorPickerPopup.Builder(getContext())
                         .initialColor(multifeed.getColor())
-                        .enableBrightness(false)
-                        .enableAlpha(true)
+                        .enableBrightness(true)
+                        .enableAlpha(false)
                         .okTitle(getString(R.string.choose))
                         .cancelTitle(getString(R.string.cancel))
                         .showIndicator(false)

@@ -24,6 +24,7 @@ import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 import java.util.List;
 
 public class MultifeedCreationActivity extends AppCompatActivity implements MultifeedEditFragment.MultifeedEditInterface {
+    public static final String CREATED_MULTIFEED_EXTRA = "CREATED_MULTIFEED";
     private final String TAG = getClass().getName();
     private RESTMiddleware api;
     private UserData userData;
@@ -117,6 +118,8 @@ public class MultifeedCreationActivity extends AppCompatActivity implements Mult
                     Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed saved successfully via API " + sqlOperation.toString());
 
                     // return with success code
+                    multifeed.setId(sqlOperation.getInsertId());
+                    returnIntent.putExtra(CREATED_MULTIFEED_EXTRA, multifeed);
                     setResult(RESULT_OK, returnIntent);
                     finish();
                 }

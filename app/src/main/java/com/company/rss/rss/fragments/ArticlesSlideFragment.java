@@ -56,21 +56,22 @@ public class ArticlesSlideFragment extends Fragment {
         if(mArticle != null) {
             articleTitle.setText(mArticle.getTitle());
 
-            articleSource.setText(mArticle.getFeedObj().getTitle());
+            if(mArticle.getFeedObj() != null){
+                articleSource.setText(mArticle.getFeedObj().getTitle());
 
+                String feedIcon = mArticle.getFeedObj().getIconURL();
+                if (feedIcon == null || feedIcon.isEmpty()) {
+                    articleFeedIcon.setVisibility(View.GONE);
+                } else {
+                    Picasso.get().load(feedIcon).into(articleFeedIcon);
+                }
+            }
 
             String imgLink = mArticle.getImgLink();
             if (imgLink == null || imgLink.isEmpty()) {
                 articleImage.setVisibility(View.GONE);
             } else {
                 Picasso.get().load(imgLink).into(articleImage);
-            }
-
-            String feedIcon = mArticle.getFeedObj().getIconURL();
-            if (feedIcon == null || feedIcon.isEmpty()) {
-                articleFeedIcon.setVisibility(View.GONE);
-            } else {
-                Picasso.get().load(feedIcon).into(articleFeedIcon);
             }
 
             String pubDate = mArticle.getPubDateString("dd-MM-yyyy");
@@ -81,7 +82,6 @@ public class ArticlesSlideFragment extends Fragment {
                 pubDate = ArticleRecyclerViewAdapter.computeDaysDiff(getContext(), pubDate, articlePubDate);
                 articlePubDateTextView.setText(pubDate);
             }
-
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
