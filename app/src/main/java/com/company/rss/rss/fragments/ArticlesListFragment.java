@@ -1,6 +1,8 @@
 package com.company.rss.rss.fragments;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -173,32 +175,6 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         //of articles stored in the local SQLite Database;
         if (articles == null) {
             this.articles = new ArrayList<>();
-
-            //Get all the articles, and notify the change to the RecyclerView once we have them
-            /*sqLiteService.getAllArticles(new ArticleCallback() {
-                @Override
-                public void onLoad(List<Article> localArticles) {
-                    if (localArticles != null) {
-                        articlesSQLiteLoaded[0] = true;
-                        articles.clear();
-                        articles.addAll(localArticles);
-
-                        //Associate the FeedObjects to each Article (since these are not stored in the local SQLite Database
-                        for (Article article: articles){
-                            for (Feed feed: userData.getFeedList()){
-                                if (feed.getId() == article.getFeed()){
-                                    article.setFeedObj(feed);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure() {
-                    Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
-                }
-            });*/
         }
 
         Collection collection = null;
@@ -232,41 +208,43 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             scoreCounter = 0;
 
             //Start Downloading the Articles, even if the UI hasn't loaded yet
-            for (final Feed feed : feedList) {
+            if (isNetworkAvailable()) {
+                for (final Feed feed : feedList) {
 
-                new LoadRSSFeed(new AsyncRSSFeedResponse() {
-                    @Override
-                    public void processFinish(Object output, RSSFeed rssFeed) {
-                        final HashMap<Long, Article> articlesHashesMap = new HashMap<>();
+                    new LoadRSSFeed(new AsyncRSSFeedResponse() {
+                        @Override
+                        public void processFinish(Object output, RSSFeed rssFeed) {
+                            final HashMap<Long, Article> articlesHashesMap = new HashMap<>();
 
-                        for (final Article article : rssFeed.getItemList()) {
-                            article.setFeedId(feed.getId());
-                            article.setFeedObj(feed);
+                            for (final Article article : rssFeed.getItemList()) {
+                                article.setFeedId(feed.getId());
+                                article.setFeedObj(feed);
 
-                            articlesHashesMap.put(article.getHashId(), article);
+                                articlesHashesMap.put(article.getHashId(), article);
 
-                            //articles.add(article);
-                            downloadedArticleList.add(article);
+                                //articles.add(article);
+                                downloadedArticleList.add(article);
+                            }
+
+                            // Get the scores for the set of articles
+                            if (!articlesHashesMap.keySet().isEmpty()) {
+                                getArticlesScores(articlesHashesMap);
+                            }
+
+                            //Save the number of articles for each feed, mapped in a HashMap
+                            feedArticlesNumberMap.put(feed.getTitle(), rssFeed.getItemCount());
+
+                            //Wait for onCreateView to set RecyclerView's Adapter
+                            while (recyclerView == null || recyclerView.getAdapter() == null) ;
+
+                            Log.d(ArticleActivity.logTag + ":" + TAG, "LoadRSSFeed finished: " + (feedCounter + 1) + "/" + feedList.size());
+
+                            feedCounter++;
+
                         }
+                    }, getContext(), feed).execute();
 
-                        // Get the scores for the set of articles
-                        if (!articlesHashesMap.keySet().isEmpty()) {
-                            getArticlesScores(articlesHashesMap);
-                        }
-
-                        //Save the number of articles for each feed, mapped in a HashMap
-                        feedArticlesNumberMap.put(feed.getTitle(), rssFeed.getItemCount());
-
-                        //Wait for onCreateView to set RecyclerView's Adapter
-                        while (recyclerView == null || recyclerView.getAdapter() == null) ;
-
-                        Log.d(ArticleActivity.logTag + ":" + TAG, "LoadRSSFeed finished: " + (feedCounter + 1) + "/" + feedList.size());
-
-                        feedCounter++;
-
-                    }
-                }, getContext(), feed).execute();
-
+                }
             }
 
             // Wait until all the articles stored locally in the SQLite database are retrieved
@@ -283,7 +261,10 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
                     //When the local ArticleList has finished loading, get the new articles in the RecyclerView adapter's list
                     articles.clear();
-                    articles.addAll(userData.getLocalArticleList());
+                    if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS)
+                        articles.addAll(userData.getLocalArticleList());
+                    else
+                        articles.addAll(userData.getLocalArticleListFiltered(feedList));
 
                     //Associate the FeedObjects to each Article (since these are not stored in the local SQLite Database
                     for (Article article : articles) {
@@ -344,8 +325,10 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
                     //Wait for all articles to load, then notify the activity with a callback, and pass the
                     //map of the number of articles for each feed
-                    if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
-                        mListener.onListFragmentAllArticlesReady(feedArticlesNumberMap, articles);
+                    if (articleMismatch) {
+                        if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
+                            mListener.onListFragmentAllArticlesReady(feedArticlesNumberMap, articles);
+                        }
                     }
 
                     if (mListener != null) {
@@ -389,8 +372,10 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                             });
                         }
 
-                        //Callback
-                        mListener.onListFragmentArticlesReady();
+                        if (articleMismatch) {
+                            //Callback
+                            mListener.onListFragmentArticlesReady();
+                        }
 
                         //Wait for the SQLite Article to load
                         while (!userData.isLocalArticleListLoaded()) {
@@ -517,6 +502,18 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         void onListFragmentArticlesReady();
 
         void onListFragmentAllArticlesReady(Map<String, Integer> feedArticlesNumberMap, List<Article> articleList);
+    }
+
+    /**
+     * Query if there is Internet Connection or the device is Offline
+     *
+     * @return True if there is Internet connection, false if Offline
+     */
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 
 

@@ -19,7 +19,11 @@ import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
 import com.company.rss.rss.service.SQLiteService;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 public class LoadingActivity extends AppCompatActivity {
@@ -100,7 +104,7 @@ public class LoadingActivity extends AppCompatActivity {
         //Get a UserData instance
         final UserData userData = UserData.getInstance();
 
-        //Get all the articles satored locally in the SQLite Database
+        //Get all the articles stored locally in the SQLite Database
         sqLiteService.getAllArticles(new ArticleCallback() {
             @Override
             public void onLoad(List<Article> localArticles) {

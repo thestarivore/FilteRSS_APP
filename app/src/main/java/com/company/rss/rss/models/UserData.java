@@ -240,6 +240,17 @@ public class UserData {
         return localArticleList;
     }
 
+    public List<Article> getLocalArticleListFiltered(List<Feed> feedList) {
+        List<Article> feedFilteredArticles = new ArrayList<>();
+        for (Article article: localArticleList){
+            for (Feed feed: feedList) {
+                if (article.getFeed() == feed.getId())
+                    feedFilteredArticles.add(article);
+            }
+        }
+        return feedFilteredArticles;
+    }
+
     public void setLocalArticleList(List<Article> localArticleList) {
         this.localArticleList = localArticleList;
         this.localArticleListLoaded = true;

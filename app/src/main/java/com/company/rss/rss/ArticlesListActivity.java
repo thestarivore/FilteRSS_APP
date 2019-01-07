@@ -770,9 +770,10 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
             int maxIndex = articleList.size() - 1;
 
             for (i = 0; i < ArticleSlidePagerAdapter.NUM_ARTICLES; i++) {
+                int attempts = 0;
                 do {
                     j = rand.nextInt(maxIndex);
-                } while (articleList.get(j).getImgLink() == null);
+                } while (articleList.get(j).getImgLink() == null && attempts++<20);
                 topArticles.add(articleList.get(j));
             }
         } else
