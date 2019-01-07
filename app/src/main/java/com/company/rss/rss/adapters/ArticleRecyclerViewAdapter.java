@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.company.rss.rss.R;
 import com.company.rss.rss.fragments.ArticlesListFragment.OnListFragmentInteractionListener;
 import com.company.rss.rss.models.Article;
+import com.company.rss.rss.models.Collection;
 import com.squareup.picasso.Picasso;
 
 import java.util.Date;
@@ -26,7 +27,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
     private final List<Article> mArticles;
     private final OnListFragmentInteractionListener mListener;
     private final Context mContext;
-    private TextView articleSwipeTextView;
+    private Collection collection;
 
     public ArticleRecyclerViewAdapter(List<Article> articles, OnListFragmentInteractionListener listener, Context context) {
         mArticles = articles;
@@ -39,8 +40,6 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_article, parent, false);
 
-        articleSwipeTextView = view.findViewById(R.id.articleSwipeTextView);
-
         return new ViewHolder(view);
     }
 
@@ -48,7 +47,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mArticles.get(position);
 
-        if(mArticles.get(position).getFeedObj() != null)
+        if (mArticles.get(position).getFeedObj() != null)
             holder.mArticleColorView.setBackgroundColor(mArticles.get(position).getFeedObj().getMultifeed().getColor());
         else
             holder.mArticleColorView.setBackgroundColor(Color.BLACK);
@@ -74,7 +73,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             holder.mPubDateView.setText(pubDate);
         }
 
-        if(mArticles.get(position).getFeedObj() != null)
+        if (mArticles.get(position).getFeedObj() != null)
             holder.mFeedNameView.setText(mArticles.get(position).getFeedObj().getTitle());
 
         String imgLink = mArticles.get(position).getImgLink();
@@ -85,7 +84,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         }
 
         String feedIcon = null;
-        if(mArticles.get(position).getFeedObj() != null)
+        if (mArticles.get(position).getFeedObj() != null)
             feedIcon = mArticles.get(position).getFeedObj().getIconURL();
         if (feedIcon == null || feedIcon.isEmpty()) {
             holder.mFeedIcon.setVisibility(View.GONE);
@@ -107,14 +106,18 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
                 }
             }
         });
-    }
 
-    public void setCollectionMode(boolean collectionMode) {
-        if (collectionMode) {
-            articleSwipeTextView.setText(R.string.removed_from_collection);
+        TextView articleSwipeTextView = holder.articleSwipeTextView;
+        if (collection != null) {
+            String text = mContext.getText(R.string.removed_from_collection) + " " + collection.getTitle();
+            articleSwipeTextView.setText(text);
         } else {
             articleSwipeTextView.setText(R.string.swipe_to_save);
         }
+    }
+
+    public void setCollection(Collection collection) {
+        this.collection = collection;
     }
 
     static public String computeDaysDiff(Context context, String pubDate, Date articlePubDate) {
@@ -145,6 +148,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         public final ImageView mImageView;
         public final ImageView mFeedIcon;
         public LinearLayout viewBackground, viewForeground;
+        public TextView articleSwipeTextView;
 
         public Article mItem;
 
@@ -161,6 +165,8 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
 
             viewBackground = view.findViewById(R.id.articleListSingleBackground);
             viewForeground = view.findViewById(R.id.articleListSingleForeground);
+
+            articleSwipeTextView = view.findViewById(R.id.articleSwipeTextView);
         }
 
         @Override

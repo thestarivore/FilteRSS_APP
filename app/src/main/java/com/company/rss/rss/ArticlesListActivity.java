@@ -115,7 +115,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private Window window;
 
     // Autoslider
-    int currentSlide = 0;
+    int currentSlide = 1;
     boolean autoSliderOn;
     private Handler autoSliderHandler;
     private Runnable autoSliderRunnable;
@@ -200,12 +200,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
         initToolbar();
 
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            Window w = getWindow();
-            w.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-            //toolbar.setPadding(0, getStatusBarHeight(this), 0, 0);
-        }*/
-
         // TOP ARTICLES - SLIDER
         // Set the slider to third the size of the viewport
         Display display = getWindowManager().getDefaultDisplay();
@@ -214,17 +208,10 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         final ViewPager viewPager = findViewById(R.id.pagerArticles);
         viewPager.getLayoutParams().height = size.y / 3;
 
-        // Create mock articles for top articles
-        //topArticles = new ArrayList<>();//Article.generateMockupArticles(6);
-
         pager = findViewById(R.id.pagerArticles);
-        //pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
-        pager.setAdapter(pagerAdapter);
-        pager.setCurrentItem(0, true);
         pager.setClipToPadding(false);
         pager.setPadding(60, 0, 60, 0);
         pager.setPageMargin(0);
-
 
         // Set the progress bar visible and hide other
         progressBar = findViewById(R.id.progressBarArticlesList);
@@ -262,12 +249,16 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         showArticleListFragment();
     }
 
+
+    /*+
+     * Show the list on 1 or 2 columns based on the screen size
+     */
     private void showArticleListFragment() {
         int screenLayout = context.getResources().getConfiguration().screenLayout;
         screenLayout &= Configuration.SCREENLAYOUT_SIZE_MASK;
 
         int numColumn;
-        if (screenLayout == Configuration.SCREENLAYOUT_SIZE_LARGE
+        if (screenLayout == Configuration.SCREENLAYOUT_SIZE_LARGE // large
                 || screenLayout == 4) { // x-large
             numColumn = 2;
         } else {
@@ -429,7 +420,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.setFeedPosition(childPosition);
 
                 progressBar.setVisibility(View.VISIBLE);
-                //restartActivity();
                 refreshFragmentData();
                 return true;
             }
@@ -446,7 +436,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.setMultifeedPosition(groupPosition);
 
                 progressBar.setVisibility(View.VISIBLE);
-                //restartActivity();
                 refreshFragmentData();
                 return true; // This way the expander cannot be collapsed
             }
@@ -458,7 +447,11 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
      */
     private void initCollectionListOnDrawer() {
         expListViewCollections = (ExpandableListView) findViewById(R.id.exp_list_view_collections);
+        expListViewCollections.setGroupIndicator(null);
+        expListViewCollections.setDividerHeight(0);
+
         prepareCollectionsListData();
+
         collectionListAdapter = new ExpandableListAdapter(this, collectionListHeaders, collectionListChild, collectionListFeedIcon, collectionColorList);
         expListViewCollections.setAdapter(collectionListAdapter);
         //Item LongClick
@@ -485,7 +478,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.setCollectionPosition(groupPosition);
 
                 progressBar.setVisibility(View.VISIBLE);
-                //restartActivity();
                 refreshFragmentData();
                 return true; // This way the expander cannot be collapsed
             }
@@ -736,6 +728,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                         Log.d(ArticleActivity.logTag + ":" + TAG, "Showing articles list");
                         progressBar.setVisibility(View.GONE);
                         contentLinearLayout.setVisibility(View.VISIBLE);
+                        currentSlide = 1;
+                        toggleAutoslider(true);
                     }
                 });
             }
@@ -786,6 +780,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         pager = findViewById(R.id.pagerArticles);
         pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
         pager.setAdapter(pagerAdapter);
+        pager.setCurrentItem(1, true);
     }
 
     /**
@@ -856,32 +851,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        toggleAutoslider(false);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        toggleAutoslider(true);
-
-        //Get intent passed data
-        Intent intent = getIntent();
-        if (intent.hasExtra("feedArticlesNumberMap")) {
-            feedArticlesNumberMap = (HashMap<String, Integer>) intent.getSerializableExtra("feedArticlesNumberMap");
-            multifeedListAdapter.updateFeedArticlesNumbers(feedArticlesNumberMap);
-            multifeedListAdapter.notifyDataSetChanged();
-        }
-        if (intent.hasExtra("topArticles")) {
-            topArticles = (List<Article>) intent.getSerializableExtra("topArticles");
-            pager = findViewById(R.id.pagerArticles);
-            pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
-            pager.setAdapter(pagerAdapter);
-        }
-    }
-
-    @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
@@ -914,35 +883,45 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
         if (requestCode == REQUEST_CODE_MULTIFEED_EDIT && resultCode == RESULT_OK) {
             // A multifeed was edited or created so refresh the local data
-
             Log.d(ArticleActivity.logTag + ":" + TAG, "Refreshing User's Multifeeds... ");
+
             Snackbar.make(findViewById(android.R.id.content), R.string.updating_user_information, Snackbar.LENGTH_LONG).show();
 
-            // Refresh the user's multifeed saved locally
-            new LoadUserMultifeeds(new AsyncResponse() {
-                @Override
-                public void processFinish(Integer output) {
-                    Log.d(ArticleActivity.logTag + ":" + TAG, "User's Multifeeds refreshed... ");
-
-                    userData.loadPersistedData(context);
-                    userData.processUserData();
-
-                    multifeedListHeaders.clear();
-                    prepareMultifeedsListData();
-                    multifeedListAdapter.notifyDataSetChanged();
-
-                    Snackbar.make(findViewById(android.R.id.content), R.string.user_information_updated, Snackbar.LENGTH_LONG).show();
-                }
-            }, this, userData.getUser()).execute();
+            loadUserMultifeeds(true);
 
         } else if (requestCode == REQUEST_CODE_COLLECTION_EDIT && resultCode == RESULT_OK) {
             // A collection was edited or created so refresh the local data
-
             Log.d(ArticleActivity.logTag + ":" + TAG, "Refreshing User's Collections... ");
+
             Snackbar.make(findViewById(android.R.id.content), R.string.updating_user_information, Snackbar.LENGTH_LONG).show();
 
             loadUserCollections(true);
         }
+    }
+
+    /**
+     * Refresh the user's multifeeds saved locally
+     *
+     * @param showSnackBar boolean to show the SnackBar or not
+     */
+    private void loadUserMultifeeds(final Boolean showSnackBar) {
+        // Refresh the user's multifeed saved locally
+        new LoadUserMultifeeds(new AsyncResponse() {
+            @Override
+            public void processFinish(Integer output) {
+                Log.d(ArticleActivity.logTag + ":" + TAG, "User's Multifeeds refreshed... ");
+
+                userData.loadPersistedData(context);
+                userData.processUserData();
+
+                multifeedListHeaders.clear();
+                prepareMultifeedsListData();
+                multifeedListAdapter.notifyDataSetChanged();
+
+                if (showSnackBar)
+                    Snackbar.make(findViewById(android.R.id.content), R.string.user_information_updated, Snackbar.LENGTH_LONG).show();
+            }
+        }, this, userData.getUser()).execute();
     }
 
     /**
@@ -969,4 +948,28 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         }, this, userData.getUser()).execute();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        toggleAutoslider(false);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        //Get intent passed data
+        Intent intent = getIntent();
+        if (intent.hasExtra("feedArticlesNumberMap")) {
+            feedArticlesNumberMap = (HashMap<String, Integer>) intent.getSerializableExtra("feedArticlesNumberMap");
+            multifeedListAdapter.updateFeedArticlesNumbers(feedArticlesNumberMap);
+            multifeedListAdapter.notifyDataSetChanged();
+        }
+        if (intent.hasExtra("topArticles")) {
+            topArticles = (List<Article>) intent.getSerializableExtra("topArticles");
+            pager = findViewById(R.id.pagerArticles);
+            pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
+            pager.setAdapter(pagerAdapter);
+        }
+    }
 }

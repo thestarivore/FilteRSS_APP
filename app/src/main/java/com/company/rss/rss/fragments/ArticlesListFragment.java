@@ -67,8 +67,6 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     public ArticlesListFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
     public static ArticlesListFragment newInstance(int columnCount) {
         ArticlesListFragment fragment = new ArticlesListFragment();
         Bundle args = new Bundle();
@@ -94,7 +92,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         View view;
 
         if (userData.getFeedList().isEmpty()) {
-            // no articles, suggest the user to add a feed
+            // No feeds, suggest the user to add a feed
             view = inflater.inflate(R.layout.fragment_article_list_empty, container, false);
 
             mListener.onListFragmentArticlesReady();
@@ -203,6 +201,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             });*/
         }
 
+        Collection collection = null;
         //Get the list of feeds to show in the RecyclerView
         //All Multifeeds Feeds Articles
         if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
@@ -220,7 +219,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         }
         //Collection Articles
         else if (userData.getVisualizationMode() == UserData.MODE_COLLECTION_ARTICLES) {
-            Collection collection = userData.getCollectionList().get(userData.getCollectionPosition());
+            collection = userData.getCollectionList().get(userData.getCollectionPosition());
             collectionArticleList.addAll(userData.getCollectionMap().get(collection));
         }
 
@@ -231,31 +230,18 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         if (userData.getVisualizationMode() != UserData.MODE_COLLECTION_ARTICLES) {
             feedCounter = 0;
             scoreCounter = 0;
+
             //Start Downloading the Articles, even if the UI hasn't loaded yet
             for (final Feed feed : feedList) {
+
                 new LoadRSSFeed(new AsyncRSSFeedResponse() {
                     @Override
                     public void processFinish(Object output, RSSFeed rssFeed) {
                         final HashMap<Long, Article> articlesHashesMap = new HashMap<>();
+
                         for (final Article article : rssFeed.getItemList()) {
                             article.setFeedId(feed.getId());
                             article.setFeedObj(feed);
-
-                           /* // get and set the article score
-                            api.getArticleScore(article.getHashId(), new ArticlesScoresCallback() {
-
-                                @Override
-                                public void onLoad(JsonObject jsonObject) {
-                                    Log.d(ArticleActivity.logTag + ":" + TAG, "Score for article " + article.getHashId() + " score: " + jsonObject.get("Score"));
-                                    article.setScore(jsonObject.get("Score").getAsFloat());
-                                }
-
-                                @Override
-                                public void onFailure() {
-                                    Log.e(ArticleActivity.logTag + ":" + TAG, "Score for article " + article.getHashId() + " NOT received");
-                                    article.setScore(0);
-                                }
-                            });*/
 
                             articlesHashesMap.put(article.getHashId(), article);
 
@@ -263,6 +249,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                             downloadedArticleList.add(article);
                         }
 
+                        // Get the scores for the set of articles
                         if(!articlesHashesMap.keySet().isEmpty()){
                             getArticlesScores(articlesHashesMap);
                         }
@@ -273,14 +260,13 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         //Wait for onCreateView to set RecyclerView's Adapter
                         while (recyclerView == null || recyclerView.getAdapter() == null) ;
 
-                        //Notify a change in the RecyclerView's Article List
-                        //recyclerView.getAdapter().notifyDataSetChanged();
-
                         Log.d(ArticleActivity.logTag + ":" + TAG, "LoadRSSFeed finished: " + (feedCounter + 1) + "/" + feedList.size());
 
                         feedCounter++;
+
                     }
                 }, getContext(), feed).execute();
+
             }
 
             // Wait until all the articles stored locally in the SQLite database are retrieved
@@ -366,7 +352,6 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         Log.d(ArticleActivity.logTag + ":" + TAG, "All LoadRSSFeed and getScores finished");
 
                         Log.d(ArticleActivity.logTag + ":" + TAG, "# Articles: " + articles.size());
-
 
                         Log.d(ArticleActivity.logTag + ":" + TAG, "Sorting articles...");
 
@@ -477,6 +462,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             mListener.onListFragmentArticlesReady();
 
             //Notify a change in the RecyclerView's Article List
+            ArticleRecyclerViewAdapter articleRecyclerViewAdapter = (ArticleRecyclerViewAdapter) recyclerView.getAdapter();
+            articleRecyclerViewAdapter.setCollection(collection);
             recyclerView.getAdapter().notifyDataSetChanged();
         }
 

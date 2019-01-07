@@ -89,7 +89,7 @@
                     style="@style/material_type_scale_h5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginLeft="16dp"
                     android:text="@string/multifeed_title" />
 
                 <com.company.rss.rss.helpers.NonScrollExpandableListView
@@ -103,17 +103,16 @@
 
                 <View
                     android:layout_width="fill_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:background="#818194" />
+                    android:layout_height="2dp"
+                    android:layout_margin="16dp"
+                    android:background="#000000" />
 
                 <TextView
                     android:id="@+id/textViewCollectionsList"
                     style="@style/material_type_scale_h5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
+                    android:layout_marginLeft="16dp"
                     android:text="@string/collections_title" />
 
                 <com.company.rss.rss.helpers.NonScrollExpandableListView

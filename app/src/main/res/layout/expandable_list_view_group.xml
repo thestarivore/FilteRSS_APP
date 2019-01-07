@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/exp_menu_group_name"
-        style="@style/material_type_scale_h6"
+        style="@style/material_type_scale_subtitle1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="22dp"

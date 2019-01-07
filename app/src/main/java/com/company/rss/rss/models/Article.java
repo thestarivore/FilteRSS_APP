@@ -12,10 +12,6 @@ import net.boeckling.crc.CRC64;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -61,7 +57,7 @@ public class Article implements Serializable {
     private int feed;
 
 
-    private Feed feedO;
+    private Feed feedObj;
 
     private float score = 1;
 
@@ -195,9 +191,9 @@ public class Article implements Serializable {
         this.user = user;
     }
 
-    public Feed getFeedObj() { return feedO; }
+    public Feed getFeedObj() { return feedObj; }
 
-    public void setFeedObj(Feed feedO) { this.feedO = feedO; }
+    public void setFeedObj(Feed feedO) { this.feedObj = feedO; }
 
     public int getFeedId() {
         return feed;

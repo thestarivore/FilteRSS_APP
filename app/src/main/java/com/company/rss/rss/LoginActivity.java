@@ -141,13 +141,16 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SIGNUP) {
+
             if (resultCode == RESULT_OK) {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "Returned from Signup activity with RESULT_OK");
                 Snackbar.make(findViewById(android.R.id.content), R.string.registration_completed_login, Snackbar.LENGTH_LONG).show();
             } else {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "Returned from Signup activity without RESULT_OK");
             }
+
         }
+
     }
 
     @Override
@@ -168,14 +171,6 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setEnabled(true);
 
         startLoadingActivity();
-
-        //Start a Loading Spinner Dialog
-        /*final ProgressDialog progress = new ProgressDialog(this);
-        progress.setTitle("Loading");
-        progress.setMessage("Wait while loading...");
-        progress.setCancelable(false); // disable dismiss by tapping outside of the dialog
-        progress.show();*/
-
     }
 
     public void onLoginFailed() {

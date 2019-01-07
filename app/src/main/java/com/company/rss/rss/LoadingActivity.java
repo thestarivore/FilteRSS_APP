@@ -90,7 +90,7 @@ public class LoadingActivity extends AppCompatActivity {
 
         Random random = new Random();
         TextView loadingTextView = findViewById(R.id.loadingTextView);
-        loadingTextView.setText(loginSentences[random.nextInt(loginSentences.length-1)]);
+        loadingTextView.setText(loginSentences[random.nextInt(loginSentences.length - 1)]);
 
         Intent intent = getIntent();
         User loggedUser = (User) intent.getSerializableExtra("logged-user");
@@ -117,11 +117,15 @@ public class LoadingActivity extends AppCompatActivity {
 
         //Load user data from the server only if there is internet connection
         if (isNetworkAvailable()) {
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Online mode...");
+
             Log.d(ArticleActivity.logTag + ":" + TAG, "Starting user's data loading...");
+
             //Start an AsyncTask to gather all the User's information before stepping into the main Activity
             new LoadUserData(new AsyncResponse() {
                 @Override
                 public void processFinish(Integer output) {
+
                     if (output == LoadUserData.DATA_LOADING_TERMINTAED) {
                         //All the data has been gathered so we can open the main activity
                         Log.d(ArticleActivity.logTag + ":" + TAG, "User's data loaded...");
@@ -130,11 +134,14 @@ public class LoadingActivity extends AppCompatActivity {
                         startLoginActivityOnAuthFailed();
                         Snackbar.make(findViewById(android.R.id.content), R.string.authentication_failed, Snackbar.LENGTH_LONG).show();
                     }
+
                 }
             }, this, loggedUser).execute();
         }
         //Offline Mode
-        else{
+        else {
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Offline mode...");
+
             Thread waitAllFeedsLoaded = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -168,6 +175,7 @@ public class LoadingActivity extends AppCompatActivity {
 
     /**
      * Query if there is Internet Connection or the device is Offline
+     *
      * @return True if there is Internet connection, false if Offline
      */
     private boolean isNetworkAvailable() {
