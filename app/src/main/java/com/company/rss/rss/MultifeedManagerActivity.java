@@ -48,12 +48,14 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         api = new RESTMiddleware(this);
         multifeedsChange = false;
 
-        Toolbar toolbar = findViewById(R.id.multifeed_manager_toolbar);
-        setSupportActionBar(toolbar);
-        actionbar = getSupportActionBar();
-        actionbar.setTitle(R.string.multifeeds);
-        actionbar.setDisplayHomeAsUpEnabled(true);
-        actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.multifeed_manager_toolbar);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            actionbar = getSupportActionBar();
+            actionbar.setTitle(R.string.multifeeds);
+            actionbar.setDisplayHomeAsUpEnabled(true);
+            actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+        }
 
         // drawerLayout = findViewById(R.id.drawer_layout_multifeed_manager);
 
