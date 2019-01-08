@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -152,7 +153,15 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     public void refreshRecyclerViewData() {
         this.articles.clear();
         onUserDataLoaded();
-        recyclerView.scrollToPosition(0);
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (recyclerView != null) {
+                    recyclerView.scrollToPosition(0);
+                }
+            }
+        });
     }
 
 
@@ -429,7 +438,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             waitAllFeedsLoaded.start();
 
             // call on list fragmentArticlesReady always after a delay of 20 seconds
-            final Handler handler = new Handler();
+            final Handler handler = new Handler(Looper.getMainLooper());
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
