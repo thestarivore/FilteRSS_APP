@@ -456,6 +456,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
         collectionListAdapter = new ExpandableListAdapter(this, collectionListHeaders, collectionListChild, collectionListFeedIcon, collectionColorList);
         expListViewCollections.setAdapter(collectionListAdapter);
+        expListViewCollections.requestLayout();
         //Item LongClick
         expListViewCollections.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override

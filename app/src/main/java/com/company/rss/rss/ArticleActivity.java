@@ -411,6 +411,7 @@ public class ArticleActivity extends AppCompatActivity implements
                     @Override
                     public void onClick(View view) {
                         collection.setTitle(collectionTitleTextView.getText().toString());
+                        collection.setColor(Color.BLACK);
 
                         // Validate the collection name
                         if (collection.getTitle() == null || collection.getTitle().isEmpty()) {
