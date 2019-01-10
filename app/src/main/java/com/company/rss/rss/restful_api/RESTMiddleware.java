@@ -187,7 +187,7 @@ public class RESTMiddleware {
      ********************************************************************/
     /**
      * Gets the list of all the User's Multifeeds
-     * @param userEmail Collection's owner email
+     * @param userEmail Multifeed's owner email
      * @param callback Callback for API response management
      */
     public void getUserMultifeeds(String userEmail, MultifeedCallback callback){

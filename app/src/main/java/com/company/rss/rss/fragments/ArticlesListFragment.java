@@ -297,7 +297,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         @Override
                         public void run() {
                             if (recyclerView != null) {
-                                //recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, getContext()));
+                                recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, getContext()));
                                 recyclerView.getAdapter().notifyDataSetChanged();
                             }
                         }
@@ -329,12 +329,11 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                      * If we find even one downloaded article missing in the local list --> substitute all
                      */
                     boolean articleMismatch = false;
-                    if (articles.size() != downloadedArticleList.size()) { // if different sizes -> mismatch
+                    if (articles.size() < downloadedArticleList.size()) { // if different sizes -> mismatch
                         articleMismatch = true;
 
                         //Substitute all the articles in the recycler view with those downloaded
                         articles = downloadedArticleList;
-
                     } else {
                         for (Article article : downloadedArticleList) {
                             if (article.isArticleInTheList(articles) == false) {
@@ -347,7 +346,6 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                                 break;
                             }
                         }
-
                     }
 
                     //Wait for all articles to load, then notify the activity with a callback, and pass the
@@ -369,7 +367,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                                 @Override
                                 public void run() {
                                     if (recyclerView != null) {
-                                        //recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, getContext()));
+                                        recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, getContext()));
                                         recyclerView.getAdapter().notifyDataSetChanged();
                                     }
                                 }
@@ -393,38 +391,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                          * after the list has been sorted, otherwise if we change the list during the persistence
                          * we might get a concurrency problem (ex ConcurrentModificationException).
                          */
-                        if (articleMismatch) {
-                            //Once all the articles have been downloaded for each feed, store them in the local SQLite Database
-                            //(but first clear the table of the old rows)
-                            sqLiteService.deleteAllArticles(new SQLOperationCallback() {
-                                @Override
-                                public void onLoad(SQLOperation sqlOperation) {
-                                    Log.d(ArticleActivity.logTag + ":" + TAG,
-                                            "All the articles have been deleted from the local SQLite DB, Article Table!");
-
-                                    //Once the Table have been cleaned, add/store the list of articles
-                                    sqLiteService.putArticles(articles, new SQLOperationCallback() {
-                                        @Override
-                                        public void onLoad(SQLOperation sqlOperation) {
-                                            Log.d(ArticleActivity.logTag + ":" + TAG,
-                                                    "Added " + sqlOperation.getAffectedRows() + " articles into the local SQLite DB, Article Table!");
-                                        }
-
-                                        @Override
-                                        public void onFailure() {
-                                            Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
-                                        }
-                                    });
-                                }
-
-                                @Override
-                                public void onFailure() {
-                                    Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
-                                }
-                            });
-                        }
+                        manageArticlesLocalDBPersistence(articleMismatch, sqLiteService, downloadedArticleList);
                     }
-
                 }
             });
             waitAllFeedsLoaded.start();
@@ -554,4 +522,101 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     }
 
 
+    /**
+     * Manage the local SQLite Database persistence of the Articles. The persistence differs based on the Selection type:
+     * 1. In the ALL_MULTIFEEDS selection, we resynchronize everything by delegating everything in the Article Table of the db,
+     *      saving the new downloaded articles list and finally resynchronize by getting the article list back from the database;
+     * 2. In the PARTIAL selections, we don't currently delete articles on the database, we just add the new ones. This may
+     *      accumulate some old articles, but they will be dropped as soon as a full selection is done(ALL_MULTIFEEDS);
+     * @param articleMismatch
+     * @param sqLiteService
+     * @param downloadedArticleList
+     */
+    void manageArticlesLocalDBPersistence(boolean articleMismatch, final SQLiteService sqLiteService, final List<Article> downloadedArticleList){
+        if (articleMismatch) {
+            if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
+                //Once all the articles have been downloaded for each feed, store them in the local SQLite Database
+                //(but first clear the table of the old rows)
+                sqLiteService.deleteAllArticles(new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        Log.d(ArticleActivity.logTag + ":" + TAG,
+                                "All the articles have been deleted from the local SQLite DB, Article Table!");
+
+                        //Once the Table have been cleaned, add/store the list of articles
+                        sqLiteService.putArticles(downloadedArticleList, new SQLOperationCallback() {
+                            @Override
+                            public void onLoad(SQLOperation sqlOperation) {
+                                Log.d(ArticleActivity.logTag + ":" + TAG,
+                                        "Added " + sqlOperation.getAffectedRows() + " articles into the local SQLite DB, Article Table!");
+
+                                //UserData ArticlesList is now obsolete
+                                userData.setLocalArticleListLoaded(false);
+
+                                //Get all the articles stored locally in the SQLite Database
+                                sqLiteService.getAllArticles(new ArticleCallback() {
+                                    @Override
+                                    public void onLoad(List<Article> localArticles) {
+                                        if (localArticles != null) {
+                                            userData.setLocalArticleList(localArticles);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure() {
+                                        Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
+                    }
+                });
+            }
+            //On Partial Selections
+            else{
+                //Add/store the list of articles for this selection, without deleting the old ones
+                //This may add some additional articles, but they will be deleted on the ALL_MULTIFEEDS Selections
+                sqLiteService.putArticles(downloadedArticleList, new SQLOperationCallback() {
+                    @Override
+                    public void onLoad(SQLOperation sqlOperation) {
+                        Log.d(ArticleActivity.logTag + ":" + TAG,
+                                "Added " + sqlOperation.getAffectedRows() + " articles into the local SQLite DB, Article Table!");
+
+                        //UserData ArticlesList is now obsolete
+                        userData.setLocalArticleListLoaded(false);
+
+                        //Get all the articles stored locally in the SQLite Database
+                        sqLiteService.getAllArticles(new ArticleCallback() {
+                            @Override
+                            public void onLoad(List<Article> localArticles) {
+                                if (localArticles != null) {
+                                    userData.setLocalArticleList(localArticles);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure() {
+                                Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure() {
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
+                    }
+                });
+            }
+        }
+    }
 }

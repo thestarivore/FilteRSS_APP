@@ -94,13 +94,6 @@ public class UserData {
         collectionList  = prefs.retrieveCollections();
         savedArticleList= prefs.retrieveSavedArticles();
         articleList     = prefs.retrieveArticles();
-
-        //Initialize the SQLite Repository
-        //repository = new ArticleSQLiteRepository(context);
-
-        //Get all the downloaded articles from the SQLite local database
-        //if(dlArticleList == null)
-        //    dlArticleList   = getSQLStoredAllDownloadedArticles();
     }
 
     /**
