@@ -226,14 +226,14 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         autoSliderHandler = new Handler();
         autoSliderRunnable = new Runnable() {
             public void run() {
-                if (topArticles != null) {
+                if (topArticles != null && topArticles.size() != 0) {
                     Log.d(ArticleActivity.logTag + ":" + TAG, "Autoslider page: " + currentSlide);
                     viewPager.setCurrentItem(currentSlide, true);
                     currentSlide++;
                     if (currentSlide >= topArticles.size())
                         currentSlide = 0;
+                    autoSliderHandler.postDelayed(this, autoSliderTimeoutMillis);
                 }
-                autoSliderHandler.postDelayed(this, autoSliderTimeoutMillis);
             }
         };
 
@@ -947,13 +947,19 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.loadPersistedData(context);
                 userData.processUserData();
 
+                // refresh the multifeed list
                 multifeedListHeaders.clear();
-                /*multifeedListChild.clear();
+                multifeedListChild.clear();
                 multifeedListFeedIcon.clear();
-                multifeedColorList.clear();*/
+                multifeedColorList.clear();
 
                 prepareMultifeedsListData();
                 multifeedListAdapter.notifyDataSetChanged();
+
+                //Expand all the groups
+                for (int i = 0; i < multifeedListAdapter.getGroupCount(); i++) {
+                    expListViewMultifeeds.expandGroup(i);
+                }
 
                 if (showSnackBar)
                     Snackbar.make(findViewById(android.R.id.content), R.string.user_information_updated, Snackbar.LENGTH_LONG).show();

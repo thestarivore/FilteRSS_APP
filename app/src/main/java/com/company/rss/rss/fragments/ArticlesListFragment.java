@@ -247,8 +247,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                             //Wait for onCreateView to set RecyclerView's Adapter
                             while (recyclerView == null || recyclerView.getAdapter() == null) ;
 
-                            Log.d(ArticleActivity.logTag + ":" + TAG, "LoadRSSFeed finished: " + (feedCounter + 1) + "/" + feedList.size());
-
+                            Log.d(ArticleActivity.logTag + ":" + TAG, "LoadRSSFeed finished: " + (feedCounter + 1) + "/" + feedList.size() + ", founded: " + rssFeed.getItemCount() + " articles");
                             feedCounter++;
 
                         }

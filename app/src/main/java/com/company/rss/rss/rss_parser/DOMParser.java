@@ -1,5 +1,8 @@
 package com.company.rss.rss.rss_parser;
 
+import android.util.Log;
+
+import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.RSSFeed;
 import com.joestelmach.natty.DateGroup;
@@ -11,6 +14,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -30,6 +34,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
  * ProgressBar if one is passed to the constructor.
  */
 public class DOMParser {
+    private final String TAG = getClass().getName();
+
     //TITLE:"title"
     private ArrayList<String> titleList = new ArrayList<String>() {{
         add("title");
@@ -82,33 +88,57 @@ public class DOMParser {
     private RSSFeed feed = new RSSFeed();
 
     public RSSFeed parseXML(String feedURL) {
-        String newFeedURL;
-
-        // Create a new URL
-        URL url = null;
-        try {
-            //Convert from HTTP to HTTPS if it isn't already
-            /*if(URLUtil.isHttpUrl(feedURL)) {
-                newFeedURL = feedURL.replaceAll("http", "https");
-            }
-            else {
-                newFeedURL = feedURL;
-            }*/
-            newFeedURL = feedURL;
-
-            // Find the new URL from the given URL
-            url = new URL(newFeedURL);
-        } catch (MalformedURLException e) {
-            // Throw an exception
-            e.printStackTrace();
-        }
-
         try {
             // Create a new DocumentBuilder
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
             //Create an URL Connection
-            URLConnection urlConnection = url.openConnection();
+            String url = feedURL;
+
+            HttpURLConnection urlConnection = (HttpURLConnection) new URL(url).openConnection();
+            urlConnection.setReadTimeout(5000);
+
+            boolean firstCheck = true;
+            boolean redirect = false;
+            int maxTries = 3;
+            int tries = 0;
+            String log = "Parsing: ";
+
+
+            while ((firstCheck || redirect) && tries < maxTries) {
+                firstCheck = false;
+                redirect = false;
+
+                int status = urlConnection.getResponseCode();
+                log += url + " status " + status;
+
+                // normally, 3xx is redirect
+                if (status != HttpURLConnection.HTTP_OK) {
+                    if (status == HttpURLConnection.HTTP_MOVED_TEMP
+                            || status == HttpURLConnection.HTTP_MOVED_PERM
+                            || status == HttpURLConnection.HTTP_SEE_OTHER) {
+                        redirect = true;
+                    } else if (status == HttpURLConnection.HTTP_BAD_REQUEST
+                            || status == HttpURLConnection.HTTP_NOT_FOUND) {
+                        Log.d(ArticleActivity.logTag + ":" + TAG, log);
+                        throw new Exception(url + " error: HTTP 400 | 404");
+                    }
+                }
+
+                if (redirect) {
+                    // get redirect url from "location" header field
+                    url = urlConnection.getHeaderField("Location");
+                    // open the new connnection again
+                    urlConnection = (HttpURLConnection) new URL(url).openConnection();
+                    urlConnection.setReadTimeout(5000);
+
+                    log += "... redirect to: " + url + ". ";
+                }
+                maxTries++;
+            }
+
+            Log.d(ArticleActivity.logTag + ":" + TAG, log);
+
 
             // Parse the XML
             //Document doc = builder.parse(new InputSource(url.openStream()));
@@ -119,7 +149,7 @@ public class DOMParser {
 
             // Get all <item> OR <entry> tags.
             NodeList list = doc.getElementsByTagName("item");
-            if(list.getLength() == 0)
+            if (list.getLength() == 0)
                 list = doc.getElementsByTagName("entry");
 
             // Get size of the list
@@ -145,7 +175,7 @@ public class DOMParser {
                     // Get the name of the child
                     String nodeName = nodeChild.item(j).getNodeName(), nodeString = null;
                     // If there is at least one child element
-                    if(nodeChild.item(j).getFirstChild() != null){
+                    if (nodeChild.item(j).getFirstChild() != null) {
                         // Set the string to be the value of the node
                         nodeString = nodeChild.item(j).getFirstChild().getNodeValue();
                     }
@@ -154,12 +184,12 @@ public class DOMParser {
                         // Set the Title
                         if (titleList.contains(nodeName)) {
                             //if(article.getTitle() == null)
-                                article.setTitle(nodeString);
+                            article.setTitle(nodeString);
                         }
                         // Set the Description ("description", "content:encoded", "content", "summary"(if no other))
-                        else if(descriptionList.contains(nodeName)) {
-                            if(article.getDescription() == null)
-                                article.setDescription(nodeString.replaceAll("\\<[^>]*>",""));
+                        else if (descriptionList.contains(nodeName)) {
+                            if (article.getDescription() == null)
+                                article.setDescription(nodeString.replaceAll("\\<[^>]*>", ""));
                         }
                         // Set the PublicationDate ("pubDate", "published", "dc:date", "a10:updated")
                         else if (pubDateList.contains(nodeName)) {
@@ -169,30 +199,30 @@ public class DOMParser {
                         // Set the Author ("author", "dc:creator", "itunes:author")
                         else if (authorList.contains(nodeName)) {
                             //if (article.getAuthor() == null)
-                                article.setAuthor(nodeString);
+                            article.setAuthor(nodeString);
                         }
                         // Set the Article's Link
-                        else if (linkList.contains(nodeName)){
+                        else if (linkList.contains(nodeName)) {
                             //if (article.getLink() == null)
-                                article.setLink(nodeString);
+                            article.setLink(nodeString);
                         }
                         // Set the Thumbnail/ImageLink  ("thumbnail", "thumb")
-                        else if (thumbnailList.contains(nodeName)){
+                        else if (thumbnailList.contains(nodeName)) {
                             //if (article.getImgLink() == null)
-                                article.setImgLink(nodeString);
+                            article.setImgLink(nodeString);
                         }
                         // Set the Article's Comments   ("comments", "wfw:commentRss")
-                        else if (commentsList.contains(nodeName)){
+                        else if (commentsList.contains(nodeName)) {
                             if (article.getComment() == null)
                                 article.setComment(nodeString);
                         }
                     }
                     // Self closing TAGs with no node string value
-                    else{
+                    else {
                         // Set the Thumbnail/ImageLink  ("media:thumbnail"(url=), "media:content"(url=), "enclosure"(url=))
-                        if (thumbnailSingleTagList.contains(nodeName)){
+                        if (thumbnailSingleTagList.contains(nodeName)) {
                             //if (article.getImgLink() == null)
-                                article.setImgLink(nodeChild.item(j).getAttributes().getNamedItem("url").getNodeValue());
+                            article.setImgLink(nodeChild.item(j).getAttributes().getNamedItem("url").getNodeValue());
                         }
                     }
                 }
@@ -202,10 +232,12 @@ public class DOMParser {
             }
             long endTime = System.nanoTime();
             long duration = endTime - startTime;
-            System.out.println("DOM_Parsing Duration("+feedURL+"):  " + duration / 1000000 + "ms");
+            System.out.println("DOM_Parsing Duration(" + feedURL + "):  " + duration / 1000000 + "ms");
 
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e(ArticleActivity.logTag + ":" + TAG, "EXCEPTION: " + e.getMessage());
+
         }
         // Return the feed
         return feed;
@@ -214,16 +246,17 @@ public class DOMParser {
 
     /**
      * Parse a Date from a String using multiple matching patterns(Natty library)
+     *
      * @param candidate String to parse
      * @return Date object or null if the parsing failed
      */
-    private Date parseDateFromString(String candidate){
+    private Date parseDateFromString(String candidate) {
         Parser parser = new Parser();
         List<DateGroup> groups = parser.parse(candidate);
-        for(DateGroup group:groups) {
+        for (DateGroup group : groups) {
             List<Date> dates = group.getDates();
             return dates.get(0);
         }
-        return  null;
+        return null;
     }
 }
