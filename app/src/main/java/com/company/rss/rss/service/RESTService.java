@@ -586,21 +586,27 @@ public class RESTService {
     }
 
     /**
-     * Delete a Collection related to a User
+     * Delete a Collection related to a User, due to table relations, this api also needs to delete all
+     * the saved_articles associated to this collection(this is the first thing done).
      * @param id Collection's identification number
-     * @param callback Callback for API response management
+     * @param callback SQLOperationListCallback for API response management:
+     *                 - List's first SQLOperation indicates the rows deleted from saved_article table;
+     *                 - List's second SQLOperation indicates the rows deleted from the collection table;
      */
-    public void deleteUserCollection(int id, final SQLOperationCallback callback){
-        userRESTInterface.deleteUserCollection(id).enqueue(new retrofit2.Callback<SQLOperation>() {
+    public void deleteUserCollection(int id, final SQLOperationListCallback callback){
+        final List<SQLOperation> sqlOperationList = new ArrayList<>();
 
+        userRESTInterface.deleteUserCollection(id).enqueue(new retrofit2.Callback<List<SQLOperation>>() {
             @Override
-            public void onResponse(Call<SQLOperation> call, Response<SQLOperation> response) {
-                SQLOperation sqlOperation = response.body();
-                callback.onLoad(sqlOperation);
+            public void onResponse(Call<List<SQLOperation>> call, Response<List<SQLOperation>> response) {
+                for (SQLOperation sqlOperation :response.body()){
+                    sqlOperationList.add(sqlOperation);
+                }
+                callback.onLoad(sqlOperationList);
             }
 
             @Override
-            public void onFailure(Call<SQLOperation> call, Throwable t) {
+            public void onFailure(Call<List<SQLOperation>> call, Throwable t) {
                 callback.onFailure();
             }
         });

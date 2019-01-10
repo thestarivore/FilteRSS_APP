@@ -248,11 +248,14 @@ public class RESTMiddleware {
     }
 
     /**
-     * Delete a Collection related to a User
+     * Delete a Collection related to a User, due to table relations, this api also needs to delete all
+     * the saved_articles associated to this collection(this is the first thing done).
      * @param id Collection's identification number
-     * @param callback Callback for API response management
+     * @param callback SQLOperationListCallback for API response management:
+     *                 - List's first SQLOperation indicates the rows deleted from saved_article table;
+     *                 - List's second SQLOperation indicates the rows deleted from the collection table;
      */
-    public void deleteUserCollection(int id, SQLOperationCallback callback){
+    public void deleteUserCollection(int id, SQLOperationListCallback callback){
         RESTService.getInstance(context).deleteUserCollection(id, callback);
     }
 

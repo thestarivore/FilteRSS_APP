@@ -19,6 +19,7 @@ import com.company.rss.rss.models.User;
 import com.company.rss.rss.persistence.UserPrefs;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
+import com.company.rss.rss.restful_api.callbacks.SQLOperationListCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,14 +121,20 @@ public class CollectionManagerActivity extends AppCompatActivity implements Coll
 
         if(!collection.getTitle().equals(R.string.read_it_later)){
 
-            api.deleteUserCollection(collection.getId(), new SQLOperationCallback() {
+            api.deleteUserCollection(collection.getId(), new SQLOperationListCallback() {
                 @Override
-                public void onLoad(SQLOperation sqlOperation) {
-                    Log.d(ArticleActivity.logTag + ":" + TAG, "Collection " + collection.getTitle() + " removed");
-                    collections.remove(position);
-                    adapter.notifyDataSetChanged();
-                    Snackbar.make(findViewById(android.R.id.content), R.string.collection_removed_successfully, Snackbar.LENGTH_LONG).show();
-                    collectionsChange = true;
+                public void onLoad(List<SQLOperation> sqlOperations) {
+                    if(sqlOperations.get(1).getAffectedRows() > 0) {
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "Collection " + collection.getTitle() + " removed");
+                        collections.remove(position);
+                        adapter.notifyDataSetChanged();
+                        Snackbar.make(findViewById(android.R.id.content), R.string.collection_removed_successfully, Snackbar.LENGTH_LONG).show();
+                        collectionsChange = true;
+                    }
+                    else {
+                        Log.e(ArticleActivity.logTag + ":" + TAG, "Collection " + collection.getTitle() + " NOT removed");
+                        Snackbar.make(findViewById(android.R.id.content), R.string.collection_remove_error, Snackbar.LENGTH_LONG).show();
+                    }
                 }
 
                 @Override

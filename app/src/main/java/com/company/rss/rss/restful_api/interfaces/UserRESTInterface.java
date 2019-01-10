@@ -83,7 +83,7 @@ public interface UserRESTInterface {
 
     @FormUrlEncoded
     @HTTP(method = "DELETE", path = "/v1/user/collections", hasBody = true)
-    public Call<SQLOperation> deleteUserCollection(@Field("id") int id);
+    public Call<List<SQLOperation>> deleteUserCollection(@Field("id") int id);
 
     @FormUrlEncoded
     @PATCH("/v1/user/collections")
