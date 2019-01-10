@@ -1,7 +1,9 @@
 package com.company.rss.rss.models;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.persistence.UserPrefs;
 import com.company.rss.rss.persistence.articles.ArticleCursor;
 import com.company.rss.rss.persistence.articles.ArticleSQLiteRepository;

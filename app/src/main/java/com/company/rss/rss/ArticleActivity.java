@@ -109,6 +109,7 @@ public class ArticleActivity extends AppCompatActivity implements
         // INPUT DATA
         Intent intent = getIntent();
         article = (Article) intent.getSerializableExtra(ArticlesListActivity.EXTRA_ARTICLE);
+        actionbar.setTitle(article.getTitle());
 
         final String articleLink = article.getLink();
         articleTitle = article.getTitle();

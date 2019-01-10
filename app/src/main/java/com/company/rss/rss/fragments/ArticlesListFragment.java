@@ -62,6 +62,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     private int scoreCounter;
     private Context context;
     private ArticleRecyclerViewAdapter adapter;
+    private boolean sqlDone;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -101,27 +102,27 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             mListener.onListFragmentArticlesReady();
 
         } else {*/
-            view = inflater.inflate(R.layout.fragment_article_list, container, false);
+        view = inflater.inflate(R.layout.fragment_article_list, container, false);
 
-            // Create the RecyclerView and Set it's adapter
-            if (view instanceof RecyclerView) {
-                Context context = view.getContext();
-                this.context = context;
-                recyclerView = (RecyclerView) view;
+        // Create the RecyclerView and Set it's adapter
+        if (view instanceof RecyclerView) {
+            Context context = view.getContext();
+            this.context = context;
+            recyclerView = (RecyclerView) view;
 
-                // Set the swipe controller
-                ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ArticleListSwipeController(0, ItemTouchHelper.RIGHT, this);
-                new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
+            // Set the swipe controller
+            ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ArticleListSwipeController(0, ItemTouchHelper.RIGHT, this);
+            new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
-                if (mColumnCount <= 1) {
-                    recyclerView.setLayoutManager(new LinearLayoutManager(context));
-                } else {
-                    recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-                }
-
-                adapter = new ArticleRecyclerViewAdapter(articles, mListener, context);
-                recyclerView.setAdapter(adapter);
+            if (mColumnCount <= 1) {
+                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            } else {
+                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
+
+            adapter = new ArticleRecyclerViewAdapter(articles, mListener, context);
+            recyclerView.setAdapter(adapter);
+        }
         //}
 
         return view;
@@ -256,6 +257,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                 }
             }
 
+            sqlDone = false;
             // Wait until all the articles stored locally in the SQLite database are retrieved
             final Thread waitSQLiteLoaded = new Thread(new Runnable() {
                 @Override
@@ -270,10 +272,17 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
                     //When the local ArticleList has finished loading, get the new articles in the RecyclerView adapter's list
                     articles.clear();
-                    if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS)
-                        articles.addAll(userData.getLocalArticleList());
-                    else
+                    if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
+                        List<Article> localArticleList = userData.getLocalArticleList();
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "Local article list: " + localArticleList.size());
+                        articles.addAll(localArticleList);
+                    } else {
+                        List<Article> localArticleListFiltered = userData.getLocalArticleListFiltered(feedList);
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "Local article list filtered: " + localArticleListFiltered.size());
                         articles.addAll(userData.getLocalArticleListFiltered(feedList));
+                    }
+
+                    sqlDone = true;
 
                     //Associate the FeedObjects to each Article (since these are not stored in the local SQLite Database
                     for (Article article : articles) {
@@ -288,7 +297,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         @Override
                         public void run() {
                             if (recyclerView != null) {
-                                recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, getContext()));
+                                //recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, getContext()));
                                 recyclerView.getAdapter().notifyDataSetChanged();
                             }
                         }
@@ -299,12 +308,12 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             });
             waitSQLiteLoaded.start();
 
-            // Wait until at least one LoadRSSFeed has finished then call onListFragmentArticlesReady
+            // Wait until all LoadRSSFeeds has finished then call onListFragmentArticlesReady
             // to notify that we have something to show
             final Thread waitAllFeedsLoaded = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while (feedCounter < numberOfFeeds || scoreCounter < numberOfFeeds) {
+                    while (feedCounter < numberOfFeeds || scoreCounter < numberOfFeeds || !sqlDone) {
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e) {
@@ -320,16 +329,25 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                      * If we find even one downloaded article missing in the local list --> substitute all
                      */
                     boolean articleMismatch = false;
-                    for (Article article : downloadedArticleList) {
-                        if (article.isArticleInTheList(articles) == false) {
-                            articleMismatch = true;
+                    if (articles.size() != downloadedArticleList.size()) { // if different sizes -> mismatch
+                        articleMismatch = true;
 
-                            //Substitute all the articles in the recycler view with those downloaded
-                            articles = downloadedArticleList;
+                        //Substitute all the articles in the recycler view with those downloaded
+                        articles = downloadedArticleList;
 
-                            //Exit for loop prematurely
-                            break;
+                    } else {
+                        for (Article article : downloadedArticleList) {
+                            if (article.isArticleInTheList(articles) == false) {
+                                articleMismatch = true;
+
+                                //Substitute all the articles in the recycler view with those downloaded
+                                articles = downloadedArticleList;
+
+                                //Exit for loop prematurely
+                                break;
+                            }
                         }
+
                     }
 
                     //Wait for all articles to load, then notify the activity with a callback, and pass the
@@ -343,30 +361,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                     if (mListener != null) {
                         Log.d(ArticleActivity.logTag + ":" + TAG, "All LoadRSSFeed and getScores finished");
 
-                        Log.d(ArticleActivity.logTag + ":" + TAG, "# Articles: " + articles.size());
-
-                        Log.d(ArticleActivity.logTag + ":" + TAG, "Sorting articles...");
-
-                        for (int i = 0; i < articles.size(); i++) {
-                            Article article = articles.get(i);
-                            float articleScoreByRating = article.getScore() * article.getFeedObj().getMultifeed().getRating();
-                            article.setScore(articleScoreByRating);
-                            Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
-                        }
-
-                        Collections.sort(articles, new Comparator<Article>() {
-                            @Override
-                            public int compare(Article a1, Article a2) {
-                                if (a1.getScore() == a2.getScore())
-                                    return 0;
-                                return a1.getScore() > a2.getScore() ? -1 : 1;
-                            }
-                        });
-
-                        Log.d(ArticleActivity.logTag + ":" + TAG, "Sorting DONE");
-                        for (int i = 0; i < articles.size(); i++) {
-                            Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
-                        }
+                        sortArticles();
 
                         //Reload RecyclerView only if the downloaded articles are different that those stored locally
                         if (articleMismatch) {
@@ -374,15 +369,12 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                                 @Override
                                 public void run() {
                                     if (recyclerView != null) {
-                                        recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, getContext()));
+                                        //recyclerView.setAdapter(new ArticleRecyclerViewAdapter(articles, mListener, getContext()));
                                         recyclerView.getAdapter().notifyDataSetChanged();
                                     }
                                 }
                             });
-                        }
 
-                        if (articleMismatch) {
-                            //Callback
                             mListener.onListFragmentArticlesReady();
                         }
 
@@ -460,9 +452,45 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             //Notify a change in the RecyclerView's Article List
             ArticleRecyclerViewAdapter articleRecyclerViewAdapter = (ArticleRecyclerViewAdapter) recyclerView.getAdapter();
             articleRecyclerViewAdapter.setCollection(collection);
-            recyclerView.getAdapter().notifyDataSetChanged();
+
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (recyclerView != null) {
+                        recyclerView.getAdapter().notifyDataSetChanged();
+                    }
+                }
+            });
         }
 
+    }
+
+    private void sortArticles() {
+        Log.d(ArticleActivity.logTag + ":" + TAG, "# Articles: " + articles.size());
+
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Sorting articles...");
+
+        for (int i = 0; i < articles.size(); i++) {
+            Article article = articles.get(i);
+            float articleScoreByRating = article.getScore() * article.getFeedObj().getMultifeed().getRating();
+            article.setScore(articleScoreByRating);
+
+            //Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
+        }
+
+        Collections.sort(articles, new Comparator<Article>() {
+            @Override
+            public int compare(Article a1, Article a2) {
+                if (a1.getScore() == a2.getScore())
+                    return 0;
+                return a1.getScore() > a2.getScore() ? -1 : 1;
+            }
+        });
+
+        Log.d(ArticleActivity.logTag + ":" + TAG, "Sorting DONE");
+        /*for (int i = 0; i < articles.size(); i++) {
+            Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
+        }*/
     }
 
     /**

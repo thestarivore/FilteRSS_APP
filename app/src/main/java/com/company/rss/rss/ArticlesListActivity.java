@@ -215,8 +215,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
         // Set the progress bar visible and hide other
         progressBar = findViewById(R.id.progressBarArticlesList);
-        progressBar.setVisibility(View.VISIBLE);
         contentLinearLayout = findViewById(R.id.articleListLinearLayout);
+        progressBar.setVisibility(View.VISIBLE);
         contentLinearLayout.setVisibility(View.INVISIBLE);
 
         articlesAddedToRIL = new ArrayList<>();
@@ -351,6 +351,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 //Prepare the new ListToVisualize and Restart Activity
                 userData.setVisualizationMode(UserData.MODE_ALL_MULTIFEEDS_FEEDS);
 
+                contentLinearLayout.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
                 //restartActivity();
                 refreshFragmentData();
@@ -435,6 +436,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.setVisualizationMode(UserData.MODE_MULTIFEED_ARTICLES);
                 userData.setMultifeedPosition(groupPosition);
 
+                contentLinearLayout.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
                 refreshFragmentData();
                 return true; // This way the expander cannot be collapsed
@@ -477,6 +479,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.setVisualizationMode(UserData.MODE_COLLECTION_ARTICLES);
                 userData.setCollectionPosition(groupPosition);
 
+                contentLinearLayout.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
                 refreshFragmentData();
                 return true; // This way the expander cannot be collapsed
@@ -945,6 +948,10 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.processUserData();
 
                 multifeedListHeaders.clear();
+                /*multifeedListChild.clear();
+                multifeedListFeedIcon.clear();
+                multifeedColorList.clear();*/
+
                 prepareMultifeedsListData();
                 multifeedListAdapter.notifyDataSetChanged();
 

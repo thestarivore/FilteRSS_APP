@@ -247,6 +247,7 @@ public class Feed implements Serializable {
                 ", category='" + category + '\'' +
                 ", lang='" + lang + '\'' +
                 ", popolarity=" + popolarity +
+                ", multifeed=" + multifeed +
                 '}';
     }
 
