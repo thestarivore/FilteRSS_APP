@@ -81,6 +81,7 @@ public class DOMParser {
     private ArrayList<String> thumbnailSingleTagList = new ArrayList<String>() {{
         add("media:thumbnail");
         add("media:content");
+        add("enclosure");
         //add("enclosure");
     }};
 
@@ -171,7 +172,7 @@ public class DOMParser {
                 int cLength = nodeChild.getLength();
 
                 // For all the children of a node
-                for (int j = 1; j < cLength; j = j + 2) {
+                for (int j = 0; j < cLength; j++) {
                     // Get the name of the child
                     String nodeName = nodeChild.item(j).getNodeName(), nodeString = null;
                     // If there is at least one child element
