@@ -53,10 +53,10 @@ public class ArticlesSlideFragment extends Fragment {
         ImageView articleImage = view.findViewById(R.id.imageViewArticleSlider);
         ImageView articleFeedIcon = view.findViewById(R.id.imageViewArticleFeedIcon);
 
-        if(mArticle != null) {
+        if (mArticle != null) {
             articleTitle.setText(mArticle.getTitle());
 
-            if(mArticle.getFeedObj() != null){
+            if (mArticle.getFeedObj() != null) {
                 articleSource.setText(mArticle.getFeedObj().getTitle());
 
                 String feedIcon = mArticle.getFeedObj().getIconURL();
@@ -68,10 +68,14 @@ public class ArticlesSlideFragment extends Fragment {
             }
 
             String imgLink = mArticle.getImgLink();
-            if (imgLink == null || imgLink.isEmpty()) {
-                articleImage.setVisibility(View.GONE);
-            } else {
-                Picasso.get().load(imgLink).into(articleImage);
+            if (imgLink != null && !imgLink.isEmpty()) {
+                Picasso.get()
+                        .load(imgLink)
+                        .fit()
+                        .centerCrop()
+                        .placeholder(R.drawable.ic_rss_feed_white_24dp)
+                        .error(R.drawable.ic_error_outline_white_24dp)
+                        .into(articleImage);
             }
 
             String pubDate = mArticle.getPubDateString("dd-MM-yyyy");

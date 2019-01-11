@@ -1,15 +1,22 @@
 package com.company.rss.rss.models;
 
+import android.util.Log;
+import android.view.View;
+
+import com.company.rss.rss.ArticleActivity;
+import com.company.rss.rss.R;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.joestelmach.natty.DateGroup;
 import com.joestelmach.natty.Parser;
+import com.squareup.picasso.Picasso;
 import com.thedeanda.lorem.Lorem;
 import com.thedeanda.lorem.LoremIpsum;
 
 import net.boeckling.crc.CRC64;
 
 import java.io.Serializable;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -366,6 +373,24 @@ public class Article implements Serializable {
                 return true;
         }
         return false;
+    }
+
+    /**
+     * Check if the given url is a valid one
+     * @param url
+     * @return
+     */
+    public static final boolean checkUrlIsValid(String url){
+        if(url != null && !url.isEmpty()){
+            try {
+                new URL(url);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 }
 

@@ -2,15 +2,9 @@ package com.company.rss.rss;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LevelListDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.design.widget.FloatingActionButton;
@@ -19,8 +13,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.Spanned;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -28,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -46,10 +39,6 @@ import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationListCallback;
 import com.squareup.picasso.Picasso;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +47,7 @@ import java.util.Locale;
 import top.defaults.colorpicker.ColorPickerPopup;
 
 public class ArticleActivity extends AppCompatActivity implements
-        TextToSpeech.OnInitListener, Html.ImageGetter {
+        TextToSpeech.OnInitListener {//, Html.ImageGetter {
 
     public final static String logTag = "RSSLOG";
     private final String TAG = getClass().getName();
@@ -74,7 +63,7 @@ public class ArticleActivity extends AppCompatActivity implements
     private String articleTitle;
     private MenuItem ttsPlayItem;
 
-    private TextView articleBodyTextView;
+    private WebView articleBodyWebView;
     private boolean collectionsChange;
     private boolean articleReadSend;
 
@@ -144,30 +133,43 @@ public class ArticleActivity extends AppCompatActivity implements
 
         ImageView articleImageView = findViewById(R.id.imageViewArticleImage);
         String articleImgLink = article.getImgLink();
-        if (articleImgLink == null || articleImgLink.isEmpty()) {
-        } else {
-            Picasso.get().load(articleImgLink).into(articleImageView);
 
+        if(Article.checkUrlIsValid(articleImgLink)){
+            Picasso.get()
+                    .load(articleImgLink)
+                    .fit()
+                    .centerCrop()
+                    .placeholder(R.drawable.ic_rss_feed_black_24dp)
+                    .error(R.drawable.ic_error_outline_black_24dp)
+                    .into(articleImageView);
             // Set the image to third size of the viewport
             Display display = getWindowManager().getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
             articleImageView.getLayoutParams().height = size.y / 3;
-        }
-        //Set Article Body View
-        articleBodyTextView = findViewById(R.id.textViewArticleBody);
-        if (articleBody != null) {
-            Spanned spannedBody = Html.fromHtml(articleBody, this, null);
-            articleBodyTextView.setText(spannedBody);
         } else {
-            articleBodyTextView.setText("");
+            Log.e(ArticleActivity.logTag + ":" + TAG, "EXCEPTION: url " + articleImgLink + " not valid");
+            articleImageView.setVisibility(View.GONE);
+        }
+
+        //Set Article Body View
+        articleBodyWebView = findViewById(R.id.textViewArticleBody);
+        articleBodyWebView.getSettings().setJavaScriptEnabled(true);
+        articleBodyWebView.setVerticalScrollBarEnabled(false);
+        articleBodyWebView.setBackgroundColor(Color.parseColor("#FAFAFA"));
+        if (articleBody != null) {
+            //Spanned spannedBody = Html.fromHtml(articleBody, this, null);
+            articleBodyWebView.loadData("<style>img{display: inline;height: auto;max-width: 100%;}</style>" + articleBody, "text/html; charset=utf-8", "utf-8");
+
+        } else {
+            articleBodyWebView.loadData("", "text/html; charset=utf-8", "utf-8");
         }
         /*if (articleBody != null)
-            articleBodyTextView.setText(Html.fromHtml(articleBody));        //Render HTTML code
+            articleBodyWebView.setText(Html.fromHtml(articleBody));        //Render HTTML code
         else
-            articleBodyTextView.setText("");
+            articleBodyWebView.setText("");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            articleBodyTextView.setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
+            articleBodyWebView.setJustificationMode(JUSTIFICATION_MODE_INTER_WORD);
         }*/
 
         //TextView articleReadTimeTextView = (TextView) findViewById(R.id.textViewReadTime);
@@ -177,8 +179,8 @@ public class ArticleActivity extends AppCompatActivity implements
 
         // EVENTS LISTENER
         // Swipe right to go back
-        ScrollView scrollViewArticle = findViewById(R.id.scrollViewArticle);
-        scrollViewArticle.setOnTouchListener(new OnSwipeTouchListener(ArticleActivity.this) {
+        //ScrollView scrollViewArticle = findViewById(R.id.scrollViewArticle);
+        articleBodyWebView.setOnTouchListener(new OnSwipeTouchListener(ArticleActivity.this) {
             @Override
             public void onSwipeRight() {
                 onBackPressed();
@@ -480,20 +482,21 @@ public class ArticleActivity extends AppCompatActivity implements
 
     /**
      * Add the selected article to the selected collection
-     * @param article the article to add to the collection
+     *
+     * @param article    the article to add to the collection
      * @param collection where to add the article
      */
     private void addArticleToCollection(final Article article, final Collection collection) {
 
         Log.d(ArticleActivity.logTag + ":" + TAG, "Article " +
-                article.getTitle()+" " +
-                article.getComment()+" " +
-                article.getLink()+" " +
-                article.getImgLink()+" " +
-                article.getPubDateString("yyyy-MM-dd hh:mm:ss")+" " +
-                loggedUser.getId()+" " +
-                article.getFeedId()+" " +
-                collection.getId()+ " to collection " + collection.getTitle());
+                article.getTitle() + " " +
+                article.getComment() + " " +
+                article.getLink() + " " +
+                article.getImgLink() + " " +
+                article.getPubDateString("yyyy-MM-dd hh:mm:ss") + " " +
+                loggedUser.getId() + " " +
+                article.getFeedId() + " " +
+                collection.getId() + " to collection " + collection.getTitle());
 
         api.addUserArticleAssociatedToCollection(
                 article.getTitle(),
@@ -542,7 +545,7 @@ public class ArticleActivity extends AppCompatActivity implements
      */
     @Override
     public void onBackPressed() {
-        if(collectionsChange){
+        if (collectionsChange) {
             Intent intent = getIntent();
             setResult(RESULT_OK, intent);
             finish();
@@ -688,24 +691,24 @@ public class ArticleActivity extends AppCompatActivity implements
 
     }
 
-    @Override
-    public Drawable getDrawable(String source) {
-        LevelListDrawable d = new LevelListDrawable();
-        Drawable empty = getResources().getDrawable(R.drawable.ic_launcher);
-        d.addLevel(0, 0, empty);
-        d.setBounds(0, 0, empty.getIntrinsicWidth(), empty.getIntrinsicHeight());
-
-        //Start the AsyncTask that will load the images in the body text
-        new LoadImage().execute(source, d);
-
-        return d;
-    }
-
-
-
     /**
-     * AsyncTask that loads the images in the Article's TextBody
-     */
+     @Override public Drawable getDrawable(String source) {
+     LevelListDrawable d = new LevelListDrawable();
+     Drawable empty = getResources().getDrawable(R.drawable.ic_launcher);
+     d.addLevel(0, 0, empty);
+     d.setBounds(0, 0, empty.getIntrinsicWidth(), empty.getIntrinsicHeight());
+
+     //Start the AsyncTask that will load the images in the body text
+     new LoadImage().execute(source, d);
+
+     return d;
+     }
+
+
+
+
+      * AsyncTask that loads the images in the Article's TextBody
+     *//*
     class LoadImage extends AsyncTask<Object, Void, Bitmap> {
         private LevelListDrawable mDrawable;
 
@@ -737,10 +740,11 @@ public class ArticleActivity extends AppCompatActivity implements
                 mDrawable.setBounds(0, 0, bitmap.getWidth(), bitmap.getHeight());
                 mDrawable.setLevel(1);
                 // i don't know yet a better way to refresh TextView
-                // TextView articleBodyTextView.invalidate() doesn't work as expected
-                CharSequence t = articleBodyTextView.getText();
-                articleBodyTextView.setText(t);
+                // TextView articleBodyWebView.invalidate() doesn't work as expected
+
+                CharSequence t = articleBodyWebView.getText();
+                articleBodyWebView.setText(t);
             }
         }
-    }
+    }*/
 }

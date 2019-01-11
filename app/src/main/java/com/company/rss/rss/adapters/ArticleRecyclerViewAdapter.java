@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.R;
 import com.company.rss.rss.fragments.ArticlesListFragment.OnListFragmentInteractionListener;
 import com.company.rss.rss.models.Article;
@@ -59,7 +61,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         if (description == null || description.isEmpty() || description.length() < 10) {
             holder.mDescriptionView.setVisibility(View.GONE);
         } else {
-            holder.mDescriptionView.setText(description);
+            holder.mDescriptionView.setText(description.replaceAll("\\<[^>]*>", ""));
         }
 
         String pubDate = mArticles.get(position).getPubDateString("dd-MM-yyyy");
@@ -76,12 +78,21 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         if (mArticles.get(position).getFeedObj() != null)
             holder.mFeedNameView.setText(mArticles.get(position).getFeedObj().getTitle());
 
+
         String imgLink = mArticles.get(position).getImgLink();
-        if (imgLink == null || imgLink.isEmpty()) {
-            holder.mImageView.setVisibility(View.GONE);
+        if(Article.checkUrlIsValid(imgLink)){
+            Picasso.get()
+                    .load(imgLink)
+                    .fit()
+                    .centerCrop()
+                    .placeholder(R.drawable.ic_rss_feed_black_24dp)
+                    .error(R.drawable.ic_error_outline_black_24dp)
+                    .into(holder.mImageView);
         } else {
-            Picasso.get().load(imgLink).into(holder.mImageView);
+            //Log.e(ArticleActivity.logTag + ":" + TAG, "EXCEPTION: url " + imgLink + " not valid");
+            holder.mImageView.setVisibility(View.GONE);
         }
+
 
         String feedIcon = null;
         if (mArticles.get(position).getFeedObj() != null)

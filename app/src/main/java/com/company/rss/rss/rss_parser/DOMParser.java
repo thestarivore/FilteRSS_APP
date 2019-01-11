@@ -189,8 +189,8 @@ public class DOMParser {
                         }
                         // Set the Description ("description", "content:encoded", "content", "summary"(if no other))
                         else if (descriptionList.contains(nodeName)) {
-                            if (article.getDescription() == null)
-                                article.setDescription(nodeString.replaceAll("\\<[^>]*>", ""));
+                            if (article.getDescription() == null || article.getDescription().length() < nodeString.length())
+                                article.setDescription(nodeString);//.replaceAll("\\<[^>]*>", ""));
                         }
                         // Set the PublicationDate ("pubDate", "published", "dc:date", "a10:updated")
                         else if (pubDateList.contains(nodeName)) {

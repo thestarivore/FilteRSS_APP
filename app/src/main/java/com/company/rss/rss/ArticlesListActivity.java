@@ -56,9 +56,11 @@ import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationListCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
+import com.squareup.picasso.Picasso;
 
 
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -777,7 +779,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 int attempts = 0;
                 do {
                     j = rand.nextInt(maxIndex);
-                } while (articleList.get(j).getImgLink() == null && attempts++<20);
+                } while (!Article.checkUrlIsValid(articleList.get(j).getImgLink()) && attempts++<20);
                 topArticles.add(articleList.get(j));
             }
         } else

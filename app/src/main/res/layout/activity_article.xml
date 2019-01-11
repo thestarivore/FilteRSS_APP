@@ -137,13 +137,11 @@
                             android:orientation="vertical">
 
 
-                            <TextView
+                            <WebView
                                 android:id="@+id/textViewArticleBody"
                                 style="@style/material_type_scale_body1"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:lineHeight="5sp"
-                                android:text="Article Body"
                                 android:textColor="#000000" />
 
                             <Button
