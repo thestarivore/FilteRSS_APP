@@ -67,7 +67,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/mnt/Data/00/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/alert/ic_error_outline_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/mnt/Data/00/android-studio/plugins/android/lib/android.jar!/images/material_design_icons/communication/ic_rss_feed_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -77,11 +77,10 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="height" value="8" />
-                            <entry key="outputName" value="ic_error_outline_black_8dp" />
+                            <entry key="color" value="ffffff" />
+                            <entry key="outputName" value="ic_rss_feed_white_24dp" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="$USER_HOME$" />
-                            <entry key="width" value="8" />
                           </map>
                         </option>
                       </PersistentState>

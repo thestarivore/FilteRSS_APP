@@ -355,6 +355,10 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
                 contentLinearLayout.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
+
+                // Show the pager
+                pager.setVisibility(View.VISIBLE);
+
                 //restartActivity();
                 refreshFragmentData();
             }
@@ -422,7 +426,12 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 userData.setMultifeedPosition(groupPosition);
                 userData.setFeedPosition(childPosition);
 
+                contentLinearLayout.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
+
+                // Show the pager
+                pager.setVisibility(View.VISIBLE);
+
                 refreshFragmentData();
                 return true;
             }
@@ -440,6 +449,10 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
                 contentLinearLayout.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
+
+                // Show the pager
+                pager.setVisibility(View.VISIBLE);
+
                 refreshFragmentData();
                 return true; // This way the expander cannot be collapsed
             }
@@ -484,6 +497,10 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
                 contentLinearLayout.setVisibility(View.INVISIBLE);
                 progressBar.setVisibility(View.VISIBLE);
+
+                // Hide the pager
+                pager.setVisibility(View.GONE);
+
                 refreshFragmentData();
                 return true; // This way the expander cannot be collapsed
             }
