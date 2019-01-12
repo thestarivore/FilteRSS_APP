@@ -43,19 +43,18 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multifeed_manager);
 
+        Toolbar toolbar = findViewById(R.id.multifeed_manager_toolbar);
+        setSupportActionBar(toolbar);
+        actionbar = getSupportActionBar();
+        actionbar.setTitle(R.string.multifeeds);
+        actionbar.setDisplayHomeAsUpEnabled(true);
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
+
         loadUserData();
 
         api = new RESTMiddleware(this);
         multifeedsChange = false;
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.multifeed_manager_toolbar);
-        if (toolbar != null) {
-            setSupportActionBar(toolbar);
-            actionbar = getSupportActionBar();
-            actionbar.setTitle(R.string.multifeeds);
-            actionbar.setDisplayHomeAsUpEnabled(true);
-            actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
-        }
 
         // drawerLayout = findViewById(R.id.drawer_layout_multifeed_manager);
 
@@ -128,6 +127,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
 
     /**
      * The function is called by the MultifeedEditFragment when the multifeed is updated
+     *
      * @param multifeed the updated multifeed
      */
     @Override
@@ -154,10 +154,11 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
     /**
      * The function is called when a multifeed is deleted. When the API returns a successful
      * response the multifeed is removed from the list
-     * @param multifeed the removed multifeed
+     *
+     * @param multifeed  the removed multifeed
      * @param multifeeds the list of multifeeds that need to be updated
-     * @param position the position of the multifeed to remove
-     * @param adapter the adapter set on the list of multifeed
+     * @param position   the position of the multifeed to remove
+     * @param adapter    the adapter set on the list of multifeed
      */
     @Override
     public void onDeleteMultifeed(final Multifeed multifeed, final ArrayList<Multifeed> multifeeds, final int position, final MultifeedListAdapter adapter) {
@@ -185,11 +186,12 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
     /**
      * The function is called when a feed is deleted from a multifeed. When the API returns a successful
      * response the feed is removed from the list
+     *
      * @param multifeed the multifeed from which the feed is removed
-     * @param feed the removed feed
-     * @param feeds the list of feeds that need to be updated
-     * @param position the position of the feed to remove
-     * @param adapter the adapter set on the list of feed
+     * @param feed      the removed feed
+     * @param feeds     the list of feeds that need to be updated
+     * @param position  the position of the feed to remove
+     * @param adapter   the adapter set on the list of feed
      */
     @Override
     public void onDeleteFeed(final Multifeed multifeed, final Feed feed, final List<Feed> feeds, final int position, final FeedsListAdapter adapter) {
@@ -235,13 +237,13 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
     @Override
     public void onBackPressed() {
         Log.d(ArticleActivity.logTag + ":" + TAG, "Back pressed...");
-        if(editView){
+        if (editView) {
             showListFragment();
             editView = false;
             actionbar.setTitle(R.string.multifeeds);
             actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
         } else {
-            if(multifeedsChange){
+            if (multifeedsChange) {
                 // Return RESULT_OK to notify that data changed
                 Intent intent = getIntent();
                 setResult(RESULT_OK, intent);
