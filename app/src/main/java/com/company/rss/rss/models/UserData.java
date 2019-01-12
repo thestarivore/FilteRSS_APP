@@ -94,6 +94,17 @@ public class UserData {
         collectionList  = prefs.retrieveCollections();
         savedArticleList= prefs.retrieveSavedArticles();
         articleList     = prefs.retrieveArticles();
+
+        //Associate the FeedObjects to each Article (Collection Article)
+        if (feedList != null && articleList != null) {
+            for (Article article : articleList) {
+                for (Feed feed : feedList) {
+                    if (feed.getId() == article.getFeed()) {
+                        article.setFeedObj(feed);
+                    }
+                }
+            }
+        }
     }
 
     /**

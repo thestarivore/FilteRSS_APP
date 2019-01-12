@@ -874,8 +874,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         //articlesListFragment.refreshRecyclerViewData();
         initToolbar();
 
-        //Update the fragment with a bit of delay, so thet the drawer doesn't lag on closing
-        Thread thread = new Thread(new Runnable() {
+        //Update the fragment with a bit of delay, so that the drawer doesn't lag on closing
+        /*Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (drawerLayout.isDrawerOpen(GravityCompat.START)){
@@ -885,17 +885,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                         e.printStackTrace();
                     }
                 }
-
-                // Set the progress bar visible and hide other
-            /*    runOnUiThread(new Runnable() {
-                    public void run() {
-                        //progressBar = findViewById(R.id.progressBarArticlesList);
-                        progressBar.setVisibility(View.VISIBLE);
-                        progressBar.bringToFront();
-                        //contentLinearLayout = findViewById(R.id.articleListLinearLayout);
-                        contentLinearLayout.setVisibility(View.INVISIBLE);
-                    }
-                });*/
 
                 //Refresh the RecyclerView List
                 articlesListFragment.refreshRecyclerViewData();
@@ -909,7 +898,12 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 });
             }
         });
-        thread.start();
+        thread.start();*/
+
+        //TODO: unfortunately the above solution for drawer lag is causing Concurrency problems, find another solution!
+        //Refresh the RecyclerView List
+        articlesListFragment.refreshRecyclerViewData();
+
     }
 
     @Override
