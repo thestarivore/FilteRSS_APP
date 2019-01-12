@@ -38,7 +38,7 @@
         android:ellipsize="end"
         android:maxEms="12"
         android:maxLines="1"
-        android:text="Article source"
+        android:text="..."
         android:textColor="@android:color/white"
         app:layout_constraintEnd_toEndOf="@+id/imageViewArticleSlider"
         app:layout_constraintTop_toTopOf="@+id/imageViewArticleSlider" />
@@ -51,7 +51,7 @@
         android:layout_marginTop="8dp"
         android:paddingStart="32dp"
         android:paddingEnd="32dp"
-        android:text="Article PubDate"
+        android:text="..."
         android:textColor="@android:color/white"
         app:layout_constraintStart_toStartOf="@+id/imageViewArticleSlider"
         app:layout_constraintTop_toTopOf="@+id/imageViewArticleSlider" />
@@ -65,7 +65,7 @@
         android:paddingStart="32dp"
         android:paddingEnd="32dp"
         android:paddingBottom="32dp"
-        android:text="Article title Article title Article title Article title Article title "
+        android:text="..."
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="@+id/imageViewArticleSlider"
         app:layout_constraintEnd_toEndOf="@+id/imageViewArticleSlider"

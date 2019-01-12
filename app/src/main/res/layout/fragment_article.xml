@@ -72,7 +72,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:singleLine="false"
-                    android:text="Article Title Article Title Article Title Article Title"
+                    android:text="..."
                     android:textColor="#000000" />
 
                 <TextView
@@ -83,11 +83,11 @@
                     android:ellipsize="end"
                     android:maxLines="2"
                     android:singleLine="false"
-                    android:text="Article Excerpt" />
+                    android:text="..." />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -103,7 +103,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="bottom|left"
                         android:singleLine="true"
-                        android:text="Sub" />
+                        android:text="..." />
 
                     <TextView
                         android:id="@+id/textViewPubDate"
@@ -113,7 +113,7 @@
                         android:layout_weight="1"
                         android:gravity="bottom|left"
                         android:singleLine="true"
-                        android:text="Pub Dateb" />
+                        android:text="..." />
 
                 </LinearLayout>
 
