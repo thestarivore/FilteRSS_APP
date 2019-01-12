@@ -75,6 +75,7 @@ public class ArticlesSlideFragment extends Fragment {
                         .centerCrop()
                         .placeholder(R.drawable.ic_rss_feed_white_24dp)
                         .error(R.drawable.ic_error_outline_white_24dp)
+                        .noFade()
                         .into(articleImage);
             }
 

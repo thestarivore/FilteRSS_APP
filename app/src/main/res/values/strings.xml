@@ -96,5 +96,6 @@
     <string name="add_some_content">Add some content with the + button</string>
     <string name="no_content_yet">No content, yet!</string>
     <string name="not_possible_remove_this_collection">It is not possible to remove this collection</string>
+    <string name="updating_articles">Updating articles...</string>
 
 </resources>

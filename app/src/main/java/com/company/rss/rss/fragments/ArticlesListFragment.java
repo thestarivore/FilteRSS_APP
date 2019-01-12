@@ -1,6 +1,5 @@
 package com.company.rss.rss.fragments;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -16,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.controllers.ArticleListSwipeController;
@@ -29,7 +29,6 @@ import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.RSSFeed;
 import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.UserData;
-import com.company.rss.rss.restful_api.LoadUserData;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.ArticlesScoresCallback;
@@ -101,7 +100,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view;
+        final View view;
 
         /*if (this.articles==null || this.articles.isEmpty()) {
             // No articles, suggest the user to add a feed
@@ -266,7 +265,13 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                             feedArticlesNumberMap.put(feed.getTitle(), rssFeed.getItemCount());
 
                             //Wait for onCreateView to set RecyclerView's Adapter
-                            while (recyclerView == null || recyclerView.getAdapter() == null) ;
+                            while (recyclerView == null || recyclerView.getAdapter() == null){
+                                try {
+                                    Thread.sleep(50);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
 
                             Log.d(ArticleActivity.logTag + ":" + TAG, "LoadRSSFeed finished: " + (feedCounter + 1) + "/" + feedList.size() + ", founded: " + rssFeed.getItemCount() + " articles");
                             feedCounter++;

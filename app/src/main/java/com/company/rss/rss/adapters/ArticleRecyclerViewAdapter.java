@@ -87,6 +87,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
                     .centerCrop()
                     .placeholder(R.drawable.ic_rss_feed_black_24dp)
                     .error(R.drawable.ic_error_outline_black_24dp)
+                    .noFade()
                     .into(holder.mImageView);
         } else {
             //Log.e(ArticleActivity.logTag + ":" + TAG, "EXCEPTION: url " + imgLink + " not valid");
