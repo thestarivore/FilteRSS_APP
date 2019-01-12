@@ -61,6 +61,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         if (description == null || description.isEmpty() || description.length() < 10) {
             holder.mDescriptionView.setVisibility(View.GONE);
         } else {
+            holder.mDescriptionView.setVisibility(View.VISIBLE);
             holder.mDescriptionView.setText(description.replaceAll("\\<[^>]*>", ""));
         }
 
@@ -68,6 +69,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         if (pubDate == null || pubDate.isEmpty()) {
             holder.mPubDateView.setVisibility(View.GONE);
         } else {
+            holder.mPubDateView.setVisibility(View.VISIBLE);
             Date articlePubDate = mArticles.get(position).getPubDate();
             pubDate = computeDaysDiff(mContext, pubDate, articlePubDate);
 
@@ -81,6 +83,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
 
         String imgLink = mArticles.get(position).getImgLink();
         if(Article.checkUrlIsValid(imgLink)){
+            holder.mImageView.setVisibility(View.VISIBLE);
             Picasso.get()
                     .load(imgLink)
                     .fit()
@@ -101,6 +104,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
         if (feedIcon == null || feedIcon.isEmpty()) {
             holder.mFeedIcon.setVisibility(View.GONE);
         } else {
+            holder.mFeedIcon.setVisibility(View.VISIBLE);
             Picasso.get().load(feedIcon).into(holder.mFeedIcon);
         }
 
