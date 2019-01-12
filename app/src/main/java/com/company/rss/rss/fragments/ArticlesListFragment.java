@@ -1,5 +1,6 @@
 package com.company.rss.rss.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -28,6 +29,7 @@ import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.RSSFeed;
 import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.UserData;
+import com.company.rss.rss.restful_api.LoadUserData;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.ArticleCallback;
 import com.company.rss.rss.restful_api.callbacks.ArticlesScoresCallback;
@@ -63,6 +65,12 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     private Context context;
     private ArticleRecyclerViewAdapter adapter;
     private boolean sqlDone;
+    private boolean allFeedsLoaded = true;
+    private boolean sqLiteArticlesLoaded = true;
+
+    private Thread waitSQLiteLoadedCopy = null;
+    private Thread waitAllFeedsLoadedCopy = null;
+    private List<LoadRSSFeed> loadRSSFeedList = new ArrayList<>();
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -151,7 +159,18 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         mListener.onListFragmentInteractionSwipe(articles.get(position));
     }
 
-    public void refreshRecyclerViewData() {
+    public synchronized void refreshRecyclerViewData() {
+        //If are still things runnig, stop everything
+        if (isEverythingLoaded() == false) {
+            //Interrupt all AsyncTasks
+            for (int i=0;i<loadRSSFeedList.size();i++){
+                loadRSSFeedList.get(i).cancel(true);
+            }
+
+            waitSQLiteLoadedCopy.interrupt();
+            waitAllFeedsLoadedCopy.interrupt();
+        }
+
         this.articles.clear();
         onUserDataLoaded();
 
@@ -169,13 +188,14 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     /**
      * Callback launched (on Fragment Attach) from the activity to inform the fragment that the UserData has been loaded
      */
-    public void onUserDataLoaded() {
+    public synchronized void onUserDataLoaded() {
         final List<Feed> feedList = new ArrayList<>();
         final List<Article> collectionArticleList = new ArrayList<>();
         final List<Article> downloadedArticleList = new ArrayList<>();
         final Map<String, Integer> feedArticlesNumberMap = new HashMap<>();
         final int numberOfFeeds;
         final SQLiteService sqLiteService = SQLiteService.getInstance(getContext());
+        final long startTimeDownloadArticles = System.nanoTime();
         //final boolean[] articlesSQLiteLoaded = {false};
 
         //Get the Transferred UserData
@@ -219,8 +239,9 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
             //Start Downloading the Articles, even if the UI hasn't loaded yet
             if (isNetworkAvailable()) {
+                loadRSSFeedList.clear();
                 for (final Feed feed : feedList) {
-
+                    loadRSSFeedList.add(
                     new LoadRSSFeed(new AsyncRSSFeedResponse() {
                         @Override
                         public void processFinish(Object output, RSSFeed rssFeed) {
@@ -251,19 +272,24 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                             feedCounter++;
 
                         }
-                    }, getContext(), feed).execute();
+                    }, getContext(), feed));
+                }
 
+                //Execute all AsyncTasks
+                for (int i=0;i<loadRSSFeedList.size();i++){
+                    loadRSSFeedList.get(i).execute();
                 }
             }
 
             sqlDone = false;
             // Wait until all the articles stored locally in the SQLite database are retrieved
+            sqLiteArticlesLoaded = false;
             final Thread waitSQLiteLoaded = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     while (!userData.isLocalArticleListLoaded()) {
                         try {
-                            Thread.sleep(200);
+                            Thread.sleep(20);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -303,22 +329,30 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                     });
                     mListener.onListFragmentAllArticlesReady(feedArticlesNumberMap, articles);
                     mListener.onListFragmentArticlesReady();
+                    sqLiteArticlesLoaded = true;
                 }
             });
             waitSQLiteLoaded.start();
+            waitSQLiteLoadedCopy = waitSQLiteLoaded;
 
             // Wait until all LoadRSSFeeds has finished then call onListFragmentArticlesReady
             // to notify that we have something to show
+            allFeedsLoaded = false;
             final Thread waitAllFeedsLoaded = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     while (feedCounter < numberOfFeeds || scoreCounter < numberOfFeeds || !sqlDone) {
                         try {
-                            Thread.sleep(500);
+                            Thread.sleep(100);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
+
+                    //Time the operation
+                    long endTimeLUD = System.nanoTime();
+                    long duration = (endTimeLUD - startTimeDownloadArticles);  //divide by 1000000 to get milliseconds.
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "#TIME: Downloaded ALL the Feeds Articles: "+ (duration/1000000) +"ms");
 
                     /**
                      * All articles have been downloaded -->
@@ -392,9 +426,11 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                          */
                         manageArticlesLocalDBPersistence(articleMismatch, sqLiteService, downloadedArticleList);
                     }
+                    allFeedsLoaded = true;
                 }
             });
             waitAllFeedsLoaded.start();
+            waitAllFeedsLoadedCopy = waitAllFeedsLoaded;
 
             // call on list fragmentArticlesReady always after a delay of 20 seconds
             final Handler handler = new Handler(Looper.getMainLooper());
@@ -402,6 +438,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                 @Override
                 public void run() {
                     waitAllFeedsLoaded.interrupt();
+                    allFeedsLoaded = true;
                     if (feedCounter < feedList.size()) {
                         if (mListener != null) {
                             Log.d(ArticleActivity.logTag + ":" + TAG, "TIMEOUT LoadRSSFeed, loading not completed");
@@ -432,7 +469,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
     }
 
-    private void sortArticles() {
+    private synchronized void sortArticles() {
         Log.d(ArticleActivity.logTag + ":" + TAG, "# Articles: " + articles.size());
 
         Log.d(ArticleActivity.logTag + ":" + TAG, "Sorting articles...");
@@ -617,5 +654,12 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                 });
             }
         }
+    }
+
+    /**
+     * Returns TRUE if everything has loaded (Downloaded Articles + Loaded Local SQLite Articles)
+     */
+    public boolean isEverythingLoaded(){
+        return allFeedsLoaded && sqLiteArticlesLoaded;
     }
 }

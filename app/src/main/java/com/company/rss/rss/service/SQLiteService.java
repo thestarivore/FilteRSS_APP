@@ -13,11 +13,14 @@ import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class SQLiteService {
 
     private static SQLiteService instance;
     private ArticleSQLiteRepository articleSQLiteRepository;
+    private final Lock _mutex = new ReentrantLock(true);
 
     private SQLiteService(Context context){
         articleSQLiteRepository = new ArticleSQLiteRepository(context);
@@ -64,6 +67,7 @@ public class SQLiteService {
             @Override
             public void run() {
                 try {
+                    //_mutex.lock();
                     for (Article article : articles) {
                         articleSQLiteRepository.add(article);
                     }
@@ -71,8 +75,12 @@ public class SQLiteService {
                     sqlOperation.setAffectedRows(articles.size());
                     sqlOperation.setMessage("Successfully added a list of Articles("+articles.size()+") on the database Article table!");
                     callback.onLoad(sqlOperation);
+                    //_mutex.unlock();
                 }
                 catch (SQLException e){
+                    callback.onFailure();
+                }
+                catch (Exception e){
                     callback.onFailure();
                 }
             }

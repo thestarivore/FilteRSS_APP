@@ -367,7 +367,7 @@ public class Article implements Serializable {
      * @param articleList
      * @return True if article is present in the list, false otherwise
      */
-    public boolean isArticleInTheList(List<Article> articleList){
+    public synchronized boolean isArticleInTheList(List<Article> articleList){
         for (Article article: articleList){
             if (hashId == article.hashId)
                 return true;

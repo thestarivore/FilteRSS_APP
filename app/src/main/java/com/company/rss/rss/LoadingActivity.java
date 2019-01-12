@@ -100,6 +100,7 @@ public class LoadingActivity extends AppCompatActivity {
         User loggedUser = (User) intent.getSerializableExtra("logged-user");
 
         //Get SQLite Service instance
+        final long startTime = System.nanoTime();
         SQLiteService sqLiteService = SQLiteService.getInstance(this);
         //Get a UserData instance
         final UserData userData = UserData.getInstance();
@@ -110,6 +111,9 @@ public class LoadingActivity extends AppCompatActivity {
             public void onLoad(List<Article> localArticles) {
                 if (localArticles != null) {
                     userData.setLocalArticleList(localArticles);
+                    long endTimeSQLite = System.nanoTime();
+                    long duration = (endTimeSQLite - startTime);  //divide by 1000000 to get milliseconds.
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "#TIME: Got Local SQLite Articles in: "+ (duration/1000000) +"ms");
                 }
             }
 
@@ -124,6 +128,7 @@ public class LoadingActivity extends AppCompatActivity {
             Log.d(ArticleActivity.logTag + ":" + TAG, "Online mode...");
 
             Log.d(ArticleActivity.logTag + ":" + TAG, "Starting user's data loading...");
+            final long startTimeLUD = System.nanoTime();
 
             //Start an AsyncTask to gather all the User's information before stepping into the main Activity
             new LoadUserData(new AsyncResponse() {
@@ -133,6 +138,13 @@ public class LoadingActivity extends AppCompatActivity {
                     if (output == LoadUserData.DATA_LOADING_TERMINTAED) {
                         //All the data has been gathered so we can open the main activity
                         Log.d(ArticleActivity.logTag + ":" + TAG, "User's data loaded...");
+
+                        //Time the operation
+                        long endTimeLUD = System.nanoTime();
+                        long duration = (endTimeLUD - startTimeLUD);  //divide by 1000000 to get milliseconds.
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "#TIME: Got Local User DATA from SharedPrefs in: "+ (duration/1000000) +"ms");
+
+                        //Start the ArticlesListActivity on success
                         startArticlesListActivity();
                     } else if (output == LoadUserData.AUTHENTICATION_FAILED) {
                         startLoginActivityOnAuthFailed();
