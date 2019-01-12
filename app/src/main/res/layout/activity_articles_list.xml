@@ -21,18 +21,23 @@
             app:title="@string/multifeed"
             app:titleTextColor="@android:color/white" />
 
-        <android.support.v4.widget.NestedScrollView
-            android:id="@+id/articleListNestedScrollView"
+        <LinearLayout
+            android:id="@+id/articleListLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="vertical"
+            android:visibility="invisible">
 
-            <FrameLayout
-                android:id="@+id/articleListContainerFrameLayout"
+            <!--
+            What we actually want to achieve is make a header (a ViewPager) as a separate view and not related to a RecyclerView List
+            and also being able to recycle the RecyclerView. But normally the problem with this is when you scroll the RecyclerView,
+            the header is not scrolling along with it, so RecyclerView area becomes too small.
+            This is perfect case when we can use CoordinatorLayout & CollapsingToolbarLayout.
+            -->
+            <android.support.design.widget.CoordinatorLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:descendantFocusability="blocksDescendants"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
                 <ProgressBar
                     android:id="@+id/progressBarArticlesList"
@@ -42,28 +47,50 @@
                     android:layout_gravity="center"
                     android:indeterminate="true" />
 
-                <LinearLayout
-                    android:id="@+id/articleListLinearLayout"
+                <android.support.design.widget.AppBarLayout
+                    android:id="@+id/main.appbar"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:descendantFocusability="blocksDescendants"
-                    android:orientation="vertical"
-                    android:visibility="invisible">
+                    android:layout_height="wrap_content">
 
-                    <com.company.rss.rss.helpers.MyViewPager
-                        android:id="@+id/pagerArticles"
+                    <android.support.design.widget.CollapsingToolbarLayout
+                        android:id="@+id/main.collapsing"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:background="#ffffff"
+                        app:layout_scrollFlags="scroll|enterAlwaysCollapsed"
+                        app:scrimAnimationDuration="0">
 
-                    <FrameLayout
-                        android:id="@+id/articleListFrameLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
 
-                </LinearLayout>
-            </FrameLayout>
+                            <com.company.rss.rss.helpers.MyViewPager
+                                android:id="@+id/pagerArticles"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:scaleType="centerCrop"/>
 
-        </android.support.v4.widget.NestedScrollView>
+
+                            <android.support.design.widget.TabLayout
+                                android:id="@+id/tab_layout"
+                                android:layout_width="match_parent"
+                                android:layout_height="4dp"
+                                android:background="#000000"/>
+                        </LinearLayout>
+
+                    </android.support.design.widget.CollapsingToolbarLayout>
+                </android.support.design.widget.AppBarLayout>
+
+                <FrameLayout
+                    android:id="@+id/articleListFrameLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+
+            </android.support.design.widget.CoordinatorLayout>
+        </LinearLayout>
     </LinearLayout>
 
     <android.support.design.widget.NavigationView
