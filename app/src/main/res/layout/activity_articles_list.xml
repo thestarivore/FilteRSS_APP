@@ -48,7 +48,7 @@
                     android:indeterminate="true" />
 
                 <android.support.design.widget.AppBarLayout
-                    android:id="@+id/main.appbar"
+                    android:id="@+id/articleListAppBarLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
@@ -56,7 +56,7 @@
                         android:id="@+id/main.collapsing"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="#ffffff"
+                        android:background="#000000"
                         app:layout_scrollFlags="scroll|enterAlwaysCollapsed"
                         app:scrimAnimationDuration="0">
 

@@ -141,6 +141,7 @@ public class ArticleActivity extends AppCompatActivity implements
                     .centerCrop()
                     .placeholder(R.drawable.ic_rss_feed_black_24dp)
                     .error(R.drawable.ic_error_outline_black_24dp)
+                    .noFade()
                     .into(articleImageView);
             // Set the image to third size of the viewport
             Display display = getWindowManager().getDefaultDisplay();
@@ -649,7 +650,7 @@ public class ArticleActivity extends AppCompatActivity implements
             // Start the player
             tts.speak(articleTitle, TextToSpeech.QUEUE_FLUSH, null);
 
-            speech(articleBody);
+            speech(articleBody.replaceAll("\\<[^>]*>", ""));
 
             // Show stop icon
             ttsPlayItem.setIcon(R.drawable.ic_stop_white_24dp);

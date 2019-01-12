@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -32,7 +33,6 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ExpandableListView;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -41,7 +41,6 @@ import com.company.rss.rss.adapters.ArticleSlidePagerAdapter;
 import com.company.rss.rss.adapters.ExpandableListAdapter;
 import com.company.rss.rss.fragments.ArticlesListFragment;
 import com.company.rss.rss.fragments.ArticlesSlideFragment;
-import com.company.rss.rss.fragments.MultifeedListFragment;
 import com.company.rss.rss.models.Article;
 import com.company.rss.rss.models.Collection;
 import com.company.rss.rss.models.Feed;
@@ -49,18 +48,14 @@ import com.company.rss.rss.models.Multifeed;
 import com.company.rss.rss.models.SQLOperation;
 import com.company.rss.rss.models.SavedArticle;
 import com.company.rss.rss.models.UserData;
-import com.company.rss.rss.persistence.articles.ArticleSQLiteRepository;
 import com.company.rss.rss.restful_api.LoadUserCollections;
 import com.company.rss.rss.restful_api.LoadUserMultifeeds;
 import com.company.rss.rss.restful_api.RESTMiddleware;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationCallback;
 import com.company.rss.rss.restful_api.callbacks.SQLOperationListCallback;
 import com.company.rss.rss.restful_api.interfaces.AsyncResponse;
-import com.squareup.picasso.Picasso;
-
 
 import java.io.Serializable;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -123,6 +118,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
     private Runnable autoSliderRunnable;
     private int autoSliderTimeoutMillis = 4000;
     private ArticlesListFragment articlesListFragment;
+    private AppBarLayout appBarLayout;
+    private Snackbar snackBarUpdatingArticles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,17 +204,25 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        final ViewPager viewPager = findViewById(R.id.pagerArticles);
-        viewPager.getLayoutParams().height = size.y / 3;
 
         pager = findViewById(R.id.pagerArticles);
+        pager.getLayoutParams().height = size.y / 3;
         pager.setClipToPadding(false);
         pager.setPadding(60, 0, 60, 0);
         pager.setPageMargin(0);
+        // Disable autoslider when the slider is touched
+        pager.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                toggleAutoslider(false);
+                return false;
+            }
+        });
 
         // Set the progress bar visible and hide other
         progressBar = findViewById(R.id.progressBarArticlesList);
         contentLinearLayout = findViewById(R.id.articleListLinearLayout);
+        appBarLayout = findViewById(R.id.articleListAppBarLayout);
         progressBar.setVisibility(View.VISIBLE);
         contentLinearLayout.setVisibility(View.INVISIBLE);
 
@@ -230,7 +235,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
             public void run() {
                 if (topArticles != null && topArticles.size() != 0) {
                     Log.d(ArticleActivity.logTag + ":" + TAG, "Autoslider page: " + currentSlide);
-                    viewPager.setCurrentItem(currentSlide, true);
+                    pager.setCurrentItem(currentSlide, true);
                     currentSlide++;
                     if (currentSlide >= topArticles.size())
                         currentSlide = 0;
@@ -239,14 +244,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
             }
         };
 
-        // Disable autoslider when the slider is touched
-        viewPager.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                toggleAutoslider(false);
-                return false;
-            }
-        });
+        snackBarUpdatingArticles = Snackbar.make(findViewById(android.R.id.content),R.string.updating_articles, Snackbar.LENGTH_LONG);
+        snackBarUpdatingArticles.show();
 
         showArticleListFragment();
     }
@@ -869,6 +868,8 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
      * Refresh ArticlesListFragment's Data without the need for a activity reboot
      */
     private void refreshFragmentData() {
+        snackBarUpdatingArticles.show();
+
         drawerLayout.closeDrawers();
         //articlesListFragment.refreshRecyclerViewData();
         initToolbar();
@@ -898,6 +899,14 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
                 //Refresh the RecyclerView List
                 articlesListFragment.refreshRecyclerViewData();
+
+                // Expand the toolbar
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        appBarLayout.setExpanded(true);
+                    }
+                });
             }
         });
         thread.start();

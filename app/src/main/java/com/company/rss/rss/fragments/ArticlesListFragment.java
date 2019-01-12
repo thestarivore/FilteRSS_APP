@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import com.company.rss.rss.ArticleActivity;
 import com.company.rss.rss.controllers.ArticleListSwipeController;
@@ -93,7 +94,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view;
+        final View view;
 
         /*if (this.articles==null || this.articles.isEmpty()) {
             // No articles, suggest the user to add a feed
@@ -245,7 +246,13 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                             feedArticlesNumberMap.put(feed.getTitle(), rssFeed.getItemCount());
 
                             //Wait for onCreateView to set RecyclerView's Adapter
-                            while (recyclerView == null || recyclerView.getAdapter() == null) ;
+                            while (recyclerView == null || recyclerView.getAdapter() == null){
+                                try {
+                                    Thread.sleep(200);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
 
                             Log.d(ArticleActivity.logTag + ":" + TAG, "LoadRSSFeed finished: " + (feedCounter + 1) + "/" + feedList.size() + ", founded: " + rssFeed.getItemCount() + " articles");
                             feedCounter++;
@@ -498,7 +505,6 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteractionClick(Article article);
 
         void onListFragmentInteractionSwipe(Article article);
