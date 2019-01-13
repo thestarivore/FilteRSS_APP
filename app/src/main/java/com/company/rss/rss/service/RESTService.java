@@ -54,9 +54,9 @@ public class RESTService {
 
     private RESTService(Context context){
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://192.168.1.110:3000/")                                         //In local Nicholas
+                //.baseUrl("http://192.168.1.110:3000/")                                         //In local Nicholas
                 //.baseUrl("http://192.168.1.22:3000/")                                         //In local Eddy
-                //.baseUrl("http://ec2-35-180-230-227.eu-west-3.compute.amazonaws.com:3000")      //On Amazon AWS
+                .baseUrl("http://ec2-35-180-230-227.eu-west-3.compute.amazonaws.com:3000")      //On Amazon AWS
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 

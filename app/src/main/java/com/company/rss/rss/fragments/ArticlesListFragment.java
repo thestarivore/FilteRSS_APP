@@ -259,6 +259,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                             // Get the scores for the set of articles
                             if (!articlesHashesMap.keySet().isEmpty()) {
                                 getArticlesScores(articlesHashesMap);
+                            } else {
+                                scoreCounter++;
                             }
 
                             //Save the number of articles for each feed, mapped in a HashMap
@@ -523,7 +525,9 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
             @Override
             public void onFailure() {
-                Log.d(ArticleActivity.logTag + ":" + TAG, "Scores for articles " + articlesHashes + "NOT received");
+                scoreCounter++;
+
+                Log.d(ArticleActivity.logTag + ":" + TAG, "Scores for articles " + articlesHashes.keySet() + "NOT received");
                 //article.setScore(0);
             }
         });
