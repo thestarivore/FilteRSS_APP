@@ -492,9 +492,14 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         Collections.sort(articles, new Comparator<Article>() {
             @Override
             public int compare(Article a1, Article a2) {
-                if (a1.getScore() == a2.getScore())
-                    return 0;
-                return a1.getScore() > a2.getScore() ? -1 : 1;
+                if (a1.getScore() == a2.getScore()){
+                    if(a1.getPubDate() != null && a2.getPubDate() != null)
+                        return a2.getPubDate().compareTo(a1.getPubDate());
+                    else
+                        return 0;
+                } else {
+                    return a1.getScore() > a2.getScore() ? -1 : 1;
+                }
             }
         });
 

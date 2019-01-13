@@ -102,6 +102,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="bottom|left"
+                        android:maxEms="12"
                         android:singleLine="true"
                         android:text="..." />
 
