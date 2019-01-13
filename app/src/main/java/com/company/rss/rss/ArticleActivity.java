@@ -509,9 +509,9 @@ public class ArticleActivity extends AppCompatActivity implements
                 loggedUser.getId(),
                 article.getFeedId(),
                 collection.getId(),
-                new SQLOperationListCallback() {
+                new SQLOperationCallback() {
                     @Override
-                    public void onLoad(List<SQLOperation> sqlOperationList) {
+                    public void onLoad(SQLOperation sqlOperation) {
                         Log.d(ArticleActivity.logTag + ":" + TAG, "Article " + article.getTitle() + " to collection " + collection.getTitle() + " saved");
                         Snackbar.make(findViewById(android.R.id.content), R.string.article_added_to_collection, Snackbar.LENGTH_LONG).show();
                         collectionsChange = true;

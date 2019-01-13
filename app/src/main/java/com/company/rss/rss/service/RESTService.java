@@ -828,21 +828,16 @@ public class RESTService {
      * @param callback      SQLOperationListCallback callback interface
      */
     public void addUserArticleAssociatedToCollection(String title, String description, String comment, String link, String img_link,
-                                                     String pub_date, int userId, int feedId, int collectionId, final SQLOperationListCallback callback){
-        final List<SQLOperation> sqlOperationList = new ArrayList<>();
-
+                                                     String pub_date, int userId, int feedId, int collectionId, final SQLOperationCallback callback){
         userRESTInterface.addUserArticleAssociatedToCollection(title, description, comment, link, img_link, pub_date, userId, feedId, collectionId)
-                .enqueue(new retrofit2.Callback<List<SQLOperation>>() {
+                .enqueue(new retrofit2.Callback<SQLOperation>() {
                     @Override
-                    public void onResponse(Call<List<SQLOperation>> call, Response<List<SQLOperation>> response) {
-                        for (SQLOperation sqlOperation :response.body()){
-                            sqlOperationList.add(sqlOperation);
-                        }
-                        callback.onLoad(sqlOperationList);
+                    public void onResponse(Call<SQLOperation> call, Response<SQLOperation> response) {
+                        callback.onLoad(response.body());
                     }
 
                     @Override
-                    public void onFailure(Call<List<SQLOperation>> call, Throwable t) {
+                    public void onFailure(Call<SQLOperation> call, Throwable t) {
                         callback.onFailure();
                     }
         });

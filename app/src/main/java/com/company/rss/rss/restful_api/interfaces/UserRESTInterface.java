@@ -127,7 +127,7 @@ public interface UserRESTInterface {
 
     @FormUrlEncoded
     @PUT("/v1/user/articles/saved")
-    public Call<List<SQLOperation>> addUserArticleAssociatedToCollection(
+    public Call<SQLOperation> addUserArticleAssociatedToCollection(
                                             @Field("title") String title,
                                             @Field("description") String description,
                                             @Field("comment") String comment,

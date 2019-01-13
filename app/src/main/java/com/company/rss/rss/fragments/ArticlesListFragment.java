@@ -527,7 +527,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             public void onFailure() {
                 scoreCounter++;
 
-                Log.d(ArticleActivity.logTag + ":" + TAG, "Scores for articles " + articlesHashes.keySet() + "NOT received");
+                Log.e(ArticleActivity.logTag + ":" + TAG, "Scores for articles " + articlesHashes.keySet() + "NOT received");
                 //article.setScore(0);
             }
         });
