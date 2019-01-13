@@ -51,6 +51,7 @@ public class MultifeedEditFragment extends Fragment {
         } else {
             Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed edit mode");
 
+            multifeedCreationMode = false;
             Bundle args = new Bundle();
             args.putSerializable("multifeed", multifeed);
             multifeedEditFragment.setArguments(args);
@@ -120,9 +121,14 @@ public class MultifeedEditFragment extends Fragment {
 
             });
         } else {
+            final int defaultColor = -16777216;
             multifeed = new Multifeed();
-            multifeed.setColor(-16777216);
+            multifeed.setColor(defaultColor);
             multifeed.setRating(1);
+
+            // set the button's color
+            GradientDrawable background = (GradientDrawable) color.getBackground();
+            background.setColor(defaultColor);
 
             // Hide the feeds list layout
             LinearLayout feedsList = view.findViewById(R.id.feedListMultifeedEdit);

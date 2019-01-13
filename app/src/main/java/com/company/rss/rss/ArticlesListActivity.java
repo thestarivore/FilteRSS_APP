@@ -888,17 +888,17 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
                 //Refresh the RecyclerView List
                 articlesListFragment.refreshRecyclerViewData();
-
-                // Expand the toolbar
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        appBarLayout.setExpanded(true);
-                    }
-                });
             }
         });
         thread.start();*/
+
+        // Expand the toolbar
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                appBarLayout.setExpanded(true);
+            }
+        });
 
         //TODO: unfortunately the above solution for drawer lag is causing Concurrency problems, find another solution!
         //Refresh the RecyclerView List

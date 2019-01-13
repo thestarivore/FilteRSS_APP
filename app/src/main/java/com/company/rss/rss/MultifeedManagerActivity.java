@@ -115,7 +115,7 @@ public class MultifeedManagerActivity extends AppCompatActivity implements Multi
             editView = true;
             actionbar.setTitle(multifeeds.get(position).getTitle());
             actionbar.setHomeAsUpIndicator(R.drawable.ic_arrow_back_white_24dp);
-            Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed passed" + multifeeds.get(position));
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Multifeed passed: " + multifeeds.get(position));
 
             MultifeedEditFragment multifeedEditFragment = MultifeedEditFragment.newInstance(multifeeds.get(position));
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
