@@ -750,8 +750,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                         Log.d(ArticleActivity.logTag + ":" + TAG, "Showing articles list");
                         progressBar.setVisibility(View.GONE);
                         contentLinearLayout.setVisibility(View.VISIBLE);
-                        currentSlide = 1;
-                        toggleAutoslider(true);
                     }
                 });
             }
@@ -772,6 +770,9 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         //Update the TopArticles in the ArticlesSlidePager
         runOnUiThread(new Runnable() {
             public void run() {
+
+                currentSlide = 1;
+                toggleAutoslider(true);
                 updateArticlesSlidePager(articleList);
             }
         });
@@ -919,7 +920,6 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         pagerAdapter = new ArticleSlidePagerAdapter(getSupportFragmentManager(), topArticles);
         pager.setAdapter(pagerAdapter);
     }
-
 
     /**
      * When returning from an activity that performs changes on the data we need to refresh

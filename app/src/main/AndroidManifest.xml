@@ -19,6 +19,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ArticlesListActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".FeedsSearchActivity"
