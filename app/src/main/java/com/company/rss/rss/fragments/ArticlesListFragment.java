@@ -70,6 +70,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
     private Thread waitSQLiteLoadedCopy = null;
     private Thread waitAllFeedsLoadedCopy = null;
     private List<LoadRSSFeed> loadRSSFeedList = new ArrayList<>();
+    private Map<String, Integer> feedArticlesNumberMap = new HashMap<>();
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -191,7 +192,6 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         final List<Feed> feedList = new ArrayList<>();
         final List<Article> collectionArticleList = new ArrayList<>();
         final List<Article> downloadedArticleList = new ArrayList<>();
-        final Map<String, Integer> feedArticlesNumberMap = new HashMap<>();
         final int numberOfFeeds;
         final SQLiteService sqLiteService = SQLiteService.getInstance(getContext());
         final long startTimeDownloadArticles = System.nanoTime();
