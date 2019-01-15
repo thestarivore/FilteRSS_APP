@@ -369,7 +369,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                      * If we find even one downloaded article missing in the local list --> substitute all
                      */
                     boolean articleMismatch = false;
-                    if (articles.size() < downloadedArticleList.size()) { // if different sizes -> mismatch
+                    if (articles.size() != downloadedArticleList.size()) { // if different sizes -> mismatch
                         articleMismatch = true;
 
                         //Substitute all the articles in the recycler view with those downloaded
@@ -483,10 +483,10 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
         for (int i = 0; i < articles.size(); i++) {
             Article article = articles.get(i);
+            //Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
             float articleScoreByRating = article.getScore() * article.getFeedObj().getMultifeed().getRating();
             article.setScore(articleScoreByRating);
 
-            //Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
         }
 
         Collections.sort(articles, new Comparator<Article>() {

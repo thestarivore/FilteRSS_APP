@@ -986,6 +986,10 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
 
                 if (showSnackBar)
                     Snackbar.make(findViewById(android.R.id.content), R.string.user_information_updated, Snackbar.LENGTH_LONG).show();
+
+                // All multifeed mode
+                textViewMultifeedList.performClick();
+
             }
         }, this, userData.getUser()).execute();
     }

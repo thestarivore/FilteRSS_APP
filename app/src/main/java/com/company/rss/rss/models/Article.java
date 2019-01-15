@@ -255,6 +255,7 @@ public class Article implements Serializable {
                 ", pubDate=" + pubDate +
                 ", user='" + user + '\'' +
                 ", feed='" + feed + '\'' +
+                ", feedObj='" + feedObj + '\'' +
                 '}';
     }
 
