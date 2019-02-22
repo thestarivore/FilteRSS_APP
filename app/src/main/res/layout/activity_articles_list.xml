@@ -21,6 +21,16 @@
             app:title="@string/multifeed"
             app:titleTextColor="@android:color/white" />
 
+
+        <ProgressBar
+            android:id="@+id/progressBarArticlesList"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="64dp"
+            android:indeterminate="true" />
+
         <LinearLayout
             android:id="@+id/articleListLinearLayout"
             android:layout_width="match_parent"
@@ -39,13 +49,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <ProgressBar
-                    android:id="@+id/progressBarArticlesList"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:indeterminate="true" />
 
                 <android.support.design.widget.AppBarLayout
                     android:id="@+id/articleListAppBarLayout"
@@ -65,11 +68,11 @@
                             android:layout_height="wrap_content"
                             android:orientation="vertical">
 
-                            <com.company.rss.rss.helpers.MyViewPager
+                            <com.filterss.filterssapp.helpers.MyViewPager
                                 android:id="@+id/pagerArticles"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:scaleType="centerCrop"/>
+                                android:scaleType="centerCrop" />
 
 
                             <!--<android.support.design.widget.TabLayout
@@ -82,12 +85,25 @@
                     </android.support.design.widget.CollapsingToolbarLayout>
                 </android.support.design.widget.AppBarLayout>
 
+
                 <FrameLayout
                     android:id="@+id/articleListFrameLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+                <Button
+                    android:id="@+id/buttonUpdate"
+                    style="@style/material_type_scale_subtitle2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center"
+                    android:layout_margin="16dp"
+                    android:background="@drawable/rectangular_black_rounded_color"
+                    android:padding="16dp"
+                    android:text="@string/update_content"
+                    android:textColor="#FFFFFF"
+                    android:visibility="gone"/>
 
             </android.support.design.widget.CoordinatorLayout>
         </LinearLayout>
@@ -120,7 +136,7 @@
                     android:layout_marginLeft="16dp"
                     android:text="@string/multifeed_title" />
 
-                <com.company.rss.rss.helpers.NonScrollExpandableListView
+                <com.filterss.filterssapp.helpers.NonScrollExpandableListView
                     android:id="@+id/exp_list_view_multifeeds"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -143,7 +159,7 @@
                     android:layout_marginLeft="16dp"
                     android:text="@string/collections_title" />
 
-                <com.company.rss.rss.helpers.NonScrollExpandableListView
+                <com.filterss.filterssapp.helpers.NonScrollExpandableListView
                     android:id="@+id/exp_list_view_collections"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

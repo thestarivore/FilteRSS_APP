@@ -33,7 +33,7 @@
             style="@style/material_type_scale_caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/rectangular_border"
+            android:background="@drawable/rectangular_rounded_black"
             android:paddingStart="8dp"
             android:paddingLeft="8dp"
             android:paddingTop="4dp"

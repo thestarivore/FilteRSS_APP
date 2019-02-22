@@ -11,6 +11,7 @@
 
     <TextView
         android:id="@+id/textViewFeedbackQuestion"
+        style="@style/material_type_scale_subtitle1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -19,6 +20,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -29,6 +31,7 @@
             android:orientation="vertical">
 
             <TextView
+                style="@style/material_type_scale_subtitle2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -48,6 +51,7 @@
             android:orientation="vertical">
 
             <TextView
+                style="@style/material_type_scale_subtitle2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -67,6 +71,7 @@
             android:orientation="vertical">
 
             <TextView
+                style="@style/material_type_scale_subtitle2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"

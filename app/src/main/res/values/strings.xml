@@ -90,12 +90,18 @@
     <string name="share_article">Share Article</string>
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
-    <string name="days">Days</string>
+    <string name="days_ago">days ago</string>
     <string name="error_collection_not_found">Error, collection not found</string>
     <string name="article_removed_from_collection">Article removed from collection</string>
     <string name="add_some_content">Add some content with the + button</string>
     <string name="no_content_yet">No content, yet!</string>
     <string name="not_possible_remove_this_collection">It is not possible to remove this collection</string>
     <string name="updating_articles">Updating articles...</string>
+    <string name="update_content">Update content</string>
+    <string name="now">Now</string>
+    <string name="one_minute_ago">1 minute ago</string>
+    <string name="minutes_ago">minutes ago</string>
+    <string name="one_hour_ago">1 hour ago</string>
+    <string name="hours_ago">hours ago</string>
 
 </resources>
