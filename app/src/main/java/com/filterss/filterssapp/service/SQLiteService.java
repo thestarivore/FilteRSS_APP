@@ -43,11 +43,11 @@ public class SQLiteService {
      *                 that are used to notify the result of the execution. This callback returns
      *                 a List<Article> on the onLoad() method.
      */
-    public synchronized void getAllArticles(final ArticleCallback callback) {
+    public synchronized void getAllArticles(final int orderBy, final ArticleCallback callback) {
         Thread thread = new Thread() {
             @Override
             public void run() {
-                ArticleCursor cursor = articleSQLiteRepository.findAll();
+                ArticleCursor cursor = articleSQLiteRepository.findAll(orderBy);
                 if (cursor != null) {
                     List<Article> articleList = getArticleListFromCursor(cursor);
                     callback.onLoad(articleList);
@@ -65,8 +65,27 @@ public class SQLiteService {
      *                 that are used to notify the result of the execution. This callback returns
      *                 a List<Article> on the onLoad() method.
      */
-    public synchronized void getFilteredArticles(final List<Feed> feedList, final ArticleCallback callback) {
-        getAllArticles(new ArticleCallback() {
+    public synchronized void getFilteredArticles(final List<Feed> feedList, final int orderBy, final ArticleCallback callback) {
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                String feedIdsString = "";
+                for(Feed feed : feedList){
+                    feedIdsString += feed.getId() + ",";
+                }
+                feedIdsString = feedIdsString.substring(0, feedIdsString.length() - 1);
+
+                ArticleCursor cursor = articleSQLiteRepository.findAllFiltered(orderBy, feedIdsString);
+                if (cursor != null) {
+                    List<Article> articleList = getArticleListFromCursor(cursor);
+                    callback.onLoad(articleList);
+                } else
+                    callback.onFailure();
+            }
+        };
+        thread.start();
+
+        /*getAllArticles(orderBy, new ArticleCallback() {
             @Override
             public void onLoad(List<Article> articleList) {
                 List<Article> feedFilteredArticles = new ArrayList<>();
@@ -83,7 +102,7 @@ public class SQLiteService {
             public void onFailure() {
                 callback.onFailure();
             }
-        });
+        });*/
     }
 
     /**
@@ -101,9 +120,7 @@ public class SQLiteService {
             public void run() {
                 try {
                     //_mutex.lock();
-                    for (Article article : articles) {
-                        articleSQLiteRepository.add(article);
-                    }
+                    articleSQLiteRepository.batchAdd(articles);
                     SQLOperation sqlOperation = new SQLOperation();
                     sqlOperation.setAffectedRows(articles.size());
                     sqlOperation.setMessage("Successfully added a list of Articles(" + articles.size() + ") on the database Article table!");

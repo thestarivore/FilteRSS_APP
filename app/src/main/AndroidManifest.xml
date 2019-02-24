@@ -42,14 +42,12 @@
         </activity>
         <activity
             android:name="com.filterss.filterssapp.SignupActivity"
-            android:label="@string/title_activity_signup"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.filterss.filterssapp.MultifeedCreationActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name="com.filterss.filterssapp.LoadingActivity"
-            android:label="@string/title_activity_main"
             android:noHistory="true"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

@@ -247,7 +247,7 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
         autoSliderRunnable = new Runnable() {
             public void run() {
                 if (topArticles != null && topArticles.size() != 0) {
-                    Log.d(ArticleActivity.logTag + ":" + TAG, "Autoslider page: " + currentSlide);
+                    // Log.d(ArticleActivity.logTag + ":" + TAG, "Autoslider page: " + currentSlide);
                     pager.setCurrentItem(currentSlide, true);
                     currentSlide++;
                     if (currentSlide >= topArticles.size())
@@ -616,9 +616,43 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                 return true;
             case R.id.itemSearchArticleList:
                 startFeedsSearchActivity();
-                return (true);
+                return true;
+            case R.id.itemOrderByArticleList:
+                showOrderByDialog();
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showOrderByDialog() {
+        CharSequence[] dialogValues = { getString(R.string.date), getString(R.string.rating) };
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle(R.string.order_by);
+
+        int checked = -1;
+        if(userData.getArticleOrder() == UserData.ORDER_BY_DATE) checked = 0;
+        else if(userData.getArticleOrder() == UserData.ORDER_BY_RATING) checked = 1;
+
+        dialog.setSingleChoiceItems(dialogValues, checked, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int item) {
+                contentLinearLayout.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.VISIBLE);
+
+                switch (item) {
+                    case 0:
+                        userData.setArticleOrder(UserData.ORDER_BY_DATE);
+                        break;
+                    case 1:
+                        userData.setArticleOrder(UserData.ORDER_BY_RATING);
+                        break;
+                }
+
+                articlesListFragment.updateArticles();
+                dialog.dismiss();
+            }
+        });
+        AlertDialog alert = dialog.create();
+        alert.show();
     }
 
     /**

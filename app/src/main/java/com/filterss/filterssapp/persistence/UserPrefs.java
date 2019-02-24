@@ -10,6 +10,7 @@ import com.filterss.filterssapp.models.FeedGrouping;
 import com.filterss.filterssapp.models.Multifeed;
 import com.filterss.filterssapp.models.SavedArticle;
 import com.filterss.filterssapp.models.User;
+import com.filterss.filterssapp.models.UserData;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -32,6 +33,7 @@ public class UserPrefs{
     private static final String SAVEDARTICLES_LIST_OBJECT   = "SavedArticlesList";
     private static final String ARTICLES_LIST_OBJECT        = "ArticleList";
     private static final String LAST_UPDATE                 = "LastUpdate";
+    private static final String ARTICLES_ORDER_BY           = "ArticlesOrderBy";
 
     /** This application's preferences */
     private static SharedPreferences settings;
@@ -198,6 +200,15 @@ public class UserPrefs{
         editor.commit();
     }
 
+    public void storeArticlesOrderBy(int orderBy) {
+        Gson gson = new Gson();
+        String orderByJson = gson.toJson(orderBy);
+
+        // store in SharedPreferences
+        editor.putString(ARTICLES_ORDER_BY, orderByJson);
+        editor.commit();
+    }
+
 
     /***************************************************
      *                    RETRIEVE
@@ -286,6 +297,15 @@ public class UserPrefs{
             return new Date(0L);
         Type type = new TypeToken<Date>(){}.getType();
         return gson.fromJson(lastUpdateJson, type);
+    }
+
+    public int retrieveArticlesOrderBy() {
+        Gson gson = new Gson();
+        String orderByJson = settings.getString(ARTICLES_ORDER_BY, "");
+        if (orderByJson.isEmpty())
+            return UserData.ORDER_BY_DATE;
+        Type type = new TypeToken<Integer>(){}.getType();
+        return gson.fromJson(orderByJson, type);
     }
 
     /***************************************************

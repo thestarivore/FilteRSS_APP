@@ -23,7 +23,7 @@ public class ArticleDBContract {
                     ArticleEntry.USER_CLMN          +" int(11) NOT NULL, "+
                     ArticleEntry.FEED_CLMN          +" int(11) NOT NULL, "+
                     ArticleEntry.SCORE_CLMN         +" float, " +
-                    ArticleEntry.READ               +" int(1) DEFAULT 0);" +
+                    ArticleEntry.READ_CLMN               +" int(1) DEFAULT 0);" +
                     "CREATE INDEX hashid_index ON " + ArticleEntry.TABLE_NAME + " (" + ArticleEntry.HASH_ID_CLMN + ");";
 
     public static SQLiteDatabase getWritableDatabase(Context context){
@@ -50,7 +50,7 @@ public class ArticleDBContract {
         public static final String USER_CLMN        = "user";
         public static final String FEED_CLMN        = "feed";
         public static final String SCORE_CLMN       = "score";
-        public static final String READ             = "read";
+        public static final String READ_CLMN        = "read";
     }
 
     /**

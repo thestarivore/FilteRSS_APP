@@ -41,6 +41,8 @@ public class UserData {
     public static int MODE_MULTIFEED_ARTICLES      = 1;
     public static int MODE_FEED_ARTICLES           = 2;
     public static int MODE_COLLECTION_ARTICLES     = 3;
+    public static int ORDER_BY_DATE                = 0;
+    public static int ORDER_BY_RATING              = 1;
     private int visualizationMode;
     private int multifeedPosition;
     private int feedPosition;
@@ -137,7 +139,6 @@ public class UserData {
 
             //For every feed in the list, assign the multifeed
             for (Feed feed: mfeedList){
-                Log.d(ArticleActivity.logTag + ":" + "USERDATA", "Feed: " + feed.getId() + " to " + multifeed.getId());
                 feed.setMultifeed(multifeed);
             }
 
@@ -384,6 +385,14 @@ public class UserData {
 
     public void setCollectionPosition(int collectionPosition) {
         this.collectionPosition = collectionPosition;
+    }
+
+    public int getArticleOrder() {
+        return prefs.retrieveArticlesOrderBy();
+    }
+
+    public void setArticleOrder(int articleOrder) {
+        prefs.storeArticlesOrderBy(articleOrder);
     }
 
     @Override

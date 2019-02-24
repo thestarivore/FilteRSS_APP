@@ -5,6 +5,12 @@
     tools:context=".ArticleActivity">
 
     <item
+        android:id="@+id/itemOrderByArticleList"
+        android:icon="@drawable/ic_sort_white_24dp"
+        android:title="Order By"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/itemSearchArticleList"
         android:icon="@drawable/ic_add_white_24dp"
         android:title="Search"

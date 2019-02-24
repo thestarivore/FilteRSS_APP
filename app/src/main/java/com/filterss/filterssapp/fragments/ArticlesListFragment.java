@@ -3,6 +3,8 @@ package com.filterss.filterssapp.fragments;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -158,36 +160,6 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         mListener.onListFragmentInteractionSwipe(articles.get(position));
     }
 
-    /*
-    public synchronized void refreshRecyclerViewData() {
-        //If are still things running, wait until finish
-        if (isEverythingLoaded()) {
-            updateArticles();
-
-            /*
-            //Interrupt all AsyncTasks
-            for (int i = 0; i < loadRSSFeedList.size(); i++) {
-                loadRSSFeedList.get(i).cancel(true);
-            }
-
-            waitSQLiteLoadedCopy.interrupt();
-            waitAllFeedsLoadedCopy.interrupt();
-        }
-
-        /*this.articles.clear();
-
-
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (recyclerView != null) {
-                    recyclerView.scrollToPosition(0);
-                }
-            }
-        });
-    }*/
-
-
     /**
      * Callback launched (on Fragment Attach) from the activity to inform the fragment that the UserData has been loaded
      */
@@ -195,10 +167,8 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         final List<Feed> feedList = new ArrayList<>();
         final List<Article> collectionArticleList = new ArrayList<>();
         final List<Article> downloadedArticleList = new ArrayList<>();
-        final int numberOfFeeds;
         final SQLiteService sqLiteService = SQLiteService.getInstance(getContext());
         final long startTimeDownloadArticles = System.nanoTime();
-        //final boolean[] articlesSQLiteLoaded = {false};
 
         //Get the Transferred UserData
         this.userData = UserData.getInstance();
@@ -242,21 +212,16 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
             final Thread waitSQLiteLoaded = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                /*while (!userData.isLocalArticleListLoaded()) {
-                    try {
-                        Thread.sleep(20);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }*/
 
                     //When the local ArticleList has finished loading, get the new articles in the RecyclerView adapter's list
                     articles.clear();
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "Getting articles from DB...");
                     if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
                         //List<Article> localArticleList = userData.getLocalArticleList();
 
+
                         // get all the articles directly from the database
-                        sqLiteService.getFilteredArticles(feedList, new ArticleCallback() {
+                        sqLiteService.getFilteredArticles(feedList, userData.getArticleOrder(), new ArticleCallback() {
                             @Override
                             public void onLoad(List<Article> localArticles) {
                                 Log.d(ArticleActivity.logTag + ":" + TAG, "Local article list: " + localArticles.size());
@@ -274,7 +239,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                         //List<Article> localArticleListFiltered = userData.getLocalArticleListFiltered(feedList);
 
                         // get filtered articles directly from the database
-                        sqLiteService.getFilteredArticles(feedList, new ArticleCallback() {
+                        sqLiteService.getFilteredArticles(feedList, userData.getArticleOrder(), new ArticleCallback() {
                             @Override
                             public void onLoad(List<Article> localArticles) {
                                 Log.d(ArticleActivity.logTag + ":" + TAG, "Filtered local article list: " + localArticles.size());
@@ -398,7 +363,7 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
                     //Execute all AsyncTasks
                     for (int i = 0; i < loadRSSFeedList.size(); i++) {
-                        loadRSSFeedList.get(i).execute();
+                        loadRSSFeedList.get(i).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                     }
 
                     final Thread waitAllFeedsLoaded = new Thread(new Runnable() {
@@ -417,71 +382,6 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                             long duration = (endTimeLUD - startTimeDownloadArticles);  //divide by 1000000 to get milliseconds.
                             Log.d(ArticleActivity.logTag + ":" + TAG, "#TIME: Downloaded ALL the Feeds Articles: " + (duration / 1000000) + "ms");
 
-                            /**
-                             * All articles have been downloaded -->
-                             *      Control if there are any changes, between the copy in the local SQLite Database and
-                             *      the list of articles just downloaded;
-                             *
-                             * If we find even one downloaded article missing in the local list --> substitute all
-                             */
-                    /*boolean articleMismatch = false;
-                    if (articles.size() != downloadedArticleList.size()) { // if different sizes -> mismatch
-                        articleMismatch = true;
-
-                        //Substitute all the articles in the recycler view with those downloaded
-                        articles = downloadedArticleList;
-                    } else {
-                        for (Article article : downloadedArticleList) {
-                            if (article.isArticleInTheList(articles) == false) {
-                                articleMismatch = true;
-
-                                //Substitute all the articles in the recycler view with those downloaded
-                                articles = downloadedArticleList;
-
-                                //Exit for loop prematurely
-                                break;
-                            }
-                        }
-                    }
-
-                    //Wait for all articles to load, then notify the activity with a callback, and pass the
-                    //map of the number of articles for each feed
-                    if (articleMismatch) {
-                        if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
-                            mListener.onListFragmentAllArticlesReady(feedArticlesNumberMap, articles);
-                        }
-                    }
-
-                    if (mListener != null) {
-                        Log.d(ArticleActivity.logTag + ":" + TAG, "All LoadRSSFeed and getScores finished");
-
-                        computeArticlesScore();
-
-                        //Reload RecyclerView only if the downloaded articles are different that those stored locally
-                        if (articleMismatch) {
-                            // notify that content can be updated
-                            mListener.onListFragmentArticlesReady();
-                        }
-
-                        //Wait for the SQLite Article to load
-                        while (!userData.isLocalArticleListLoaded()) {
-                            try {
-                                Thread.sleep(200);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        /**
-                         * If the LocalCopy of the articles is different from the one just downloaded, we also
-                         * need to persist the new list of articles downloaded. It is important to do it here,
-                         * after the list has been sorted, otherwise if we change the list during the persistence
-                         * we might get a concurrency problem (ex ConcurrentModificationException).
-                         */
-                        /*
-                        manageArticlesLocalDBPersistence(articleMismatch, sqLiteService, downloadedArticleList);
-                    }*/
-
                             computeArticlesScore(downloadedArticleList);
 
                             // save downloaded articles in the db
@@ -498,8 +398,9 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
                                     allFeedsLoaded = true;
                                     onlineRunning = false;
 
-                                    if (articles.size() ==  0) {
+                                    if (articles.size() == 0) {
                                         // local DB empty => reload
+                                        Log.d(ArticleActivity.logTag + ":" + TAG, "Local DB empty, reloading...");
                                         updateArticles();
                                     } else {
                                         mListener.onListFragmentArticlesReady();
@@ -579,24 +480,6 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
         }
 
         Log.d(ArticleActivity.logTag + ":" + TAG, "Sorting DONE");
-
-        /*Collections.sort(articles, new Comparator<Article>() {
-            @Override
-            public int compare(Article a1, Article a2) {
-                if (a1.getScore() == a2.getScore()) {
-                    if (a1.getPubDate() != null && a2.getPubDate() != null)
-                        return a2.getPubDate().compareTo(a1.getPubDate());
-                    else
-                        return -1;
-                } else {
-                    return a1.getScore() > a2.getScore() ? -1 : 1;
-                }
-            }
-        });*/
-
-        /*for (int i = 0; i < articles.size(); i++) {
-            Log.d(ArticleActivity.logTag + ":" + TAG, articles.get(i).toString());
-        }*/
     }
 
     /**
@@ -676,105 +559,5 @@ public class ArticlesListFragment extends Fragment implements ArticleListSwipeCo
 
         void onListFragmentAllArticlesReady(Map<String, Integer> feedArticlesNumberMap);
     }
-
-
-/*
-    /**
-     * Manage the local SQLite Database persistence of the Articles. The persistence differs based on the Selection type:
-     * 1. In the ALL_MULTIFEEDS selection, we resynchronize everything by delegating everything in the Article Table of the db,
-     *      saving the new downloaded articles list and finally resynchronize by getting the article list back from the database;
-     * 2. In the PARTIAL selections, we don't currently delete articles on the database, we just add the new ones. This may
-     *      accumulate some old articles, but they will be dropped as soon as a full selection is done(ALL_MULTIFEEDS);
-     * @param articleMismatch
-     * @param sqLiteService
-     * @param downloadedArticleList
-     */
-    /*void manageArticlesLocalDBPersistence(boolean articleMismatch, final SQLiteService sqLiteService, final List<Article> downloadedArticleList){
-        if (articleMismatch) {
-            if (userData.getVisualizationMode() == UserData.MODE_ALL_MULTIFEEDS_FEEDS) {
-                //Once all the articles have been downloaded for each feed, store them in the local SQLite Database
-                //(but first clear the table of the old rows)
-                sqLiteService.deleteAllArticles(new SQLOperationCallback() {
-                    @Override
-                    public void onLoad(SQLOperation sqlOperation) {
-                        Log.d(ArticleActivity.logTag + ":" + TAG,
-                                "All the articles have been deleted from the local SQLite DB, Article Table!");
-
-                        //Once the Table have been cleaned, add/store the list of articles
-                        sqLiteService.putArticles(downloadedArticleList, new SQLOperationCallback() {
-                            @Override
-                            public void onLoad(SQLOperation sqlOperation) {
-                                Log.d(ArticleActivity.logTag + ":" + TAG,
-                                        "Added " + sqlOperation.getAffectedRows() + " articles into the local SQLite DB, Article Table!");
-
-                                //UserData ArticlesList is now obsolete
-                                userData.setLocalArticleListLoaded(false);
-
-                                //Get all the articles stored locally in the SQLite Database
-                                sqLiteService.getAllArticles(new ArticleCallback() {
-                                    @Override
-                                    public void onLoad(List<Article> localArticles) {
-                                        if (localArticles != null) {
-                                            userData.setLocalArticleList(localArticles);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure() {
-                                        Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onFailure() {
-                                Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onFailure() {
-                        Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
-                    }
-                });
-            }
-            //On Partial Selections
-            else{
-                //Add/store the list of articles for this selection, without deleting the old ones
-                //This may add some additional articles, but they will be deleted on the ALL_MULTIFEEDS Selections
-                sqLiteService.putArticles(downloadedArticleList, new SQLOperationCallback() {
-                    @Override
-                    public void onLoad(SQLOperation sqlOperation) {
-                        Log.d(ArticleActivity.logTag + ":" + TAG,
-                                "Added " + sqlOperation.getAffectedRows() + " articles into the local SQLite DB, Article Table!");
-
-                        //UserData ArticlesList is now obsolete
-                        userData.setLocalArticleListLoaded(false);
-
-                        //Get all the articles stored locally in the SQLite Database
-                        sqLiteService.getAllArticles(new ArticleCallback() {
-                            @Override
-                            public void onLoad(List<Article> localArticles) {
-                                if (localArticles != null) {
-                                    userData.setLocalArticleList(localArticles);
-                                }
-                            }
-
-                            @Override
-                            public void onFailure() {
-                                Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onFailure() {
-                        Log.d(ArticleActivity.logTag + ":" + TAG, "Failed!");
-                    }
-                });
-            }
-        }
-    }*/
 
 }

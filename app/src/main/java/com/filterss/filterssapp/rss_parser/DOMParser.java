@@ -154,6 +154,7 @@ public class DOMParser {
             //Measure the execution time of the parsing
             long startTime = System.nanoTime();
 
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             // For all the items in the feed
             for (int i = 0; i < length; i++) {
                 // Create a new node of the first item
@@ -192,8 +193,6 @@ public class DOMParser {
                             if (article.getPubDate() == null){
                                 Date pubDate = parseDateFromString(nodeString);
                                 article.setPubDate(pubDate);
-
-                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 article.setPubDateAsString(sdf.format(pubDate));
                             }
                         }
