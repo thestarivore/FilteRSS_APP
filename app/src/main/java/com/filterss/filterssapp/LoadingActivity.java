@@ -151,6 +151,7 @@ public class LoadingActivity extends AppCompatActivity {
         //Offline Mode
         else {
             Log.d(ArticleActivity.logTag + ":" + TAG, "Offline mode...");
+            startArticlesListActivity();
 
             /*
             Thread waitAllFeedsLoaded = new Thread(new Runnable() {

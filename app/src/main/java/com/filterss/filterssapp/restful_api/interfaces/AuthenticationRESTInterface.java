@@ -27,4 +27,8 @@ public interface AuthenticationRESTInterface {
     @POST("/v1/auth/password/change")
     public Call<SQLOperation> changeUsersPassword(@Field("email") String email,
                                                   @Field("password") String password);
+
+    @FormUrlEncoded
+    @POST("/v1/auth/login/google")
+    public Call<List<User>> getUserAuthenticationGoogle(@Field("token") String token);
 }

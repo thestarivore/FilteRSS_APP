@@ -15,12 +15,18 @@ import com.filterss.filterssapp.models.User;
 import com.filterss.filterssapp.persistence.UserPrefs;
 import com.filterss.filterssapp.restful_api.RESTMiddleware;
 import com.filterss.filterssapp.restful_api.callbacks.UserCallback;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 
 import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
     private final String TAG = getClass().getName();
-    public static final String EXTRA_USER = "com.rss.rss.USER";
     private RESTMiddleware api;
     private User loggedUser;
 
@@ -28,7 +34,9 @@ public class LoginActivity extends AppCompatActivity {
     private TextView emailText;
     private TextView passwordText;
     private static final int REQUEST_SIGNUP = 0;
+    private static final int RC_SIGN_IN_GOOGLE = 1;
     private Context context;
+    private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
         //Verifies if this Activity was opened after a failed authentication
         Intent intent = getIntent();
         boolean persistedAuthFailed = intent.getBooleanExtra("authFailed", false);
-        if(persistedAuthFailed==true) {
+        if (persistedAuthFailed == true) {
             Snackbar.make(findViewById(android.R.id.content), R.string.authentication_failed, Snackbar.LENGTH_LONG).show();
         }
 
@@ -67,6 +75,35 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.server_client_id))
+                .requestEmail()
+                .build();
+
+        // Build a GoogleSignInClient with the options specified by gso.
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        // Check for existing Google Sign In account, if the user is already signed in
+        // the GoogleSignInAccount will be non-null.
+        GoogleSignInAccount googleAccount = GoogleSignIn.getLastSignedInAccount(this);
+
+        SignInButton signInButton = findViewById(R.id.sign_in_button);
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.sign_in_button:
+                        signInGoogle();
+                        break;
+                }
+            }
+        });
+
+        // Set the dimensions of the sign-in button.
+        signInButton.setSize(SignInButton.SIZE_WIDE);
+
         //Instantiate the Middleware for the RESTful API's
         api = new RESTMiddleware(this);
 
@@ -76,11 +113,72 @@ public class LoginActivity extends AppCompatActivity {
         //Get the User Logged in
         loggedUser = prefs.retrieveUser();
         //Skip Login Activity if User already persisted
-        if(loggedUser != null && persistedAuthFailed == false) {
+        if (loggedUser != null && persistedAuthFailed == false) {
+            onLoginSuccess();
+        } else if (googleAccount != null) {
+            // login with Google
             onLoginSuccess();
         }
+
     }
 
+    private void signInGoogle() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN_GOOGLE);
+    }
+
+    private void handleSignInResultGoogle(Task<GoogleSignInAccount> completedTask) {
+        try {
+            // Signed in successfully in Google, show authenticated UI.
+            final ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
+            progressDialog.setIndeterminate(true);
+            progressDialog.setMessage(getText(R.string.authenticating));
+            progressDialog.show();
+
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            String idToken = account.getIdToken();
+            Log.d(ArticleActivity.logTag + ":" + TAG, "Authenticating Google user: " + idToken);
+
+            // send ID Token to server and validate
+            api.getUserAuthenticationGoogle(idToken, new UserCallback() {
+                @Override
+                public void onLoad(List<User> users) {
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "Returned users" + users);
+                    if (!users.isEmpty()) {
+                        loggedUser = users.get(0);
+                        Log.d(ArticleActivity.logTag + ":" + TAG, "\nUser: " + loggedUser.getId() + ", " + loggedUser.getName() + ", "
+                                + loggedUser.getSurname() + ", " + loggedUser.getEmail() + ", " + loggedUser.getPassword());
+
+                        //Get a SharedPreferences instance
+                        UserPrefs prefs = new UserPrefs(context);
+
+                        //Persist the User Logged in
+                        prefs.storeUser(loggedUser);
+                        onLoginSuccess();
+                    } else {
+                        onLoginFailed();
+                    }
+                    progressDialog.dismiss();
+
+                }
+
+                @Override
+                public void onFailure() {
+                    Log.e(ArticleActivity.logTag + ":" + TAG, "\nFailure on: getUserAuthenticationGoogle");
+                    progressDialog.dismiss();
+                    onLoginFailed();
+                }
+            });
+
+            //onLoginSuccess();
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.e(ArticleActivity.logTag + ":" + TAG, "Google SignIn, signInResult:failed code=" + e.getStatusCode());
+
+            Snackbar.make(findViewById(android.R.id.content), R.string.login_failed, Snackbar.LENGTH_LONG).show();
+        }
+    }
 
     /**
      * Login procedure
@@ -111,19 +209,18 @@ public class LoginActivity extends AppCompatActivity {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "\nUser authentication " + users.size());
 
                 //Get logged user
-                if(users.isEmpty() == false) {
+                if (users.isEmpty() == false) {
                     loggedUser = users.get(0);
-                    Log.d(ArticleActivity.logTag + ":" + TAG, "\nUser: " + loggedUser.getId() +  ", " + loggedUser.getName() + ", "
+                    Log.d(ArticleActivity.logTag + ":" + TAG, "\nUser: " + loggedUser.getId() + ", " + loggedUser.getName() + ", "
                             + loggedUser.getSurname() + ", " + loggedUser.getEmail() + ", " + loggedUser.getPassword());
 
                     //Get a SharedPreferences instance
-                    UserPrefs prefs = new UserPrefs( context);
+                    UserPrefs prefs = new UserPrefs(context);
 
                     //Persist the User Logged in
                     prefs.storeUser(loggedUser);
                     onLoginSuccess();
-                }
-                else{
+                } else {
                     onLoginFailed();
                 }
                 progressDialog.dismiss();
@@ -131,7 +228,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure() {
-                Log.d(ArticleActivity.logTag + ":" + TAG, "\nFailure on: getUserAuthentication");
+                Log.e(ArticleActivity.logTag + ":" + TAG, "\nFailure on: getUserAuthentication");
                 progressDialog.dismiss();
                 onLoginFailed();
             }
@@ -149,6 +246,11 @@ public class LoginActivity extends AppCompatActivity {
                 Log.d(ArticleActivity.logTag + ":" + TAG, "Returned from Signup activity without RESULT_OK");
             }
 
+        } else if (requestCode == RC_SIGN_IN_GOOGLE) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResultGoogle(task);
         }
 
     }

@@ -44,7 +44,7 @@
         <item
             android:id="@+id/nav_tech"
             android:icon="@drawable/ic_usb_black_24dp"
-            android:title="Tech" />
+            android:title="Tecnologia" />
         <item
             android:id="@+id/nav_tendenze"
             android:icon="@drawable/ic_bubble_chart_black_24dp"

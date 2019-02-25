@@ -54,9 +54,9 @@ public class RESTService {
 
     private RESTService(Context context){
         Retrofit retrofit = new Retrofit.Builder()
-                //.baseUrl("http://192.168.1.110:3000/")                                         //In local Nicholas
+                .baseUrl("http://192.168.1.110:3000/")                                         //In local Nicholas
                 //.baseUrl("http://192.168.1.22:3000/")                                         //In local Eddy
-                .baseUrl("http://ec2-35-180-230-227.eu-west-3.compute.amazonaws.com:3000")      //On Amazon AWS
+                //.baseUrl("http://ec2-35-180-230-227.eu-west-3.compute.amazonaws.com:3000")      //On Amazon AWS
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -173,6 +173,30 @@ public class RESTService {
 
             @Override
             public void onFailure(Call<SQLOperation> call, Throwable t) {
+                callback.onFailure();
+            }
+        });
+    }
+
+    /**
+     * Manage the login with a Google account
+     * @param token the token of the Google account
+     * @param callback Callback for API response management
+     */
+    public void getUserAuthenticationGoogle(String token, final UserCallback callback){
+        final List<User> users = new ArrayList<>();
+
+        authenticationRESTInterface.getUserAuthenticationGoogle(token).enqueue(new retrofit2.Callback<List<User>>() {
+            @Override
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+                for (User user: response.body()) {
+                    users.add(user);
+                }
+                callback.onLoad(users);
+            }
+
+            @Override
+            public void onFailure(Call<List<User>> call, Throwable t) {
                 callback.onFailure();
             }
         });

@@ -1,9 +1,17 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('keystore/debug.keystore')
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storePassword 'android'
+        }
+    }
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.company.rss.rss"
+        applicationId "com.filterss.filterssapp"
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1

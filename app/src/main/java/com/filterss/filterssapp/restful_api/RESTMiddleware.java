@@ -87,6 +87,15 @@ public class RESTMiddleware {
         RESTService.getInstance(context).changeUsersPassword(email, password, callback);
     }
 
+    /**
+     * Manage the login with a Google account
+     * @param token the token of the Google account
+     * @param callback Callback for API response management
+     */
+    public void getUserAuthenticationGoogle(String token, UserCallback callback){
+        RESTService.getInstance(context).getUserAuthenticationGoogle(token, callback);
+    }
+
     /********************************************************************
      *                           Feeds
      ********************************************************************/

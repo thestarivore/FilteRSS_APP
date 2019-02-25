@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FilteRSS</string>
+    <string name="app_name">Filterss</string>
     <string name="action_settings">Settings</string>
     <string name="dialog_add_feed_title">Choose a multifeed</string>
     <string name="dialog_add_feed_positive_button">Create New</string>
@@ -90,7 +90,7 @@
     <string name="no_content_yet">No content, yet!</string>
     <string name="not_possible_remove_this_collection">It is not possible to remove this collection</string>
     <string name="updating_articles">Updating articles...</string>
-    <string name="update_content">Update content</string>
+    <string name="update">Update</string>
     <string name="now">Now</string>
     <string name="one_minute_ago">1 minute ago</string>
     <string name="minutes_ago">minutes ago</string>
@@ -98,4 +98,6 @@
     <string name="hours_ago">hours ago</string>
     <string name="order_by">Order By</string>
     <string name="date">Date</string>
+    <string name="or">Or</string>
+    <string name="server_client_id">885542723221-a0ha33g3gq1h6280eujpc35d678th1eu.apps.googleusercontent.com</string>
 </resources>

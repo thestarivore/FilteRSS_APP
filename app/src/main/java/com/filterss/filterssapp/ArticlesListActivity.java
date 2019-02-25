@@ -1,5 +1,6 @@
 package com.filterss.filterssapp;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +12,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
@@ -54,6 +56,11 @@ import com.filterss.filterssapp.restful_api.LoadUserMultifeeds;
 import com.filterss.filterssapp.restful_api.RESTMiddleware;
 import com.filterss.filterssapp.restful_api.callbacks.SQLOperationCallback;
 import com.filterss.filterssapp.restful_api.interfaces.AsyncResponse;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -299,6 +306,23 @@ public class ArticlesListActivity extends AppCompatActivity implements ArticlesL
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.d(ArticleActivity.logTag + ":" + TAG, "User logout confirmed...");
                                 userData.deleteAll();
+
+                                // Google logout
+                                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                        .requestIdToken(getString(R.string.server_client_id))
+                                        .requestEmail()
+                                        .build();
+
+                                // Build a GoogleSignInClient with the options specified by gso.
+                                GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
+                                mGoogleSignInClient.signOut()
+                                        .addOnCompleteListener((Activity) context, new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                Log.d(ArticleActivity.logTag + ":" + TAG, "Logout from Google completed");
+                                            }
+                                        });
+
                                 finish();
                                 startLoginActivity();
                             }

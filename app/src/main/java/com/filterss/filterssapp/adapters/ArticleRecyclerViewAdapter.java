@@ -58,7 +58,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
 
         holder.mArticleColorView.setBackgroundColor(multifeedColor);
 
-        holder.mTitleView.setText(StringEscapeUtils.unescapeHtml(mArticles.get(position).getTitle()));
+        holder.mTitleView.setText(StringEscapeUtils.unescapeHtml(mArticles.get(position).getTitle().replaceAll("\\<[^>]*>|\\n", "")));
 
         String description = mArticles.get(position).getDescription();
 
@@ -66,7 +66,7 @@ public class ArticleRecyclerViewAdapter extends RecyclerView.Adapter<ArticleRecy
             holder.mDescriptionView.setVisibility(View.GONE);
         } else {
             holder.mDescriptionView.setVisibility(View.VISIBLE);
-            holder.mDescriptionView.setText(StringEscapeUtils.unescapeHtml(description.replaceAll("\\<[^>]*>", "")));
+            holder.mDescriptionView.setText(StringEscapeUtils.unescapeHtml(description.replaceAll("\\<[^>]*>|\\n", "")));
         }
 
         String pubDate = mArticles.get(position).getPubDateString("dd-MM-yyyy");

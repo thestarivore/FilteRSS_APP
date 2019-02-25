@@ -101,7 +101,7 @@
                     android:layout_margin="16dp"
                     android:background="@drawable/rectangular_black_rounded_color"
                     android:padding="16dp"
-                    android:text="@string/update_content"
+                    android:text="@string/update"
                     android:textColor="#FFFFFF"
                     android:visibility="gone"/>
 

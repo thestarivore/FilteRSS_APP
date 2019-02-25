@@ -94,7 +94,7 @@ public class LoadUserData extends AsyncTask<Void, Void, Integer> {
                 userVerified = true;
 
                 //Get logged user
-                if(users.isEmpty() == false) {
+                if(!users.isEmpty()) {
                     Log.d(ArticleActivity.logTag + ":" + TAG, "\nUser authentication " + users.size());
                     Log.d(ArticleActivity.logTag + ":" + TAG, "\nUser: " + users.get(0).getId() +  ", " + users.get(0).getName() + ", "
                             + users.get(0).getSurname() + ", " + users.get(0).getEmail() + ", " + users.get(0).getPassword());

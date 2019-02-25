@@ -73,7 +73,7 @@ public class SQLiteService {
                 for(Feed feed : feedList){
                     feedIdsString += feed.getId() + ",";
                 }
-                feedIdsString = feedIdsString.substring(0, feedIdsString.length() - 1);
+                if(!feedList.isEmpty()) feedIdsString = feedIdsString.substring(0, feedIdsString.length() - 1);
 
                 ArticleCursor cursor = articleSQLiteRepository.findAllFiltered(orderBy, feedIdsString);
                 if (cursor != null) {
